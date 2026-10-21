@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "uboce-document-service",
+      "credentials": [{ "accessKey": "uboce_dev", "secretKey": "uboce_dev_secret_key" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

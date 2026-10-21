@@ -16,11 +16,14 @@
     "dev": "pnpm -r --parallel --filter \"./services/*\" --filter ./apps/gateway start:dev",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "lint": "oxlint packages/ services/",
+    "lint": "oxlint packages/ services/ apps/",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
-    "smoke": "node scripts/smoke-test.mjs",
+    "smoke": "node scripts/smoke-operations.mjs && node scripts/smoke-test.mjs",
     "infra:db": "docker compose exec -T postgres psql -U postgres -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/init.sql",
-    "migrate:dev": "pnpm -r --filter \"./services/*\" prisma:migrate:dev"
+    "migrate:dev": "pnpm -r --filter \"./services/*\" prisma:migrate:dev",
+    "compose:generate": "node scripts/generate-compose.mjs",
+    "smoke:operations": "node scripts/smoke-operations.mjs",
+    "smoke:core": "node scripts/smoke-test.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

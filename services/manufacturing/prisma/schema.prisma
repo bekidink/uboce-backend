@@ -1,0 +1,164 @@
+// Manufacturing Service (S12) — bills of materials, production orders and runs,
+// material consumption, yield/waste and batch lineage.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BomStatus {
+  active
+  archived
+}
+
+enum ProductionStatus {
+  planned
+  released
+  completed
+  cancelled
+}
+
+model BillOfMaterials {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  name           String
+  /// What one run of this recipe produces (a catalog product).
+  outputItemId   String    @map("output_item_id") @db.Uuid
+  outputQuantity Decimal   @map("output_quantity") @db.Decimal(18, 4)
+  unitOfMeasure  String    @map("unit_of_measure")
+  status         BomStatus @default(active)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  components BomComponent[]
+  orders     ProductionOrder[]
+
+  @@index([organizationId])
+  @@map("bills_of_materials")
+}
+
+model BomComponent {
+  id            String  @id @default(uuid()) @db.Uuid
+  bomId         String  @map("bom_id") @db.Uuid
+  /// Raw material: a product, produce lot or batch.
+  itemId        String  @map("item_id") @db.Uuid
+  description   String
+  quantity      Decimal @db.Decimal(18, 4)
+  unitOfMeasure String  @map("unit_of_measure")
+
+  bom BillOfMaterials @relation(fields: [bomId], references: [id], onDelete: Cascade)
+
+  @@unique([bomId, itemId])
+  @@map("bom_components")
+}
+
+model ProductionOrder {
+  id                  String           @id @default(uuid()) @db.Uuid
+  organizationId      String           @map("organization_id") @db.Uuid
+  bomId               String           @map("bom_id") @db.Uuid
+  plannedOutput       Decimal          @map("planned_output") @db.Decimal(18, 4)
+  warehouseId         String           @map("warehouse_id") @db.Uuid
+  status              ProductionStatus @default(planned)
+  /// Leftover reservation still to be released after completion.
+  releasePending      Boolean          @default(false) @map("release_pending")
+  createdByUserId     String           @map("created_by_user_id") @db.Uuid
+  createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  releasedAt          DateTime?        @map("released_at") @db.Timestamptz(3)
+  completedAt         DateTime?        @map("completed_at") @db.Timestamptz(3)
+
+  bom  BillOfMaterials @relation(fields: [bomId], references: [id])
+  runs ProductionRun[]
+
+  @@index([organizationId, status])
+  @@map("production_orders")
+}
+
+model ProductionRun {
+  id                String   @id @default(uuid()) @db.Uuid
+  productionOrderId String   @map("production_order_id") @db.Uuid
+  outputQuantity    Decimal  @map("output_quantity") @db.Decimal(18, 4)
+  wasteQuantity     Decimal  @default(0) @map("waste_quantity") @db.Decimal(18, 4)
+  notes             String?
+  recordedByUserId  String   @map("recorded_by_user_id") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  order        ProductionOrder       @relation(fields: [productionOrderId], references: [id])
+  consumptions MaterialConsumption[]
+  batch        Batch?
+
+  @@map("production_runs")
+}
+
+model MaterialConsumption {
+  id       String  @id @default(uuid()) @db.Uuid
+  runId    String  @map("run_id") @db.Uuid
+  itemId   String  @map("item_id") @db.Uuid
+  quantity Decimal @db.Decimal(18, 4)
+
+  run ProductionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@map("material_consumptions")
+}
+
+/// Output batch; its inputs are the run's consumptions (lineage, PRD 5.12).
+model Batch {
+  id             String   @id @default(uuid()) @db.Uuid
+  batchCode      String   @unique @map("batch_code")
+  organizationId String   @map("organization_id") @db.Uuid
+  itemId         String   @map("item_id") @db.Uuid
+  quantity       Decimal  @db.Decimal(18, 4)
+  runId          String   @unique @map("run_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  run ProductionRun @relation(fields: [runId], references: [id])
+
+  @@index([organizationId])
+  @@map("batches")
+}
+
+/// Stock changes a run owes Inventory; posted idempotently and retried until done.
+model StockPosting {
+  id                String    @id @default(uuid()) @db.Uuid
+  organizationId    String    @map("organization_id") @db.Uuid
+  productionOrderId String    @map("production_order_id") @db.Uuid
+  warehouseId       String    @map("warehouse_id") @db.Uuid
+  itemId            String    @map("item_id") @db.Uuid
+  type              String
+  quantity          Decimal   @db.Decimal(18, 4)
+  idempotencyKey    String    @unique @map("idempotency_key")
+  attempts          Int       @default(0)
+  lastError         String?   @map("last_error")
+  postedAt          DateTime? @map("posted_at") @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([postedAt, createdAt])
+  @@map("stock_postings")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

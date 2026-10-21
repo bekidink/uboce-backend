@@ -83,6 +83,34 @@ export class NotificationEventHandlers implements OnApplicationBootstrap, Before
           ]);
           return [...buyers, ...sellers].filter((r) => r.userId !== e.data.changedByUserId);
         }),
+        StockReservationFailed: this.on('StockReservationFailed', async (e) =>
+          this.toMembers([e.data.organizationId], [...SALES_ROLES, 'warehouse_operator'], 'stock_reservation_failed', { orderId: e.data.orderId }),
+        ),
+        ShipmentDispatched: this.on('ShipmentDispatched', async (e) =>
+          this.toMembers([e.data.consigneeOrganizationId], [...BUYING_ROLES, 'warehouse_operator', 'logistics_operator'], 'shipment_dispatched', { shipmentId: e.data.shipmentId }),
+        ),
+        DeliveryConfirmed: this.on('DeliveryConfirmed', async (e) =>
+          this.toMembers([e.data.shipperOrganizationId], [...SALES_ROLES, 'logistics_operator'], 'delivery_confirmed', {
+            shipmentId: e.data.shipmentId,
+            complete: String(e.data.complete),
+          }),
+        ),
+        InvoiceIssued: this.on('InvoiceIssued', async (e) =>
+          this.toMembers([e.data.buyerOrganizationId], [...BUYING_ROLES, 'finance_officer'], 'invoice_issued', {
+            invoiceId: e.data.invoiceId,
+            invoiceNumber: e.data.invoiceNumber,
+            dueDate: formatDate(e.data.dueDate),
+          }),
+        ),
+        DisputeOpened: this.on('DisputeOpened', async (e) =>
+          this.toMembers([e.data.againstOrganizationId], ['owner', 'admin'], 'dispute_opened', { disputeId: e.data.disputeId }),
+        ),
+        KycVerificationDecided: this.on('KycVerificationDecided', async (e) =>
+          e.data.decision === 'submitted' ? [] : [{ userId: e.data.subjectId, template: 'verification_update', vars: { kind: 'kyc', decision: e.data.decision } }],
+        ),
+        KybVerificationDecided: this.on('KybVerificationDecided', async (e) =>
+          e.data.decision === 'submitted' ? [] : this.toMembers([e.data.subjectId], ['owner', 'admin'], 'verification_update', { kind: 'kyb', decision: e.data.decision }),
+        ),
       },
     });
   }

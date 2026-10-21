@@ -66,3 +66,8 @@ export type Invitation = Prisma.InvitationModel
  * Transactional outbox (PRD 8.3).
  */
 export type OutboxEvent = Prisma.OutboxEventModel
+/**
+ * Model ProcessedEvent
+ * Inbox for idempotent event consumption.
+ */
+export type ProcessedEvent = Prisma.ProcessedEventModel

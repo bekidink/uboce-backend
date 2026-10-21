@@ -59,3 +59,17 @@ export async function publishToStream(redis: Redis, event: EventEnvelope, stream
     JSON.stringify(event),
   );
 }
+
+/** Any Prisma transaction client whose service has the standard OutboxEvent model. */
+export interface OutboxWriter {
+  outboxEvent: { create(args: { data: { id: string; eventType: string; payload: object } }): Promise<unknown> };
+}
+
+/** Writes an event to the outbox inside the caller's transaction (PRD 8.3). */
+export const emitEvent = <T extends EventType>(
+  tx: OutboxWriter,
+  producer: string,
+  eventType: T,
+  aggregateId: string,
+  data: EventCatalog[T],
+) => tx.outboxEvent.create({ data: toOutboxRow(buildEvent(producer, eventType, aggregateId, data)) });

@@ -26,7 +26,12 @@ const hashToken = (token: string) => createHash('sha256').update(token).digest('
 const invalidInvitation = () =>
   new AppError(HttpStatus.BAD_REQUEST, 'invalid_invitation', 'This invitation is invalid, expired or already used');
 
-const publicView = ({ tokenHash: _, ...invitation }: Invitation) => invitation;
+/** Never return the token hash. */
+const publicView = (invitation: Invitation): Omit<Invitation, 'tokenHash'> => {
+  const { tokenHash, ...rest } = invitation;
+  void tokenHash;
+  return rest;
+};
 
 @Injectable()
 export class InvitationsService {

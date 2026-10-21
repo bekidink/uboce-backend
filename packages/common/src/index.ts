@@ -11,3 +11,4 @@ export * from './logging.js';
 export * from './money.js';
 export * from './pagination.js';
 export * from './rate-limit.js';
+export * from './verification.js';

@@ -14,14 +14,14 @@ import {
   toOutboxRow,
   toPage,
 } from '@uboce/common';
-import type { DomainEvent, EventCatalog, EventType } from '@uboce/contracts';
+import type { DomainEvent, EventCatalog, EventType, InternalOrder } from '@uboce/contracts';
 
 import { SERVICE_NAME } from '../config.js';
 import { Prisma } from '../generated/prisma/client.js';
 import type { Order, OrderStatus } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
 import type { CreateDirectOrderDto, ListOrdersQueryDto } from './orders.dto.js';
-import { assertTransition, InvalidTransitionError, type OrderParty } from './state-machine.js';
+import { assertTransition, canTransition, InvalidTransitionError, type OrderParty } from './state-machine.js';
 
 type Tx = Prisma.TransactionClient;
 const { Decimal } = Prisma;
@@ -189,7 +189,8 @@ export class OrdersService {
       const { count } = await tx.order.updateMany({ where: { id: orderId, status: order.status }, data: { status: to } });
       if (count === 0) throw conflict('concurrent_change', 'The order changed; reload and try again');
       await tx.orderStatusHistory.create({ data: { orderId, fromStatus: order.status, toStatus: to, changedByUserId: userId, reason } });
-      await this.emit(tx, eventType, orderId, {
+      const change = {
+        party: side,
         orderId,
         orderNumber: order.number,
         buyerOrganizationId: order.buyerOrganizationId,
@@ -197,8 +198,106 @@ export class OrdersService {
         status: to,
         changedByUserId: userId,
         reason,
-      });
+      };
+      if (eventType === 'PurchaseOrderConfirmed') {
+        // Lines ride along so Inventory can reserve stock without calling back.
+        await this.emit(tx, 'PurchaseOrderConfirmed', orderId, {
+          ...change,
+          lines: order.lines.map((l) => ({
+            orderLineId: l.id,
+            productId: l.productId,
+            quantity: l.quantity.toString(),
+            unitOfMeasure: l.unitOfMeasure,
+          })),
+        });
+      } else {
+        await this.emit(tx, 'PurchaseOrderCancelled', orderId, change);
+      }
       return tx.order.findUniqueOrThrow({ where: { id: orderId }, include: orderInclude });
+    });
+  }
+
+  /** The buyer closes a fulfilled order (PRD 5.8: closure). */
+  async close(org: ActingOrganization, userId: string, orderId: string) {
+    requireRole(org, BUYER_ROLES, 'close orders');
+    const order = await this.owned(org, 'buyer', orderId);
+    try {
+      assertTransition(order.status, 'closed', 'buyer');
+    } catch (error) {
+      if (error instanceof InvalidTransitionError) throw conflict('invalid_transition', error.message);
+      throw error;
+    }
+    return this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.order.updateMany({ where: { id: orderId, status: order.status }, data: { status: 'closed' } });
+      if (count === 0) throw conflict('concurrent_change', 'The order changed; reload and try again');
+      await tx.orderStatusHistory.create({ data: { orderId, fromStatus: order.status, toStatus: 'closed', changedByUserId: userId } });
+      await this.announceFulfillment(tx, { ...order, status: 'closed' });
+      return tx.order.findUniqueOrThrow({ where: { id: orderId }, include: orderInclude });
+    });
+  }
+
+  // ---- System-driven changes (events from Inventory and Logistics) -------------------
+
+  /** Stock couldn't be reserved: the order needs human attention (PRD 8.5: defined exception state). */
+  async markException(tx: Tx, orderId: string, reason: string) {
+    const order = await tx.order.findUnique({ where: { id: orderId } });
+    if (!order || !canTransition(order.status, 'exception', 'system')) return;
+    await tx.order.update({ where: { id: orderId }, data: { status: 'exception' } });
+    await tx.orderStatusHistory.create({ data: { orderId, fromStatus: order.status, toStatus: 'exception', reason } });
+    await this.announceFulfillment(tx, { ...order, status: 'exception' });
+  }
+
+  /** Applies delivered quantities to the lines; fulfilled once every line is fully delivered. */
+  async applyDelivery(tx: Tx, orderId: string, items: { orderLineId: string; deliveredQuantity: string }[]) {
+    const order = await tx.order.findUnique({ where: { id: orderId }, include: { lines: true } });
+    if (!order) return;
+    for (const item of items) {
+      const line = order.lines.find((l) => l.id === item.orderLineId);
+      if (!line) continue;
+      const fulfilled = Decimal.min(line.quantity, line.fulfilledQuantity.plus(item.deliveredQuantity));
+      await tx.orderLine.update({ where: { id: line.id }, data: { fulfilledQuantity: fulfilled } });
+    }
+    const lines = await tx.orderLine.findMany({ where: { orderId } });
+    const to: OrderStatus = lines.every((l) => l.fulfilledQuantity.greaterThanOrEqualTo(l.quantity)) ? 'fulfilled' : 'partially_fulfilled';
+    if (order.status === to || !canTransition(order.status, to, 'system')) return;
+    await tx.order.update({ where: { id: orderId }, data: { status: to } });
+    await tx.orderStatusHistory.create({ data: { orderId, fromStatus: order.status, toStatus: to, reason: 'delivery confirmed' } });
+    await this.announceFulfillment(tx, { ...order, status: to });
+  }
+
+  async internalGet(orderId: string): Promise<InternalOrder> {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId }, include: { lines: { orderBy: { lineNumber: 'asc' } } } });
+    if (!order) throw notFound('Order');
+    return {
+      id: order.id,
+      number: order.number,
+      buyerOrganizationId: order.buyerOrganizationId,
+      supplierOrganizationId: order.supplierOrganizationId,
+      status: order.status,
+      currency: order.currency,
+      total: order.total.toString(),
+      deliveryLocation: order.deliveryLocation,
+      lines: order.lines.map((l) => ({
+        id: l.id,
+        lineNumber: l.lineNumber,
+        productId: l.productId,
+        description: l.description,
+        quantity: l.quantity.toString(),
+        unitOfMeasure: l.unitOfMeasure,
+        unitPrice: l.unitPrice.toString(),
+        lineTotal: l.lineTotal.toString(),
+        fulfilledQuantity: l.fulfilledQuantity.toString(),
+      })),
+    };
+  }
+
+  private announceFulfillment(tx: Tx, order: { id: string; number: string; buyerOrganizationId: string; supplierOrganizationId: string; status: string }) {
+    return this.emit(tx, 'PurchaseOrderFulfillmentUpdated', order.id, {
+      orderId: order.id,
+      orderNumber: order.number,
+      buyerOrganizationId: order.buyerOrganizationId,
+      supplierOrganizationId: order.supplierOrganizationId,
+      status: order.status,
     });
   }
 

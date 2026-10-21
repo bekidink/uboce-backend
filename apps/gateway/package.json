@@ -8,7 +8,7 @@
     "start": "node dist/main.js",
     "start:dev": "node --watch --experimental-strip-types src/main.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@uboce/common": "workspace:*",

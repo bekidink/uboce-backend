@@ -1,14 +1,31 @@
 // Public route table: path prefix → owning service. Anything not listed is 404,
 // and internal service-to-service routes are never reachable from outside.
 
-export type ServiceName =
-  | 'identity'
-  | 'organization'
-  | 'notification'
-  | 'catalog'
-  | 'discovery'
-  | 'procurement'
-  | 'commerce';
+export const SERVICES = [
+  'identity',
+  'organization',
+  'notification',
+  'catalog',
+  'discovery',
+  'procurement',
+  'commerce',
+  'inventory',
+  'warehouse',
+  'logistics',
+  'quality',
+  'agriculture',
+  'manufacturing',
+  'kyc',
+  'kyb',
+  'finance',
+  'document',
+  'dispute',
+  'integration',
+  'analytics',
+  'administration',
+] as const;
+
+export type ServiceName = (typeof SERVICES)[number];
 
 export const ROUTES: [prefix: string, service: ServiceName][] = [
   ['/api/v1/auth', 'identity'],
@@ -21,6 +38,22 @@ export const ROUTES: [prefix: string, service: ServiceName][] = [
   ['/api/v1/quotations', 'procurement'],
   ['/api/v1/purchase-orders', 'commerce'],
   ['/api/v1/sales-orders', 'commerce'],
+  ['/api/v1/inventory', 'inventory'],
+  ['/api/v1/warehouse', 'warehouse'],
+  ['/api/v1/shipments', 'logistics'],
+  ['/api/v1/quality', 'quality'],
+  ['/api/v1/agriculture', 'agriculture'],
+  ['/api/v1/manufacturing', 'manufacturing'],
+  ['/api/v1/kyc', 'kyc'],
+  ['/api/v1/kyb', 'kyb'],
+  ['/api/v1/invoices', 'finance'],
+  ['/api/v1/documents', 'document'],
+  ['/api/v1/disputes', 'dispute'],
+  ['/api/v1/disputes-review', 'dispute'],
+  ['/api/v1/performance', 'dispute'],
+  ['/api/v1/integrations', 'integration'],
+  ['/api/v1/analytics', 'analytics'],
+  ['/api/v1/admin', 'administration'],
 ];
 
 /** Matches whole path segments only: `/api/v1/rfqs` matches `/api/v1/rfqs/x`, not `/api/v1/rfqsx`. */

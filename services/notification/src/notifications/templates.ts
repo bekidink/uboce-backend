@@ -13,6 +13,23 @@ interface Template {
   text: Record<Locale, { title: (v: Vars) => string; body: (v: Vars) => string }>;
 }
 
+const VERIFICATION_TEXT: Record<Locale, Record<string, string>> = {
+  en: {
+    approved: 'Your verification was approved.',
+    rejected: 'Your verification was not approved. You can start a new one.',
+    needs_information: 'Your verification needs more information.',
+    suspended: 'Your verification was suspended. Contact support.',
+    expired: 'Your verification has expired. Please verify again.',
+  },
+  am: {
+    approved: 'ማረጋገጫዎ ጸድቋል።',
+    rejected: 'ማረጋገጫዎ አልጸደቀም። አዲስ መጀመር ይችላሉ።',
+    needs_information: 'ማረጋገጫዎ ተጨማሪ መረጃ ይፈልጋል።',
+    suspended: 'ማረጋገጫዎ ታግዷል። ድጋፍ ሰጪን ያነጋግሩ።',
+    expired: 'ማረጋገጫዎ ጊዜው አልፏል። እባክዎ እንደገና ያረጋግጡ።',
+  },
+};
+
 // English + Amharic (PRD 10). Amharic copy needs review by a native speaker before launch.
 // Push previews show on lock screens, so pushes never carry identity or payment details (PRD 5.16).
 export const TEMPLATES = {
@@ -127,6 +144,54 @@ export const TEMPLATES = {
     text: {
       en: { title: () => 'Order cancelled', body: (v) => `Order ${v.orderNumber} was cancelled.` },
       am: { title: () => 'ትዕዛዝ ተሰርዟል', body: (v) => `ትዕዛዝ ${v.orderNumber} ተሰርዟል።` },
+    },
+  },
+  stock_reservation_failed: {
+    push: true,
+    route: (v) => `/sales-orders/${v.orderId}`,
+    text: {
+      en: { title: () => 'Order needs attention', body: () => 'Stock could not be reserved for a confirmed order. Check inventory.' },
+      am: { title: () => 'ትዕዛዝ ትኩረት ይፈልጋል', body: () => 'ለተረጋገጠ ትዕዛዝ ክምችት መያዝ አልተቻለም። ክምችቱን ያረጋግጡ።' },
+    },
+  },
+  shipment_dispatched: {
+    push: true,
+    route: (v) => `/shipments/${v.shipmentId}`,
+    text: {
+      en: { title: () => 'Shipment on its way', body: () => 'A shipment for your order has been dispatched.' },
+      am: { title: () => 'ጭነት ተልኳል', body: () => 'ለትዕዛዝዎ የሚሆን ጭነት ተልኳል።' },
+    },
+  },
+  delivery_confirmed: {
+    push: true,
+    route: (v) => `/shipments/${v.shipmentId}`,
+    text: {
+      en: { title: () => 'Delivery confirmed', body: (v) => (v.complete === 'true' ? 'The buyer confirmed full delivery.' : 'The buyer confirmed a partial delivery.') },
+      am: { title: () => 'ርክክብ ተረጋግጧል', body: (v) => (v.complete === 'true' ? 'ገዢው ሙሉ ርክክብ አረጋግጧል።' : 'ገዢው ከፊል ርክክብ አረጋግጧል።') },
+    },
+  },
+  invoice_issued: {
+    push: true,
+    route: (v) => `/invoices/${v.invoiceId}`,
+    text: {
+      en: { title: () => 'New invoice', body: (v) => `Invoice ${v.invoiceNumber} is due ${v.dueDate}.` },
+      am: { title: () => 'አዲስ ደረሰኝ', body: (v) => `ደረሰኝ ${v.invoiceNumber} እስከ ${v.dueDate} ድረስ መከፈል አለበት።` },
+    },
+  },
+  dispute_opened: {
+    push: true,
+    route: (v) => `/disputes/${v.disputeId}`,
+    text: {
+      en: { title: () => 'A dispute was opened', body: () => 'Another organization opened a dispute with you. Review it and respond.' },
+      am: { title: () => 'ክርክር ተከፍቷል', body: () => 'ሌላ ድርጅት ከእርስዎ ጋር ክርክር ከፍቷል። ይመልከቱና ምላሽ ይስጡ።' },
+    },
+  },
+  verification_update: {
+    push: true,
+    route: (v) => `/verification/${v.kind}`,
+    text: {
+      en: { title: () => 'Verification update', body: (v) => VERIFICATION_TEXT.en[v.decision ?? ''] ?? 'Your verification status changed.' },
+      am: { title: () => 'የማረጋገጫ ዝማኔ', body: (v) => VERIFICATION_TEXT.am[v.decision ?? ''] ?? 'የማረጋገጫ ሁኔታዎ ተቀይሯል።' },
     },
   },
 } satisfies Record<string, Template>;

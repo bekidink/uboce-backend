@@ -1,0 +1,138 @@
+// Warehouse Service (S10) — warehouses, storage locations, receiving and transfers.
+// Stock quantities are never edited here; every change is posted through Inventory (PRD 5.10).
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WarehouseStatus {
+  active
+  inactive
+}
+
+enum ReceiptStatus {
+  pending_inspection
+  posted
+  cancelled
+}
+
+model Warehouse {
+  id             String          @id @default(uuid()) @db.Uuid
+  organizationId String          @map("organization_id") @db.Uuid
+  code           String
+  name           String
+  countryCode    String          @default("ET") @map("country_code") @db.Char(2)
+  region         String?
+  city           String?
+  addressLine    String?         @map("address_line")
+  status         WarehouseStatus @default(active)
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  locations StorageLocation[]
+  receipts  Receipt[]
+
+  @@unique([organizationId, code])
+  @@map("warehouses")
+}
+
+model StorageLocation {
+  id          String   @id @default(uuid()) @db.Uuid
+  warehouseId String   @map("warehouse_id") @db.Uuid
+  code        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@unique([warehouseId, code])
+  @@map("storage_locations")
+}
+
+model Receipt {
+  id                 String        @id @default(uuid()) @db.Uuid
+  organizationId     String        @map("organization_id") @db.Uuid
+  warehouseId        String        @map("warehouse_id") @db.Uuid
+  orderId            String?       @map("order_id") @db.Uuid
+  shipmentId         String?       @map("shipment_id") @db.Uuid
+  status             ReceiptStatus
+  inspectionRequired Boolean       @map("inspection_required")
+  inspectionId       String?       @map("inspection_id") @db.Uuid
+  notes              String?
+  receivedByUserId   String        @map("received_by_user_id") @db.Uuid
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  postedAt           DateTime?     @map("posted_at") @db.Timestamptz(3)
+
+  warehouse Warehouse     @relation(fields: [warehouseId], references: [id])
+  lines     ReceiptLine[]
+
+  @@index([organizationId, createdAt])
+  @@map("receipts")
+}
+
+model ReceiptLine {
+  id               String   @id @default(uuid()) @db.Uuid
+  receiptId        String   @map("receipt_id") @db.Uuid
+  lineNumber       Int      @map("line_number")
+  itemId           String   @map("item_id") @db.Uuid
+  orderLineId      String?  @map("order_line_id") @db.Uuid
+  description      String
+  expectedQuantity Decimal? @map("expected_quantity") @db.Decimal(18, 4)
+  receivedQuantity Decimal  @map("received_quantity") @db.Decimal(18, 4)
+  /// Rejected at the dock (visibly damaged, wrong item).
+  rejectedQuantity Decimal  @default(0) @map("rejected_quantity") @db.Decimal(18, 4)
+  /// Set when posted: received − rejected, or what inspection accepted.
+  acceptedQuantity Decimal? @map("accepted_quantity") @db.Decimal(18, 4)
+  discrepancyNote  String?  @map("discrepancy_note")
+
+  receipt Receipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+
+  @@unique([receiptId, lineNumber])
+  @@map("receipt_lines")
+}
+
+model Transfer {
+  id               String   @id @default(uuid()) @db.Uuid
+  organizationId   String   @map("organization_id") @db.Uuid
+  fromWarehouseId  String   @map("from_warehouse_id") @db.Uuid
+  toWarehouseId    String   @map("to_warehouse_id") @db.Uuid
+  itemId           String   @map("item_id") @db.Uuid
+  quantity         Decimal  @db.Decimal(18, 4)
+  /// out_posted after the first leg, completed after both. Retrying finishes a half-done transfer.
+  status           String
+  createdByUserId  String   @map("created_by_user_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([organizationId, createdAt])
+  @@map("transfers")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

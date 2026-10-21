@@ -1,0 +1,91 @@
+// Administration Service (S21) — platform staff roles, settings, feature flags
+// and audited administrative actions.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PlatformRole {
+  platform_admin
+  verification_reviewer
+  dispute_reviewer
+  support
+}
+
+/// Who is platform staff. Rows are never deleted; revocation is recorded.
+model PlatformRoleGrant {
+  id              String       @id @default(uuid()) @db.Uuid
+  userId          String       @map("user_id") @db.Uuid
+  role            PlatformRole
+  reason          String
+  grantedByUserId String?      @map("granted_by_user_id") @db.Uuid
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  revokedAt       DateTime?    @map("revoked_at") @db.Timestamptz(3)
+  revokedByUserId String?      @map("revoked_by_user_id") @db.Uuid
+  revokeReason    String?      @map("revoke_reason")
+
+  @@index([userId, revokedAt])
+  @@map("platform_role_grants")
+}
+
+model Setting {
+  key             String   @id
+  value           Json
+  description     String?
+  updatedByUserId String?  @map("updated_by_user_id") @db.Uuid
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("settings")
+}
+
+model FeatureFlag {
+  key             String   @id
+  /// On for everyone…
+  enabled         Boolean  @default(false)
+  /// …or only for these organizations (pilot rollouts).
+  organizationIds String[] @map("organization_ids") @db.Uuid
+  description     String?
+  updatedByUserId String?  @map("updated_by_user_id") @db.Uuid
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("feature_flags")
+}
+
+/// Append-only record of every administrative action (PRD 5.21, 9).
+model AuditEntry {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  action      String
+  targetType  String   @map("target_type")
+  targetId    String   @map("target_id")
+  reasonCode  String   @map("reason_code")
+  reason      String
+  /// Before/after values for settings and flags.
+  details     Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@map("audit_entries")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}

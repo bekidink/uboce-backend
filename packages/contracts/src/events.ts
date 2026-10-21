@@ -1,4 +1,7 @@
 import type { EventEnvelope } from './envelope.js';
+import type * as Ops from './events-operations.js';
+
+export type * from './events-operations.js';
 
 // Versioned event contracts. A breaking change to a payload means a new
 // schemaVersion, and consumers keep handling the old one until producers move.
@@ -140,6 +143,8 @@ export interface PurchaseOrderCreatedV1 {
 }
 
 export interface PurchaseOrderStatusChangedV1 {
+  /** Which side made the change. */
+  party: 'buyer' | 'supplier';
   orderId: string;
   orderNumber: string;
   buyerOrganizationId: string;
@@ -147,6 +152,11 @@ export interface PurchaseOrderStatusChangedV1 {
   status: string;
   changedByUserId: string;
   reason: string | null;
+}
+
+/** Confirmation carries the lines so Inventory can reserve stock without calling back. */
+export interface PurchaseOrderConfirmedV1 extends PurchaseOrderStatusChangedV1 {
+  lines: { orderLineId: string; productId: string | null; quantity: string; unitOfMeasure: string }[];
 }
 
 export interface EventCatalog {
@@ -161,8 +171,24 @@ export interface EventCatalog {
   QuotationSubmitted: QuotationSubmittedV1;
   QuotationAccepted: QuotationAcceptedV1;
   PurchaseOrderCreated: PurchaseOrderCreatedV1;
-  PurchaseOrderConfirmed: PurchaseOrderStatusChangedV1;
+  PurchaseOrderConfirmed: PurchaseOrderConfirmedV1;
   PurchaseOrderCancelled: PurchaseOrderStatusChangedV1;
+  StockReserved: Ops.StockReservedV1;
+  StockReservationFailed: Ops.StockReservationFailedV1;
+  StockMovementPosted: Ops.StockMovementPostedV1;
+  GoodsReceived: Ops.GoodsReceivedV1;
+  InspectionCompleted: Ops.InspectionCompletedV1;
+  ShipmentDispatched: Ops.ShipmentDispatchedV1;
+  DeliveryConfirmed: Ops.DeliveryConfirmedV1;
+  PurchaseOrderFulfillmentUpdated: Ops.PurchaseOrderFulfillmentUpdatedV1;
+  ProduceLotCreated: Ops.ProduceLotCreatedV1;
+  ProductionCompleted: Ops.ProductionCompletedV1;
+  KycVerificationDecided: Ops.VerificationDecidedV1;
+  KybVerificationDecided: Ops.VerificationDecidedV1;
+  InvoiceIssued: Ops.InvoiceIssuedV1;
+  ReconciliationUpdated: Ops.ReconciliationUpdatedV1;
+  DisputeOpened: Ops.DisputeOpenedV1;
+  DisputeResolved: Ops.DisputeResolvedV1;
 }
 
 export type EventType = keyof EventCatalog;
@@ -181,6 +207,22 @@ export const EVENT_SCHEMA_VERSIONS: Record<EventType, number> = {
   PurchaseOrderCreated: 1,
   PurchaseOrderConfirmed: 1,
   PurchaseOrderCancelled: 1,
+  StockReserved: 1,
+  StockReservationFailed: 1,
+  StockMovementPosted: 1,
+  GoodsReceived: 1,
+  InspectionCompleted: 1,
+  ShipmentDispatched: 1,
+  DeliveryConfirmed: 1,
+  PurchaseOrderFulfillmentUpdated: 1,
+  ProduceLotCreated: 1,
+  ProductionCompleted: 1,
+  KycVerificationDecided: 1,
+  KybVerificationDecided: 1,
+  InvoiceIssued: 1,
+  ReconciliationUpdated: 1,
+  DisputeOpened: 1,
+  DisputeResolved: 1,
 };
 
 export type DomainEvent<T extends EventType = EventType> = EventEnvelope<T, EventCatalog[T]>;

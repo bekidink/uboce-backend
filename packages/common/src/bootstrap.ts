@@ -20,7 +20,8 @@ export interface BootstrapOptions {
  * correlation IDs, validation, one error shape, OpenAPI at /docs, graceful shutdown.
  */
 export async function bootstrapService(appModule: unknown, options: BootstrapOptions) {
-  const app = await NestFactory.create(appModule as never, { bufferLogs: true });
+  // rawBody: signed webhooks are verified against the exact bytes received.
+  const app = await NestFactory.create(appModule as never, { bufferLogs: true, rawBody: true });
   app.useLogger(app.get(Logger));
   // Services sit behind the gateway on a private network; trust X-Forwarded-For
   // only from private/loopback hops so req.ip (used for rate limits and audit) is the real client.

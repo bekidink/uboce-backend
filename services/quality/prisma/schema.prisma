@@ -1,0 +1,116 @@
+// Quality Service (S14) — inspections, acceptance decisions and nonconformance.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SubjectType {
+  receipt
+  produce_lot
+  batch
+  product
+}
+
+enum InspectionStatus {
+  pending
+  completed
+}
+
+enum Decision {
+  accepted
+  rejected
+  conditionally_accepted
+}
+
+enum Severity {
+  minor
+  major
+  critical
+}
+
+model Inspection {
+  id                  String           @id @default(uuid()) @db.Uuid
+  organizationId      String           @map("organization_id") @db.Uuid
+  subjectType         SubjectType      @map("subject_type")
+  subjectId           String           @map("subject_id") @db.Uuid
+  status              InspectionStatus @default(pending)
+  decision            Decision?
+  /// What was checked, e.g. { "moisture_max_pct": "11.5", "defects_max_per_300g": "5" }.
+  criteria            Json?
+  notes               String?
+  evidenceDocumentIds String[]         @map("evidence_document_ids") @db.Uuid
+  inspectorUserId     String?          @map("inspector_user_id") @db.Uuid
+  createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  completedAt         DateTime?        @map("completed_at") @db.Timestamptz(3)
+
+  lines            InspectionLine[]
+  nonconformances  Nonconformance[]
+
+  /// One inspection per subject.
+  @@unique([subjectType, subjectId])
+  @@index([organizationId, status])
+  @@map("inspections")
+}
+
+model InspectionLine {
+  id                String   @id @default(uuid()) @db.Uuid
+  inspectionId      String   @map("inspection_id") @db.Uuid
+  itemId            String   @map("item_id") @db.Uuid
+  inspectedQuantity Decimal  @map("inspected_quantity") @db.Decimal(18, 4)
+  acceptedQuantity  Decimal? @map("accepted_quantity") @db.Decimal(18, 4)
+  rejectedQuantity  Decimal? @map("rejected_quantity") @db.Decimal(18, 4)
+  notes             String?
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@unique([inspectionId, itemId])
+  @@map("inspection_lines")
+}
+
+model Nonconformance {
+  id               String    @id @default(uuid()) @db.Uuid
+  inspectionId     String    @map("inspection_id") @db.Uuid
+  organizationId   String    @map("organization_id") @db.Uuid
+  description      String
+  severity         Severity
+  correctiveAction String?   @map("corrective_action")
+  status           String    @default("open")
+  closedByUserId   String?   @map("closed_by_user_id") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  closedAt         DateTime? @map("closed_at") @db.Timestamptz(3)
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@map("nonconformances")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

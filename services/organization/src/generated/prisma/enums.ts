@@ -38,7 +38,8 @@ export const VerificationStatus = {
   pending: 'pending',
   verified: 'verified',
   rejected: 'rejected',
-  expired: 'expired'
+  expired: 'expired',
+  suspended: 'suspended'
 } as const
 
 export type VerificationStatus = (typeof VerificationStatus)[keyof typeof VerificationStatus]

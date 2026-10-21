@@ -2,9 +2,11 @@ import { existsSync } from 'node:fs';
 
 import { z } from 'zod';
 
-import type { ServiceName } from './routes.js';
+import { type ServiceName, SERVICES } from './routes.js';
 
 if (existsSync('.env')) process.loadEnvFile('.env');
+
+const urlVar = (service: string) => `${service.toUpperCase()}_URL`;
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -18,29 +20,16 @@ const schema = z.object({
   AUTH_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).default(30),
   /** Hops in front of the gateway (load balancer) whose X-Forwarded-For is trusted. */
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).default(0),
-  IDENTITY_URL: z.string().min(1),
-  ORGANIZATION_URL: z.string().min(1),
-  NOTIFICATION_URL: z.string().min(1),
-  CATALOG_URL: z.string().min(1),
-  DISCOVERY_URL: z.string().min(1),
-  PROCUREMENT_URL: z.string().min(1),
-  COMMERCE_URL: z.string().min(1),
+  // One <SERVICE>_URL per upstream, e.g. IDENTITY_URL.
+  ...Object.fromEntries(SERVICES.map((s) => [urlVar(s), z.string().min(1)])),
 });
 
 const parsed = schema.safeParse(process.env);
 if (!parsed.success) {
   throw new Error(`Invalid gateway configuration:\n${parsed.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n')}`);
 }
-export const env = parsed.data;
+export const env = parsed.data as z.infer<typeof schema> & Record<string, string>;
 
-export const upstreams: Record<ServiceName, string> = {
-  identity: env.IDENTITY_URL,
-  organization: env.ORGANIZATION_URL,
-  notification: env.NOTIFICATION_URL,
-  catalog: env.CATALOG_URL,
-  discovery: env.DISCOVERY_URL,
-  procurement: env.PROCUREMENT_URL,
-  commerce: env.COMMERCE_URL,
-};
+export const upstreams = Object.fromEntries(SERVICES.map((s) => [s, env[urlVar(s)]!])) as Record<ServiceName, string>;
 
 export const corsOrigins = new Set(env.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean));

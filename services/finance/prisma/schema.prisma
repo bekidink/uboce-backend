@@ -1,0 +1,170 @@
+// Finance Operations Service (S15) — invoices, external payment references,
+// reconciliation and credit notes. UBOCE never holds funds (PRD 2.2): payments
+// happen at authorized providers; this service records and reconciles them.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum InvoiceStatus {
+  draft
+  issued
+  partially_paid
+  paid
+  void
+  disputed
+}
+
+enum PaymentStatus {
+  /// Claimed by the buyer; not proof of payment.
+  pending
+  confirmed
+  failed
+  reversed
+}
+
+model Invoice {
+  id                   String         @id @default(uuid()) @db.Uuid
+  number               String         @unique
+  sellerOrganizationId String         @map("seller_organization_id") @db.Uuid
+  buyerOrganizationId  String         @map("buyer_organization_id") @db.Uuid
+  orderId              String?        @map("order_id") @db.Uuid
+  currency             String         @db.Char(3)
+  status               InvoiceStatus  @default(draft)
+  /// Status to return to when a dispute on the invoice is resolved.
+  statusBeforeDispute  InvoiceStatus? @map("status_before_dispute")
+  subtotal             Decimal        @db.Decimal(18, 4)
+  taxTotal             Decimal        @map("tax_total") @db.Decimal(18, 4)
+  total                Decimal        @db.Decimal(18, 4)
+  paidAmount           Decimal        @default(0) @map("paid_amount") @db.Decimal(18, 4)
+  creditedAmount       Decimal        @default(0) @map("credited_amount") @db.Decimal(18, 4)
+  dueDate              DateTime       @map("due_date") @db.Timestamptz(3)
+  notes                String?
+  createdByUserId      String         @map("created_by_user_id") @db.Uuid
+  issuedAt             DateTime?      @map("issued_at") @db.Timestamptz(3)
+  voidedAt             DateTime?      @map("voided_at") @db.Timestamptz(3)
+  voidReason           String?        @map("void_reason")
+  createdAt            DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lines       InvoiceLine[]
+  payments    PaymentReference[]
+  creditNotes CreditNote[]
+
+  @@index([sellerOrganizationId, status])
+  @@index([buyerOrganizationId, status])
+  @@index([orderId])
+  @@map("invoices")
+}
+
+model InvoiceLine {
+  id          String  @id @default(uuid()) @db.Uuid
+  invoiceId   String  @map("invoice_id") @db.Uuid
+  lineNumber  Int     @map("line_number")
+  orderLineId String? @map("order_line_id") @db.Uuid
+  description String
+  quantity    Decimal @db.Decimal(18, 4)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(18, 4)
+  taxRatePct  Decimal @map("tax_rate_pct") @db.Decimal(5, 2)
+  subtotal    Decimal @db.Decimal(18, 4)
+  tax         Decimal @db.Decimal(18, 4)
+  total       Decimal @db.Decimal(18, 4)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, lineNumber])
+  @@map("invoice_lines")
+}
+
+model PaymentReference {
+  id                String        @id @default(uuid()) @db.Uuid
+  invoiceId         String        @map("invoice_id") @db.Uuid
+  /// e.g. a payment provider, "bank_transfer", "cash"
+  provider          String
+  externalReference String        @map("external_reference")
+  amount            Decimal       @db.Decimal(18, 4)
+  currency          String        @db.Char(3)
+  status            PaymentStatus
+  /// buyer_claim, seller_confirmation or provider_callback
+  source            String
+  recordedByUserId  String?       @map("recorded_by_user_id") @db.Uuid
+  occurredAt        DateTime      @map("occurred_at") @db.Timestamptz(3)
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  invoice         Invoice          @relation(fields: [invoiceId], references: [id])
+  reconciliations Reconciliation[]
+
+  /// A provider's reference is applied once, however often it calls back (PRD 8.5).
+  @@unique([provider, externalReference])
+  @@index([invoiceId])
+  @@map("payment_references")
+}
+
+/// Every change to an invoice's paid amount, with its cause (auditable, PRD 5.15).
+model Reconciliation {
+  id                 String   @id @default(uuid()) @db.Uuid
+  invoiceId          String   @map("invoice_id") @db.Uuid
+  paymentReferenceId String   @map("payment_reference_id") @db.Uuid
+  /// Signed: reversals are negative.
+  appliedAmount      Decimal  @map("applied_amount") @db.Decimal(18, 4)
+  note               String?
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  payment PaymentReference @relation(fields: [paymentReferenceId], references: [id])
+
+  @@index([invoiceId, createdAt])
+  @@map("reconciliations")
+}
+
+/// Corrections reduce what is owed without editing the issued invoice.
+model CreditNote {
+  id              String   @id @default(uuid()) @db.Uuid
+  invoiceId       String   @map("invoice_id") @db.Uuid
+  number          String   @unique
+  amount          Decimal  @db.Decimal(18, 4)
+  reason          String
+  createdByUserId String   @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@map("credit_notes")
+}
+
+model DocumentCounter {
+  key  String @id
+  last Int
+
+  @@map("document_counters")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

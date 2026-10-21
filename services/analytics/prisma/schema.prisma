@@ -1,0 +1,57 @@
+// Analytics Service (S20) — organization-scoped read models built from events.
+// Never a source of truth (PRD 5.20): everything here can be rebuilt by replay.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// One counter per organization, day (UTC), metric and currency ('' for counts).
+model DailyMetric {
+  organizationId String   @map("organization_id") @db.Uuid
+  day            DateTime @db.Date
+  metric         String
+  currency       String   @default("")
+  value          Decimal  @db.Decimal(20, 4)
+
+  @@id([organizationId, day, metric, currency])
+  @@index([organizationId, metric, day])
+  @@map("daily_metrics")
+}
+
+model IndexState {
+  id                  String   @id
+  lastEventOccurredAt DateTime @map("last_event_occurred_at") @db.Timestamptz(3)
+  lastIndexedAt       DateTime @map("last_indexed_at") @db.Timestamptz(3)
+
+  @@map("index_state")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

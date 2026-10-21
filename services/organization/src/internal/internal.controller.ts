@@ -1,11 +1,18 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { Internal, notFound } from '@uboce/common';
+import { emitEvent, Internal, notFound } from '@uboce/common';
 import type { InternalMembership, InternalOrganization, InternalOrganizationMember } from '@uboce/contracts';
+import { IsEnum } from 'class-validator';
 
+import { SERVICE_NAME } from '../config.js';
 import type { Organization } from '../generated/prisma/client.js';
-import { MembershipRole } from '../generated/prisma/enums.js';
+import { MembershipRole, OrganizationStatus } from '../generated/prisma/enums.js';
 import { PrismaService } from '../prisma.service.js';
+
+class StatusChangeDto {
+  @IsEnum(OrganizationStatus)
+  status: OrganizationStatus;
+}
 
 const ROLES = new Set<string>(Object.values(MembershipRole));
 
@@ -30,6 +37,31 @@ export class InternalController {
   async organization(@Param('organizationId', new ParseUUIDPipe()) organizationId: string): Promise<InternalOrganization> {
     const organization = await this.prisma.organization.findUnique({ where: { id: organizationId } });
     if (!organization) throw notFound('Organization');
+    return toInternal(organization);
+  }
+
+  /** Suspension/reinstatement by platform administration; audited there, announced here. */
+  @Internal('administration')
+  @Post('status')
+  @HttpCode(200)
+  async setStatus(
+    @Param('organizationId', new ParseUUIDPipe()) organizationId: string,
+    @Body() dto: StatusChangeDto,
+  ): Promise<InternalOrganization> {
+    const organization = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.organization.update({ where: { id: organizationId }, data: { status: dto.status } }).catch(() => {
+        throw notFound('Organization');
+      });
+      await emitEvent(tx, SERVICE_NAME, 'OrganizationUpdated', updated.id, {
+        organizationId: updated.id,
+        name: updated.name,
+        type: updated.type,
+        countryCode: updated.countryCode,
+        status: updated.status,
+        verificationStatus: updated.verificationStatus,
+      });
+      return updated;
+    });
     return toInternal(organization);
   }
 

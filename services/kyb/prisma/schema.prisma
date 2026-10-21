@@ -1,0 +1,119 @@
+// KYB / Trust Service (S04) — business verification cases, evidence, checks, review and decisions.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CaseStatus {
+  draft
+  submitted
+  in_review
+  needs_information
+  approved
+  rejected
+  suspended
+  expired
+}
+
+model VerificationCase {
+  id                String     @id @default(uuid()) @db.Uuid
+  /// The organization being verified.
+  subjectId         String     @map("subject_id") @db.Uuid
+  tier              String
+  policyVersion     String     @map("policy_version")
+  status            CaseStatus @default(draft)
+  reviewerUserId    String?    @map("reviewer_user_id") @db.Uuid
+  reasonCode        String?    @map("reason_code")
+  submittedAt       DateTime?  @map("submitted_at") @db.Timestamptz(3)
+  decidedAt         DateTime?  @map("decided_at") @db.Timestamptz(3)
+  expiresAt         DateTime?  @map("expires_at") @db.Timestamptz(3)
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  evidence  CaseEvidence[]
+  checks    CaseCheck[]
+  decisions CaseDecision[]
+
+  @@index([subjectId, status])
+  @@index([status, submittedAt])
+  @@map("verification_cases")
+}
+
+model CaseEvidence {
+  id            String   @id @default(uuid()) @db.Uuid
+  caseId        String   @map("case_id") @db.Uuid
+  requirement   String
+  /// Private file in the Document service; reviewers get access through the case.
+  documentId    String   @map("document_id") @db.Uuid
+  addedByUserId String   @map("added_by_user_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  case VerificationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([caseId, requirement])
+  @@map("case_evidence")
+}
+
+/// Checks a reviewer performed (registry lookup, document authenticity, liveness…).
+model CaseCheck {
+  id                String   @id @default(uuid()) @db.Uuid
+  caseId            String   @map("case_id") @db.Uuid
+  type              String
+  result            String
+  details           String?
+  performedByUserId String   @map("performed_by_user_id") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  case VerificationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@map("case_checks")
+}
+
+/// Every status change with who, why and under which policy (PRD 5.3). Notes are internal.
+model CaseDecision {
+  id            String      @id @default(uuid()) @db.Uuid
+  caseId        String      @map("case_id") @db.Uuid
+  fromStatus    CaseStatus? @map("from_status")
+  toStatus      CaseStatus  @map("to_status")
+  reasonCode    String?     @map("reason_code")
+  internalNotes String?     @map("internal_notes")
+  actorUserId   String?     @map("actor_user_id") @db.Uuid
+  policyVersion String      @map("policy_version")
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  case VerificationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId, createdAt])
+  @@map("case_decisions")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

@@ -9,3 +9,4 @@ src/generated/
 secrets/
 *.log
 .DS_Store
+.smoke-admin.json

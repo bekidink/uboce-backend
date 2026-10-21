@@ -1,0 +1,142 @@
+// Logistics Service (S13) — shipments, tracking, delivery evidence and exceptions.
+// Delivery confirmation is recorded here and never implies payment (PRD 5.13).
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ShipmentStatus {
+  created
+  dispatched
+  in_transit
+  delivered
+  partially_delivered
+  failed
+  returned
+  cancelled
+}
+
+model Shipment {
+  id                      String         @id @default(uuid()) @db.Uuid
+  orderId                 String         @map("order_id") @db.Uuid
+  orderNumber             String         @map("order_number")
+  /// The supplier sending the goods.
+  shipperOrganizationId   String         @map("shipper_organization_id") @db.Uuid
+  /// The buyer receiving them.
+  consigneeOrganizationId String         @map("consignee_organization_id") @db.Uuid
+  originWarehouseId       String?        @map("origin_warehouse_id") @db.Uuid
+  destination             String
+  carrierName             String?        @map("carrier_name")
+  trackingNumber          String?        @unique @map("tracking_number")
+  status                  ShipmentStatus @default(created)
+  expectedDeliveryAt      DateTime?      @map("expected_delivery_at") @db.Timestamptz(3)
+  dispatchedAt            DateTime?      @map("dispatched_at") @db.Timestamptz(3)
+  deliveredAt             DateTime?      @map("delivered_at") @db.Timestamptz(3)
+  createdByUserId         String         @map("created_by_user_id") @db.Uuid
+  createdAt               DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt               DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  items      ShipmentItem[]
+  tracking   TrackingEvent[]
+  evidence   DeliveryEvidence?
+  exceptions DeliveryException[]
+
+  @@index([orderId])
+  @@index([shipperOrganizationId, status])
+  @@index([consigneeOrganizationId, status])
+  @@map("shipments")
+}
+
+model ShipmentItem {
+  id                String   @id @default(uuid()) @db.Uuid
+  shipmentId        String   @map("shipment_id") @db.Uuid
+  lineNumber        Int      @map("line_number")
+  orderLineId       String   @map("order_line_id") @db.Uuid
+  /// Inventory item (the order line's product), when stock is tracked.
+  itemId            String?  @map("item_id") @db.Uuid
+  description       String
+  quantity          Decimal  @db.Decimal(18, 4)
+  deliveredQuantity Decimal? @map("delivered_quantity") @db.Decimal(18, 4)
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentId, lineNumber])
+  @@map("shipment_items")
+}
+
+model TrackingEvent {
+  id              String         @id @default(uuid()) @db.Uuid
+  shipmentId      String         @map("shipment_id") @db.Uuid
+  status          ShipmentStatus
+  location        String?
+  note            String?
+  /// user:<id> or carrier:<provider>
+  source          String
+  /// Carrier's own event ID; duplicate callbacks are ignored (PRD 5.13).
+  externalEventId String?        @unique @map("external_event_id")
+  occurredAt      DateTime       @map("occurred_at") @db.Timestamptz(3)
+  recordedAt      DateTime       @default(now()) @map("recorded_at") @db.Timestamptz(3)
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId, occurredAt])
+  @@map("tracking_events")
+}
+
+model DeliveryEvidence {
+  id                String   @id @default(uuid()) @db.Uuid
+  shipmentId        String   @unique @map("shipment_id") @db.Uuid
+  recipientName     String   @map("recipient_name")
+  documentIds       String[] @map("document_ids") @db.Uuid
+  notes             String?
+  confirmedByUserId String   @map("confirmed_by_user_id") @db.Uuid
+  confirmedAt       DateTime @default(now()) @map("confirmed_at") @db.Timestamptz(3)
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@map("delivery_evidence")
+}
+
+model DeliveryException {
+  id               String   @id @default(uuid()) @db.Uuid
+  shipmentId       String   @map("shipment_id") @db.Uuid
+  type             String
+  description      String
+  reportedByUserId String?  @map("reported_by_user_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+  @@map("delivery_exceptions")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

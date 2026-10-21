@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Headers, Param, ParseUUIDPipe, Post, Query, Res } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
-import { type ActingOrganization, ActingOrg, ActsForOrganization, type AuthUser, badRequest, CurrentUser } from '@uboce/common';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { type ActingOrganization, ActingOrg, ActsForOrganization, type AuthUser, badRequest, CurrentUser, Internal } from '@uboce/common';
 import type { Response } from 'express';
 
 import { CreateDirectOrderDto, ListOrdersQueryDto, ReasonDto } from './orders.dto.js';
@@ -50,6 +50,12 @@ export class PurchaseOrdersController {
   cancel(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @OrderId() orderId: string, @Body() dto: ReasonDto) {
     return this.orders.cancel(org, 'buyer', user.userId, orderId, dto.reason?.trim() || null);
   }
+
+  /** Close a fully delivered order. */
+  @Post(':orderId/close')
+  close(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @OrderId() orderId: string) {
+    return this.orders.close(org, user.userId, orderId);
+  }
 }
 
 /** The supplier's side of the same orders. */
@@ -79,5 +85,18 @@ export class SalesOrdersController {
   @Post(':orderId/cancel')
   decline(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @OrderId() orderId: string, @Body() dto: ReasonDto) {
     return this.orders.cancel(org, 'supplier', user.userId, orderId, dto.reason?.trim() || null);
+  }
+}
+
+/** For Logistics, Finance and Disputes: order facts without going through either party. */
+@Controller('internal/orders')
+export class InternalOrdersController {
+  constructor(private readonly orders: OrdersService) {}
+
+  @ApiExcludeEndpoint()
+  @Internal('logistics', 'finance', 'dispute')
+  @Get(':orderId')
+  get(@OrderId() orderId: string) {
+    return this.orders.internalGet(orderId);
   }
 }

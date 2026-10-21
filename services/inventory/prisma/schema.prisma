@@ -1,0 +1,126 @@
+// Inventory Service (S09) — the auditable stock ledger. Balances are derived
+// from movements; posted movements are never edited, only reversed (PRD 5.9).
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MovementType {
+  receipt
+  issue
+  adjustment
+  transfer_in
+  transfer_out
+  production_issue
+  production_output
+  reversal
+}
+
+enum ReservationStatus {
+  active
+  released
+  consumed
+  failed
+}
+
+/// Append-only. `quantity` is signed: positive adds stock, negative removes it.
+model StockMovement {
+  id                String       @id @default(uuid()) @db.Uuid
+  organizationId    String       @map("organization_id") @db.Uuid
+  warehouseId       String       @map("warehouse_id") @db.Uuid
+  /// Catalog product, produce lot or production batch (external reference).
+  itemId            String       @map("item_id") @db.Uuid
+  type              MovementType
+  quantity          Decimal      @db.Decimal(18, 4)
+  unitOfMeasure     String?      @map("unit_of_measure")
+  sourceType        String       @map("source_type")
+  sourceId          String       @map("source_id")
+  /// Retrying a posting with the same key never posts twice.
+  idempotencyKey    String       @unique @map("idempotency_key")
+  /// SHA-256 of the request, to refuse a reused key with different content.
+  requestHash       String       @map("request_hash")
+  reversesMovementId String?     @unique @map("reverses_movement_id") @db.Uuid
+  reservationId     String?      @map("reservation_id") @db.Uuid
+  note              String?
+  createdBy         String       @map("created_by")
+  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([organizationId, itemId, createdAt])
+  @@index([organizationId, warehouseId, createdAt])
+  @@map("stock_movements")
+}
+
+/// Derived projection, updated in the same transaction as each movement.
+model StockBalance {
+  organizationId String   @map("organization_id") @db.Uuid
+  warehouseId    String   @map("warehouse_id") @db.Uuid
+  itemId         String   @map("item_id") @db.Uuid
+  onHand         Decimal  @default(0) @map("on_hand") @db.Decimal(18, 4)
+  reserved       Decimal  @default(0) @db.Decimal(18, 4)
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@id([organizationId, warehouseId, itemId])
+  @@index([organizationId, itemId])
+  @@map("stock_balances")
+}
+
+model StockReservation {
+  id             String            @id @default(uuid()) @db.Uuid
+  organizationId String            @map("organization_id") @db.Uuid
+  referenceType  String            @map("reference_type")
+  referenceId    String            @map("reference_id") @db.Uuid
+  status         ReservationStatus
+  /// Why a reservation failed: requested vs available per item.
+  shortages      Json?
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lines StockReservationLine[]
+
+  @@unique([referenceType, referenceId])
+  @@map("stock_reservations")
+}
+
+model StockReservationLine {
+  id               String  @id @default(uuid()) @db.Uuid
+  reservationId    String  @map("reservation_id") @db.Uuid
+  itemId           String  @map("item_id") @db.Uuid
+  warehouseId      String  @map("warehouse_id") @db.Uuid
+  quantity         Decimal @db.Decimal(18, 4)
+  consumedQuantity Decimal @default(0) @map("consumed_quantity") @db.Decimal(18, 4)
+
+  reservation StockReservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  @@index([reservationId])
+  @@map("stock_reservation_lines")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

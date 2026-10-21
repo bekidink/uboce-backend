@@ -1,0 +1,55 @@
+// Integration Service (S19) — provider adapters, verified callbacks and normalized results.
+// Vendor-specific formats stop here; core services only see normalized internal calls.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// One row per callback received — valid or not — for replay protection and diagnostics.
+/// Payloads are not stored (they can contain personal or payment data); only their hash.
+model CallbackReceipt {
+  id              String   @id @default(uuid()) @db.Uuid
+  provider        String
+  /// Provider's event ID, unique per provider: duplicates are acknowledged, not reprocessed.
+  externalEventId String?  @map("external_event_id")
+  signatureValid  Boolean  @map("signature_valid")
+  /// processed, duplicate, rejected or failed
+  outcome         String
+  error           String?
+  payloadSha256   String   @map("payload_sha256")
+  receivedAt      DateTime @default(now()) @map("received_at") @db.Timestamptz(3)
+
+  @@unique([provider, externalEventId])
+  @@index([provider, receivedAt])
+  @@map("callback_receipts")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

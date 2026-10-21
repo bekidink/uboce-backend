@@ -99,4 +99,32 @@ update('identity', { SERVICE_CLIENTS: clients.join(',') });
 for (const [name, path] of envs) {
   if (parse(readFileSync(path, 'utf8')).has('JWT_PUBLIC_KEY')) update(name, { JWT_PUBLIC_KEY: publicKey });
 }
+
+// Every service (and the gateway) knows where its peers are, from one port map.
+const ports = JSON.parse(readFileSync(join(root, 'infrastructure', 'services.json'), 'utf8'));
+const peerUrls = Object.fromEntries(
+  Object.entries(ports)
+    .filter(([name]) => name !== 'gateway')
+    .map(([name, port]) => [`${name.toUpperCase()}_URL`, `http://localhost:${port}`]),
+);
+for (const [name, path] of envs) {
+  const current = parse(readFileSync(path, 'utf8'));
+  const missing = Object.fromEntries(Object.entries(peerUrls).filter(([key]) => !current.get(key)));
+  if (Object.keys(missing).length) update(name, missing);
+}
+
+// Local-only conveniences, never overwriting a value already set:
+const integration = envs.get('integration');
+if (integration && !parse(readFileSync(integration, 'utf8')).get('PROVIDERS')) {
+  // Two signed test webhook providers, used by `pnpm smoke`.
+  const providers = [`testpay:payment:${randomBytes(24).toString('base64url')}`, `testcarrier:carrier:${randomBytes(24).toString('base64url')}`];
+  update('integration', { PROVIDERS: providers.join(',') });
+  console.log('configured local test webhook providers (testpay, testcarrier)');
+}
+const administration = envs.get('administration');
+if (administration && !parse(readFileSync(administration, 'utf8')).get('ADMIN_BOOTSTRAP_EMAILS')) {
+  // The first platform administrator locally (still needs a verified email and MFA).
+  update('administration', { ADMIN_BOOTSTRAP_EMAILS: 'admin@uboce.local' });
+  console.log('local bootstrap admin: admin@uboce.local');
+}
 console.log(`ready: ${[...envs.keys()].join(', ')}`);

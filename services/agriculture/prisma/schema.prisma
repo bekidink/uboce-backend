@@ -1,0 +1,196 @@
+// Agriculture Service (S11) — farms, plots, seasons, harvests, grading and produce lots.
+// Lots keep their full lineage back to the harvests and farms they came from (PRD 6.4).
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Ethiopian cropping seasons, plus irrigated production.
+enum CroppingSeason {
+  meher
+  belg
+  irrigated
+}
+
+enum LotStatus {
+  active
+  depleted
+}
+
+model Farm {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  /// Cooperative member who farms it, if any (Identity user ID).
+  memberUserId   String?  @map("member_user_id") @db.Uuid
+  region         String?
+  zone           String?
+  woreda         String?
+  latitude       Decimal? @db.Decimal(9, 6)
+  longitude      Decimal? @db.Decimal(9, 6)
+  areaHectares   Decimal? @map("area_hectares") @db.Decimal(10, 2)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  plots   FarmPlot[]
+  seasons ProductionSeason[]
+
+  @@index([organizationId])
+  @@map("farms")
+}
+
+model FarmPlot {
+  id           String   @id @default(uuid()) @db.Uuid
+  farmId       String   @map("farm_id") @db.Uuid
+  name         String
+  areaHectares Decimal? @map("area_hectares") @db.Decimal(10, 2)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@map("farm_plots")
+}
+
+model ProductionSeason {
+  id                       String         @id @default(uuid()) @db.Uuid
+  organizationId           String         @map("organization_id") @db.Uuid
+  farmId                   String         @map("farm_id") @db.Uuid
+  plotId                   String?        @map("plot_id") @db.Uuid
+  crop                     String
+  year                     Int
+  season                   CroppingSeason
+  plantedAt                DateTime?      @map("planted_at") @db.Timestamptz(3)
+  expectedHarvestQuantity  Decimal?       @map("expected_harvest_quantity") @db.Decimal(18, 4)
+  unitOfMeasure            String         @map("unit_of_measure")
+  createdAt                DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  farm     Farm            @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  harvests HarvestRecord[]
+
+  @@index([organizationId, year])
+  @@map("production_seasons")
+}
+
+model HarvestRecord {
+  id               String   @id @default(uuid()) @db.Uuid
+  seasonId         String   @map("season_id") @db.Uuid
+  organizationId   String   @map("organization_id") @db.Uuid
+  harvestedAt      DateTime @map("harvested_at") @db.Timestamptz(3)
+  quantity         Decimal  @db.Decimal(18, 4)
+  unitOfMeasure    String   @map("unit_of_measure")
+  notes            String?
+  recordedByUserId String   @map("recorded_by_user_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  season ProductionSeason @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("harvest_records")
+}
+
+model ProduceLot {
+  id               String    @id @default(uuid()) @db.Uuid
+  lotCode          String    @unique @map("lot_code")
+  organizationId   String    @map("organization_id") @db.Uuid
+  crop             String
+  /// Catalog product the lot is sold as, if listed.
+  productId        String?   @map("product_id") @db.Uuid
+  /// Current quantity (reduced by splits and merges).
+  quantity         Decimal   @db.Decimal(18, 4)
+  originalQuantity Decimal   @map("original_quantity") @db.Decimal(18, 4)
+  unitOfMeasure    String    @map("unit_of_measure")
+  grade            String?
+  warehouseId      String?   @map("warehouse_id") @db.Uuid
+  status           LotStatus @default(active)
+  /// harvest_aggregation, split or merge
+  origin           String
+  createdByUserId  String    @map("created_by_user_id") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  sources  LotSource[]     @relation("child")
+  gradings GradingRecord[]
+
+  @@index([organizationId, status])
+  @@map("produce_lots")
+}
+
+/// Lineage edge: how much of a parent lot or harvest went into a lot.
+model LotSource {
+  id          String   @id @default(uuid()) @db.Uuid
+  lotId       String   @map("lot_id") @db.Uuid
+  parentLotId String?  @map("parent_lot_id") @db.Uuid
+  harvestId   String?  @map("harvest_id") @db.Uuid
+  quantity    Decimal  @db.Decimal(18, 4)
+
+  lot ProduceLot @relation("child", fields: [lotId], references: [id], onDelete: Cascade)
+
+  @@index([lotId])
+  @@index([parentLotId])
+  @@index([harvestId])
+  @@map("lot_sources")
+}
+
+model GradingRecord {
+  id              String   @id @default(uuid()) @db.Uuid
+  lotId           String   @map("lot_id") @db.Uuid
+  grade           String
+  moisturePct     Decimal? @map("moisture_pct") @db.Decimal(5, 2)
+  defectCount     Int?     @map("defect_count")
+  notes           String?
+  gradedByUserId  String   @map("graded_by_user_id") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  lot ProduceLot @relation(fields: [lotId], references: [id], onDelete: Cascade)
+
+  @@index([lotId])
+  @@map("grading_records")
+}
+
+/// Stock changes a lot operation owes Inventory. Written in the same transaction as
+/// the lineage change, then posted (idempotently) and retried until done.
+model StockPosting {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  lotId          String    @map("lot_id") @db.Uuid
+  warehouseId    String    @map("warehouse_id") @db.Uuid
+  type           String
+  quantity       Decimal   @db.Decimal(18, 4)
+  unitOfMeasure  String    @map("unit_of_measure")
+  idempotencyKey String    @unique @map("idempotency_key")
+  attempts       Int       @default(0)
+  lastError      String?   @map("last_error")
+  postedAt       DateTime? @map("posted_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([postedAt, createdAt])
+  @@map("stock_postings")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

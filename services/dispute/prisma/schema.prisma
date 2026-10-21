@@ -1,0 +1,119 @@
+// Dispute & Performance Service (S18) — disputes, evidence, statements,
+// resolutions, appeals and reproducible supplier performance metrics.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SubjectType {
+  order
+  shipment
+  inspection
+  invoice
+}
+
+enum DisputeStatus {
+  open
+  under_review
+  resolved
+  withdrawn
+}
+
+enum Outcome {
+  in_favor_of_opener
+  in_favor_of_respondent
+  shared_responsibility
+  no_fault_found
+}
+
+model Dispute {
+  id                     String        @id @default(uuid()) @db.Uuid
+  subjectType            SubjectType   @map("subject_type")
+  subjectId              String        @map("subject_id") @db.Uuid
+  /// The order both parties share; it defines who is in the case.
+  orderId                String        @map("order_id") @db.Uuid
+  openedByOrganizationId String        @map("opened_by_organization_id") @db.Uuid
+  againstOrganizationId  String        @map("against_organization_id") @db.Uuid
+  category               String
+  description            String
+  status                 DisputeStatus @default(open)
+  reviewerUserId         String?       @map("reviewer_user_id") @db.Uuid
+  outcome                Outcome?
+  resolutionSummary      String?       @map("resolution_summary")
+  /// What the owning services should do (refund via credit note, re-ship…). Never applied here (PRD 6.6).
+  followUpActions        String?       @map("follow_up_actions")
+  appealOfDisputeId      String?       @unique @map("appeal_of_dispute_id") @db.Uuid
+  openedByUserId         String        @map("opened_by_user_id") @db.Uuid
+  createdAt              DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  resolvedAt             DateTime?     @map("resolved_at") @db.Timestamptz(3)
+
+  statements DisputeStatement[]
+
+  @@index([openedByOrganizationId, status])
+  @@index([againstOrganizationId, status])
+  @@index([status, createdAt])
+  @@map("disputes")
+}
+
+model DisputeStatement {
+  id                  String   @id @default(uuid()) @db.Uuid
+  disputeId           String   @map("dispute_id") @db.Uuid
+  /// Null for statements by platform reviewers.
+  organizationId      String?  @map("organization_id") @db.Uuid
+  authorUserId        String   @map("author_user_id") @db.Uuid
+  /// opener, respondent or reviewer
+  role                String
+  text                String
+  evidenceDocumentIds String[] @map("evidence_document_ids") @db.Uuid
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId, createdAt])
+  @@map("dispute_statements")
+}
+
+/// Facts about a supplier taken from events; metrics are computed from these on demand.
+model SupplierFact {
+  id                     String   @id @default(uuid()) @db.Uuid
+  supplierOrganizationId String   @map("supplier_organization_id") @db.Uuid
+  /// order_created, order_confirmed, order_cancelled, delivery_complete, delivery_partial, dispute_opened, dispute_lost
+  kind                   String
+  /// What the fact is about, e.g. the order ID (pairs order_created with order_confirmed).
+  reference              String
+  occurredAt             DateTime @map("occurred_at") @db.Timestamptz(3)
+  sourceEventId          String   @unique @map("source_event_id") @db.Uuid
+
+  @@index([supplierOrganizationId, kind, occurredAt])
+  @@map("supplier_facts")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

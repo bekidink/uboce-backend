@@ -32,6 +32,7 @@ const toInternalUser = (user: User): InternalUser => ({
   id: user.id,
   email: user.email,
   emailVerified: !!user.emailVerifiedAt,
+  mfaEnabled: !!user.mfaEnabledAt,
   phone: user.phone,
   displayName: user.displayName,
   locale: user.locale,
@@ -73,7 +74,7 @@ export class InternalController {
     return toInternalUser(user);
   }
 
-  @Internal('organization')
+  @Internal('organization', 'administration')
   @Get('users')
   async findByEmail(@Query() query: FindUserQueryDto): Promise<InternalUser> {
     const user = await this.prisma.user.findUnique({ where: { email: query.email.toLowerCase() } });
