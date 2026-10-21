@@ -1,0 +1,128 @@
+// Commerce Service (S08) — owns orders and their commercial state transitions.
+// A purchase order (buyer's view) and a sales order (supplier's view) are the same Order.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  pending_confirmation
+  confirmed
+  partially_fulfilled
+  fulfilled
+  closed
+  cancelled
+  /// Needs human attention (e.g. a failed stock reservation once Inventory exists).
+  exception
+}
+
+enum OrderSource {
+  quotation
+  direct
+}
+
+model Order {
+  id                     String      @id @default(uuid()) @db.Uuid
+  /// Human-facing, e.g. PO-2026-000042.
+  number                 String      @unique
+  buyerOrganizationId    String      @map("buyer_organization_id") @db.Uuid
+  supplierOrganizationId String      @map("supplier_organization_id") @db.Uuid
+  source                 OrderSource
+  /// One order per accepted quotation, enforced by the database.
+  sourceQuotationId      String?     @unique @map("source_quotation_id") @db.Uuid
+  rfqId                  String?     @map("rfq_id") @db.Uuid
+  /// Client-chosen key for direct orders; unique per buyer.
+  idempotencyKey         String?     @map("idempotency_key")
+  /// SHA-256 of the direct-order request, to reject a reused key with a different body.
+  requestHash            String?     @map("request_hash")
+  title                  String?
+  currency               String      @db.Char(3)
+  total                  Decimal     @db.Decimal(18, 4)
+  deliveryTerms          String?     @map("delivery_terms")
+  deliveryLocation       String?     @map("delivery_location")
+  status                 OrderStatus @default(pending_confirmation)
+  createdByUserId        String      @map("created_by_user_id") @db.Uuid
+  createdAt              DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lines   OrderLine[]
+  history OrderStatusHistory[]
+
+  @@unique([buyerOrganizationId, idempotencyKey])
+  @@index([buyerOrganizationId, status])
+  @@index([supplierOrganizationId, status])
+  @@map("orders")
+}
+
+/// Immutable commercial snapshot: catalog or quotation changes never alter a placed order (PRD 5.5, 5.8).
+model OrderLine {
+  id                String  @id @default(uuid()) @db.Uuid
+  orderId           String  @map("order_id") @db.Uuid
+  lineNumber        Int     @map("line_number")
+  productId         String? @map("product_id") @db.Uuid
+  description       String
+  quantity          Decimal @db.Decimal(18, 4)
+  unitOfMeasure     String  @map("unit_of_measure")
+  unitPrice         Decimal @map("unit_price") @db.Decimal(18, 4)
+  lineTotal         Decimal @map("line_total") @db.Decimal(18, 4)
+  leadTimeDays      Int?    @map("lead_time_days")
+  fulfilledQuantity Decimal @default(0) @map("fulfilled_quantity") @db.Decimal(18, 4)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, lineNumber])
+  @@map("order_lines")
+}
+
+model OrderStatusHistory {
+  id              String       @id @default(uuid()) @db.Uuid
+  orderId         String       @map("order_id") @db.Uuid
+  fromStatus      OrderStatus? @map("from_status")
+  toStatus        OrderStatus  @map("to_status")
+  changedByUserId String?      @map("changed_by_user_id") @db.Uuid
+  reason          String?
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+  @@map("order_status_history")
+}
+
+/// Per-year counter behind order numbers.
+model OrderNumberCounter {
+  year Int @id
+  last Int
+
+  @@map("order_number_counters")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}

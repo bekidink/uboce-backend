@@ -1,0 +1,75 @@
+// Discovery Service (S06) — search read models built from Catalog and Organization events.
+// Never a source of truth: everything here can be rebuilt by replaying events.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// One row per published product. Removed when the product is archived.
+model ProductListing {
+  productId      String   @id @map("product_id") @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  description    String?
+  categoryId     String   @map("category_id") @db.Uuid
+  categorySlug   String   @map("category_slug")
+  unitOfMeasure  String   @map("unit_of_measure")
+  attributes     Json
+  variants       Json
+  /// Lowest active variant price, for price filters and sorting.
+  minPrice       Decimal  @map("min_price") @db.Decimal(18, 4)
+  maxPrice       Decimal  @map("max_price") @db.Decimal(18, 4)
+  currency       String   @db.Char(3)
+  publishedAt    DateTime @map("published_at") @db.Timestamptz(3)
+  /// occurredAt of the event that produced this row; older events are ignored (out-of-order safety).
+  sourceOccurredAt DateTime @map("source_occurred_at") @db.Timestamptz(3)
+  indexedAt      DateTime @default(now()) @updatedAt @map("indexed_at") @db.Timestamptz(3)
+  /// to_tsvector('simple', name, description, category), maintained by the indexer.
+  searchDocument Unsupported("tsvector")? @map("search_document")
+
+  @@index([searchDocument], type: Gin)
+  @@index([categorySlug])
+  @@index([organizationId])
+  @@index([minPrice])
+  @@map("product_listings")
+}
+
+/// Public facts about organizations, for supplier search and listing labels.
+model OrganizationProfile {
+  organizationId     String   @id @map("organization_id") @db.Uuid
+  name               String
+  type               String
+  countryCode        String   @map("country_code") @db.Char(2)
+  status             String
+  verificationStatus String   @map("verification_status")
+  sourceOccurredAt   DateTime @map("source_occurred_at") @db.Timestamptz(3)
+  indexedAt          DateTime @default(now()) @updatedAt @map("indexed_at") @db.Timestamptz(3)
+
+  @@map("organization_profiles")
+}
+
+/// Index freshness (PRD 5.6): when we last applied an event, and how old it was.
+model IndexState {
+  id                  String   @id
+  lastEventId         String   @map("last_event_id") @db.Uuid
+  lastEventOccurredAt DateTime @map("last_event_occurred_at") @db.Timestamptz(3)
+  lastIndexedAt       DateTime @map("last_indexed_at") @db.Timestamptz(3)
+
+  @@map("index_state")
+}
+
+/// Inbox for idempotent event consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

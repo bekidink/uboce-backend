@@ -1,0 +1,32 @@
+{
+  "name": "uboce",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "setup": "node scripts/setup-env.mjs",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "generate": "pnpm -r --filter \"./services/*\" prisma:generate",
+    "migrate": "pnpm -r --filter \"./services/*\" prisma:migrate",
+    "build": "pnpm generate && pnpm -r build",
+    "dev": "pnpm -r --parallel --filter \"./services/*\" --filter ./apps/gateway start:dev",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "oxlint packages/ services/",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "smoke": "node scripts/smoke-test.mjs",
+    "infra:db": "docker compose exec -T postgres psql -U postgres -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/init.sql",
+    "migrate:dev": "pnpm -r --filter \"./services/*\" prisma:migrate:dev"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "oxlint": "^1.58.0",
+    "prettier": "^3.4.2",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.2"
+  }
+}

@@ -1,0 +1,155 @@
+// Procurement Service (S07) — owns RFQs, quotations, revisions and supplier selection.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RfqStatus {
+  draft
+  published
+  awarded
+  cancelled
+}
+
+enum RfqVisibility {
+  /// Any eligible supplier may quote.
+  open
+  /// Only the invited supplier organizations may see and quote.
+  invited
+}
+
+enum QuotationStatus {
+  submitted
+  withdrawn
+  accepted
+  rejected
+}
+
+model Rfq {
+  id                  String        @id @default(uuid()) @db.Uuid
+  buyerOrganizationId String        @map("buyer_organization_id") @db.Uuid
+  title               String
+  description         String?
+  currency            String        @db.Char(3)
+  deliveryTerms       String?       @map("delivery_terms")
+  deliveryLocation    String?       @map("delivery_location")
+  responseDeadline    DateTime      @map("response_deadline") @db.Timestamptz(3)
+  visibility          RfqVisibility @default(invited)
+  status              RfqStatus     @default(draft)
+  awardedQuotationId  String?       @unique @map("awarded_quotation_id") @db.Uuid
+  createdByUserId     String        @map("created_by_user_id") @db.Uuid
+  publishedAt         DateTime?     @map("published_at") @db.Timestamptz(3)
+  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lines       RfqLine[]
+  invitations RfqInvitation[]
+  quotations  Quotation[]
+
+  @@index([buyerOrganizationId, status])
+  @@index([status, visibility, responseDeadline])
+  @@map("rfqs")
+}
+
+model RfqLine {
+  id             String  @id @default(uuid()) @db.Uuid
+  rfqId          String  @map("rfq_id") @db.Uuid
+  lineNumber     Int     @map("line_number")
+  /// Optional catalog reference (external).
+  productId      String? @map("product_id") @db.Uuid
+  description    String
+  quantity       Decimal @db.Decimal(18, 4)
+  unitOfMeasure  String  @map("unit_of_measure")
+  specifications Json?
+
+  rfq Rfq @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+
+  @@unique([rfqId, lineNumber])
+  @@map("rfq_lines")
+}
+
+model RfqInvitation {
+  rfqId                  String   @map("rfq_id") @db.Uuid
+  supplierOrganizationId String   @map("supplier_organization_id") @db.Uuid
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  rfq Rfq @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+
+  @@id([rfqId, supplierOrganizationId])
+  @@index([supplierOrganizationId])
+  @@map("rfq_invitations")
+}
+
+/// One live quotation per supplier per RFQ; revising bumps `revision` and keeps the old one in history.
+model Quotation {
+  id                     String          @id @default(uuid()) @db.Uuid
+  rfqId                  String          @map("rfq_id") @db.Uuid
+  supplierOrganizationId String          @map("supplier_organization_id") @db.Uuid
+  status                 QuotationStatus @default(submitted)
+  revision               Int             @default(1)
+  currency               String          @db.Char(3)
+  total                  Decimal         @db.Decimal(18, 4)
+  validUntil             DateTime        @map("valid_until") @db.Timestamptz(3)
+  notes                  String?
+  submittedByUserId      String          @map("submitted_by_user_id") @db.Uuid
+  createdAt              DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  rfq       Rfq                 @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  lines     QuotationLine[]
+  revisions QuotationRevision[]
+
+  @@unique([rfqId, supplierOrganizationId])
+  @@index([supplierOrganizationId])
+  @@map("quotations")
+}
+
+model QuotationLine {
+  id           String  @id @default(uuid()) @db.Uuid
+  quotationId  String  @map("quotation_id") @db.Uuid
+  rfqLineId    String  @map("rfq_line_id") @db.Uuid
+  quantity     Decimal @db.Decimal(18, 4)
+  unitPrice    Decimal @map("unit_price") @db.Decimal(18, 4)
+  lineTotal    Decimal @map("line_total") @db.Decimal(18, 4)
+  leadTimeDays Int?    @map("lead_time_days")
+
+  quotation Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  @@unique([quotationId, rfqLineId])
+  @@map("quotation_lines")
+}
+
+/// Every superseded revision, as it was submitted (PRD 5.7: preserve history).
+model QuotationRevision {
+  id          String   @id @default(uuid()) @db.Uuid
+  quotationId String   @map("quotation_id") @db.Uuid
+  revision    Int
+  snapshot    Json
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  quotation Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  @@unique([quotationId, revision])
+  @@map("quotation_revisions")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}

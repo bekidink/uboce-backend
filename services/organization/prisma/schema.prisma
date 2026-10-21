@@ -1,0 +1,157 @@
+// Organization Service (S02) — owns organizations, memberships, roles and branches.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrganizationType {
+  business
+  cooperative
+  farm
+  manufacturer
+  wholesaler
+  distributor
+  warehouse
+  logistics_provider
+  other
+}
+
+enum OrganizationStatus {
+  active
+  suspended
+  closed
+}
+
+/// Mirrors KYB (S04) via events once that service exists; never set directly by clients.
+enum VerificationStatus {
+  unverified
+  pending
+  verified
+  rejected
+  expired
+}
+
+enum MembershipRole {
+  owner
+  admin
+  procurement_officer
+  sales_representative
+  warehouse_operator
+  farmer
+  quality_inspector
+  manufacturer
+  logistics_operator
+  finance_officer
+  auditor
+}
+
+enum MembershipStatus {
+  active
+  revoked
+}
+
+model Organization {
+  id                 String             @id @default(uuid()) @db.Uuid
+  name               String
+  legalName          String?            @map("legal_name")
+  type               OrganizationType
+  /// ISO 3166-1 alpha-2
+  countryCode        String             @default("ET") @map("country_code") @db.Char(2)
+  status             OrganizationStatus @default(active)
+  verificationStatus VerificationStatus @default(unverified) @map("verification_status")
+  /// Identity user ID (external reference — no cross-database foreign key).
+  createdByUserId    String             @map("created_by_user_id") @db.Uuid
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  memberships Membership[]
+  branches    Branch[]
+  invitations Invitation[]
+
+  @@map("organizations")
+}
+
+model Membership {
+  id             String           @id @default(uuid()) @db.Uuid
+  organizationId String           @map("organization_id") @db.Uuid
+  /// Identity user ID (external reference).
+  userId         String           @map("user_id") @db.Uuid
+  role           MembershipRole
+  status         MembershipStatus @default(active)
+  addedByUserId  String           @map("added_by_user_id") @db.Uuid
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  revokedAt      DateTime?        @map("revoked_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  /// One membership row per user per organization; revoking keeps the row for history.
+  @@unique([organizationId, userId])
+  @@index([userId, status])
+  @@map("memberships")
+}
+
+model Branch {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  region         String?
+  city           String?
+  addressLine    String?  @map("address_line")
+  countryCode    String   @default("ET") @map("country_code") @db.Char(2)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@map("branches")
+}
+
+enum InvitationStatus {
+  pending
+  accepted
+  revoked
+}
+
+/// An invitation to join, sent by email or SMS. Only the token's SHA-256 is stored.
+model Invitation {
+  id              String           @id @default(uuid()) @db.Uuid
+  organizationId  String           @map("organization_id") @db.Uuid
+  /// Lowercased. Exactly one of email/phone is set.
+  email           String?
+  phone           String?
+  role            MembershipRole
+  tokenHash       String           @unique @map("token_hash")
+  status          InvitationStatus @default(pending)
+  invitedByUserId String           @map("invited_by_user_id") @db.Uuid
+  acceptedByUserId String?         @map("accepted_by_user_id") @db.Uuid
+  expiresAt       DateTime         @map("expires_at") @db.Timestamptz(3)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  respondedAt     DateTime?        @map("responded_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, status])
+  @@map("invitations")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}

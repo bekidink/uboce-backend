@@ -1,0 +1,108 @@
+// Notification Service (S16) — owns device tokens, notifications, delivery attempts and preferences.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DevicePlatform {
+  ios
+  android
+  web
+}
+
+enum NotificationChannel {
+  in_app
+  push
+  email
+  sms
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  failed
+  skipped
+}
+
+model DeviceToken {
+  id         String         @id @default(uuid()) @db.Uuid
+  /// Identity user ID (external reference).
+  userId     String         @map("user_id") @db.Uuid
+  /// FCM registration token. A device belongs to whoever signed in on it last.
+  token      String         @unique
+  platform   DevicePlatform
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastSeenAt DateTime       @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+model UserPreference {
+  userId    String   @id @map("user_id") @db.Uuid
+  locale    String   @default("en")
+  pushEnabled Boolean @default(true) @map("push_enabled")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("user_preferences")
+}
+
+model Notification {
+  id            String              @id @default(uuid()) @db.Uuid
+  /// Null for messages to people without an account yet (e.g. an emailed invitation).
+  userId        String?             @map("user_id") @db.Uuid
+  /// Masked email/phone for email and SMS, e.g. "b***@example.com".
+  recipient     String?
+  channel       NotificationChannel
+  templateKey   String              @map("template_key")
+  locale        String
+  title         String
+  body          String
+  data          Json?
+  status        NotificationStatus  @default(pending)
+  /// The event that caused this notification; makes redelivered events harmless.
+  sourceEventId String?             @map("source_event_id") @db.Uuid
+  readAt        DateTime?           @map("read_at") @db.Timestamptz(3)
+  attemptCount  Int                 @default(0) @map("attempt_count")
+  /// When the retry job may try again; null when nothing is left to do.
+  nextAttemptAt DateTime?           @map("next_attempt_at") @db.Timestamptz(3)
+  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  attempts DeliveryAttempt[]
+
+  @@unique([sourceEventId, userId, channel])
+  @@index([userId, channel, createdAt])
+  @@index([channel, status, nextAttemptAt])
+  @@map("notifications")
+}
+
+model DeliveryAttempt {
+  id             String   @id @default(uuid()) @db.Uuid
+  notificationId String   @map("notification_id") @db.Uuid
+  provider       String
+  success        Boolean
+  /// Safe diagnostic only — never provider payloads with personal data.
+  error          String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+  @@map("delivery_attempts")
+}
+
+/// Inbox: events already handled by this service, for idempotent consumption.
+model ProcessedEvent {
+  eventId     String   @id @map("event_id") @db.Uuid
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
+
+  @@map("processed_events")
+}

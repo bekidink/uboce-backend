@@ -1,0 +1,160 @@
+name: uboce
+
+# `docker compose up -d` starts infrastructure only (for `pnpm dev`).
+# `docker compose --profile apps up -d --build` also runs every service in containers.
+
+x-service: &service
+  profiles: [apps]
+  restart: unless-stopped
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+  environment: &service-env
+    NODE_ENV: production
+    REDIS_URL: redis://redis:6379
+    IDENTITY_URL: http://identity:4101
+    ORGANIZATION_URL: http://organization:4102
+    NOTIFICATION_URL: http://notification:4103
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6380:6379'
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Catches every outgoing email locally. Inbox UI: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.31.6
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+  # ---- Application services (profile: apps) -------------------------------------
+  # Migrations run as one-shot containers before the services start.
+
+  migrate:
+    <<: *service
+    restart: 'no'
+    build: { context: ., target: migrate }
+    environment:
+      IDENTITY_DATABASE_URL: postgresql://identity_svc:identity_dev@postgres:5432/identity
+      ORGANIZATION_DATABASE_URL: postgresql://organization_svc:organization_dev@postgres:5432/organization
+      NOTIFICATION_DATABASE_URL: postgresql://notification_svc:notification_dev@postgres:5432/notification
+      CATALOG_DATABASE_URL: postgresql://catalog_svc:catalog_dev@postgres:5432/catalog
+      DISCOVERY_DATABASE_URL: postgresql://discovery_svc:discovery_dev@postgres:5432/discovery
+      PROCUREMENT_DATABASE_URL: postgresql://procurement_svc:procurement_dev@postgres:5432/procurement
+      COMMERCE_DATABASE_URL: postgresql://commerce_svc:commerce_dev@postgres:5432/commerce
+
+  identity:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: services/identity } }
+    env_file: services/identity/.env
+    environment:
+      <<: *service-env
+      DATABASE_URL: postgresql://identity_svc:identity_dev@postgres:5432/identity
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  organization:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: services/organization } }
+    env_file: services/organization/.env
+    environment:
+      <<: *service-env
+      DATABASE_URL: postgresql://organization_svc:organization_dev@postgres:5432/organization
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  notification:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: services/notification } }
+    env_file: services/notification/.env
+    environment:
+      <<: *service-env
+      DATABASE_URL: postgresql://notification_svc:notification_dev@postgres:5432/notification
+      SMTP_URL: smtp://mailpit:1025
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  catalog:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: services/catalog } }
+    env_file: services/catalog/.env
+    environment:
+      <<: *service-env
+      DATABASE_URL: postgresql://catalog_svc:catalog_dev@postgres:5432/catalog
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  discovery:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: services/discovery } }
+    env_file: services/discovery/.env
+    environment:
+      <<: *service-env
+      DATABASE_URL: postgresql://discovery_svc:discovery_dev@postgres:5432/discovery
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  procurement:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: services/procurement } }
+    env_file: services/procurement/.env
+    environment:
+      <<: *service-env
+      DATABASE_URL: postgresql://procurement_svc:procurement_dev@postgres:5432/procurement
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  commerce:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: services/commerce } }
+    env_file: services/commerce/.env
+    environment:
+      <<: *service-env
+      DATABASE_URL: postgresql://commerce_svc:commerce_dev@postgres:5432/commerce
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  gateway:
+    <<: *service
+    build: { context: ., target: runtime, args: { TARGET: apps/gateway } }
+    env_file: apps/gateway/.env
+    environment:
+      <<: *service-env
+      CATALOG_URL: http://catalog:4104
+      DISCOVERY_URL: http://discovery:4105
+      PROCUREMENT_URL: http://procurement:4106
+      COMMERCE_URL: http://commerce:4107
+    ports:
+      - '4100:4100'
+    depends_on:
+      identity: { condition: service_started }
+
+volumes:
+  pgdata:
+  redisdata:

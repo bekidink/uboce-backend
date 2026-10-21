@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - services/*
+  - apps/*
+
+# Install scripts allowed to run (pnpm 11). Everything else is blocked.
+allowBuilds:
+  '@firebase/util': false # browser auto-init config; not needed server-side
+  '@prisma/engines': true
+  '@scarf/scarf': false # Swagger UI usage telemetry
+  argon2: true
+  prisma: true
+  protobufjs: true

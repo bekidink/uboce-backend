@@ -1,0 +1,108 @@
+// Catalog Service (S05) — owns products, variants, categories and units of measure.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UnitOfMeasure {
+  kg
+  quintal
+  tonne
+  gram
+  litre
+  piece
+  box
+  bag
+  carton
+  metre
+  square_metre
+}
+
+enum ProductStatus {
+  draft
+  published
+  archived
+}
+
+/// Platform-managed taxonomy (seeded). `requiredAttributes` must be filled before a product can be published.
+model Category {
+  id                 String   @id @default(uuid()) @db.Uuid
+  slug               String   @unique
+  name               String
+  parentId           String?  @map("parent_id") @db.Uuid
+  requiredAttributes String[] @map("required_attributes")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id              String        @id @default(uuid()) @db.Uuid
+  /// Owning organization (external reference).
+  organizationId  String        @map("organization_id") @db.Uuid
+  name            String
+  description     String?
+  categoryId      String        @map("category_id") @db.Uuid
+  unitOfMeasure   UnitOfMeasure @map("unit_of_measure")
+  /// Category specification values, e.g. { "origin": "Yirgacheffe", "grade": "1" }.
+  attributes      Json          @default("{}")
+  status          ProductStatus @default(draft)
+  publishedAt     DateTime?     @map("published_at") @db.Timestamptz(3)
+  createdByUserId String        @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  category Category         @relation(fields: [categoryId], references: [id])
+  variants ProductVariant[]
+
+  @@index([organizationId, status])
+  @@map("products")
+}
+
+model ProductVariant {
+  id               String   @id @default(uuid()) @db.Uuid
+  productId        String   @map("product_id") @db.Uuid
+  organizationId   String   @map("organization_id") @db.Uuid
+  sku              String
+  name             String
+  price            Decimal  @db.Decimal(18, 4)
+  /// ISO 4217
+  currency         String   @db.Char(3)
+  minOrderQuantity Decimal? @map("min_order_quantity") @db.Decimal(18, 4)
+  attributes       Json     @default("{}")
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  /// SKUs are unique within an organization.
+  @@unique([organizationId, sku])
+  @@index([productId])
+  @@map("product_variants")
+}
+
+/// Transactional outbox (PRD 8.3).
+model OutboxEvent {
+  id          String    @id @db.Uuid
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
