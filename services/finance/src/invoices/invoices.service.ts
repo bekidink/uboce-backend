@@ -12,6 +12,7 @@ import {
   requireRole,
   skipTake,
   toPage,
+  qualified,
 } from '@uboce/common';
 import type { PaymentNotification } from '@uboce/contracts';
 
@@ -314,7 +315,7 @@ export class InvoicesService {
   private async nextNumber(tx: Tx, prefix: 'INV' | 'CN') {
     const key = `${prefix}-${new Date().getUTCFullYear()}`;
     const [row] = await tx.$queryRaw<{ last: number }[]>`
-      INSERT INTO document_counters (key, last) VALUES (${key}, 1)
+      INSERT INTO ${Prisma.raw(qualified('document_counters'))} (key, last) VALUES (${key}, 1)
       ON CONFLICT (key) DO UPDATE SET last = document_counters.last + 1 RETURNING last`;
     return `${key}-${String(row!.last).padStart(6, '0')}`;
   }

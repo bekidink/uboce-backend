@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { AppError, conflict, emitEvent, notFound, type PaginationQueryDto, skipTake, toPage } from '@uboce/common';
+import { AppError, conflict, emitEvent, notFound, type PaginationQueryDto, skipTake, toPage, qualified } from '@uboce/common';
 import type { PostMovementRequest, ReserveStockRequest, ReserveStockResult } from '@uboce/contracts';
 
 import { SERVICE_NAME } from '../config.js';
@@ -167,7 +167,7 @@ export class LedgerService {
       for (const [key, want] of [...wanted.entries()].sort(([a], [b]) => a.localeCompare(b))) {
         const itemId = key.split('|')[0]!;
         const rows = await tx.$queryRaw<{ warehouse_id: string; on_hand: Prisma.Decimal; reserved: Prisma.Decimal }[]>`
-          SELECT warehouse_id, on_hand, reserved FROM stock_balances
+          SELECT warehouse_id, on_hand, reserved FROM ${Prisma.raw(qualified('stock_balances'))}
           WHERE organization_id = ${request.organizationId}::uuid AND item_id = ${itemId}::uuid
             ${want.warehouseId ? Prisma.sql`AND warehouse_id = ${want.warehouseId}::uuid` : Prisma.empty}
           ORDER BY warehouse_id
@@ -185,7 +185,7 @@ export class LedgerService {
       const status = shortages.length ? 'failed' : 'active';
       if (status === 'active') {
         for (const p of picks) {
-          await tx.$executeRaw`UPDATE stock_balances SET reserved = reserved + ${p.quantity}, updated_at = now()
+          await tx.$executeRaw`UPDATE ${Prisma.raw(qualified('stock_balances'))} SET reserved = reserved + ${p.quantity}, updated_at = now()
             WHERE organization_id = ${request.organizationId}::uuid AND warehouse_id = ${p.warehouseId}::uuid AND item_id = ${p.itemId}::uuid`;
         }
       }
@@ -235,7 +235,7 @@ export class LedgerService {
         const remaining = line.quantity.minus(line.consumedQuantity);
         if (!remaining.greaterThan(0)) continue;
         await this.lockBalance(tx, reservation.organizationId, line.warehouseId, line.itemId);
-        await tx.$executeRaw`UPDATE stock_balances SET reserved = GREATEST(reserved - ${remaining}, 0), updated_at = now()
+        await tx.$executeRaw`UPDATE ${Prisma.raw(qualified('stock_balances'))} SET reserved = GREATEST(reserved - ${remaining}, 0), updated_at = now()
           WHERE organization_id = ${reservation.organizationId}::uuid AND warehouse_id = ${line.warehouseId}::uuid AND item_id = ${line.itemId}::uuid`;
       }
       await tx.stockReservation.update({ where: { id: reservation.id }, data: { status: 'released' } });
@@ -289,10 +289,10 @@ export class LedgerService {
   // ---- Locking -----------------------------------------------------------------------
 
   private async lockBalance(tx: Tx, organizationId: string, warehouseId: string, itemId: string): Promise<BalanceState> {
-    await tx.$executeRaw`INSERT INTO stock_balances (organization_id, warehouse_id, item_id, updated_at)
+    await tx.$executeRaw`INSERT INTO ${Prisma.raw(qualified('stock_balances'))} (organization_id, warehouse_id, item_id, updated_at)
       VALUES (${organizationId}::uuid, ${warehouseId}::uuid, ${itemId}::uuid, now()) ON CONFLICT DO NOTHING`;
     const [row] = await tx.$queryRaw<{ on_hand: Prisma.Decimal; reserved: Prisma.Decimal }[]>`
-      SELECT on_hand, reserved FROM stock_balances
+      SELECT on_hand, reserved FROM ${Prisma.raw(qualified('stock_balances'))}
       WHERE organization_id = ${organizationId}::uuid AND warehouse_id = ${warehouseId}::uuid AND item_id = ${itemId}::uuid
       FOR UPDATE`;
     return { onHand: new Decimal(row!.on_hand), reserved: new Decimal(row!.reserved) };

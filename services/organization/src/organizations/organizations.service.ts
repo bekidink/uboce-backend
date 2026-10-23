@@ -4,6 +4,7 @@ import {
   buildEvent,
   conflict,
   forbidden,
+  IdentityClient,
   notFound,
   type PaginationQueryDto,
   skipTake,
@@ -32,7 +33,17 @@ const lastOwner = () =>
 
 @Injectable()
 export class OrganizationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly identity: IdentityClient,
+  ) {}
+
+  directory(ids: string[]) {
+    return this.prisma.organization.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, name: true, type: true, countryCode: true, status: true, verificationStatus: true },
+    });
+  }
 
   async create(userId: string, dto: CreateOrganizationDto) {
     return this.prisma.$transaction(async (tx) => {
@@ -116,7 +127,12 @@ export class OrganizationsService {
       this.prisma.membership.findMany({ where, orderBy: { createdAt: 'asc' }, ...skipTake(query) }),
       this.prisma.membership.count({ where }),
     ]);
-    return toPage(items, total, query);
+    const users = await Promise.all(items.map((m) => this.identity.getUser(m.userId)));
+    const withUsers = items.map((m, i) => ({
+      ...m,
+      user: users[i] ? { displayName: users[i].displayName, email: users[i].email } : null,
+    }));
+    return toPage(withUsers, total, query);
   }
 
   async addMember(userId: string, organizationId: string, dto: AddMemberDto) {

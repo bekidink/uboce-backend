@@ -1,4 +1,5 @@
 import type { EventEnvelope } from '@uboce/contracts';
+import { qualified } from '../database.js';
 
 import type { OutboxTx } from './outbox.js';
 
@@ -19,7 +20,7 @@ export async function handleOnce<Tx extends OutboxTx>(
 ): Promise<boolean> {
   return db.$transaction(async (tx) => {
     const inserted = await tx.$executeRawUnsafe(
-      `INSERT INTO processed_events (event_id, event_type) VALUES ($1::uuid, $2) ON CONFLICT (event_id) DO NOTHING`,
+      `INSERT INTO ${qualified('processed_events')} (event_id, event_type) VALUES ($1::uuid, $2) ON CONFLICT (event_id) DO NOTHING`,
       event.eventId,
       event.eventType,
     );

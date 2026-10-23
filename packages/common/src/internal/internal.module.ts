@@ -38,7 +38,8 @@ const CLIENTS = [IdentityClient, OrganizationsClient, MessagesClient, Administra
 @Module({})
 export class InternalModule {
   static forRoot(options: InternalModuleOptions): DynamicModule {
-    const http = new InternalClient(options);
+    // INTERNAL_CALL_TIMEOUT_MS: raise it when the database is remote (e.g. Supabase).
+    const http = new InternalClient({ timeoutMs: Number(process.env.INTERNAL_CALL_TIMEOUT_MS) || undefined, ...options });
     return {
       module: InternalModule,
       providers: [

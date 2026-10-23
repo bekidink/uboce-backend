@@ -12,6 +12,7 @@ import {
   skipTake,
   toPage,
   WarehousesClient,
+  qualified,
 } from '@uboce/common';
 
 import { SERVICE_NAME } from '../config.js';
@@ -73,6 +74,31 @@ export class AgricultureService {
     });
   }
 
+  /** Seasons with their harvests and how much of each harvest is not yet in a lot. */
+  async listSeasons(org: ActingOrganization, farmId: string | undefined, query: PaginationQueryDto) {
+    requireRole(org, READ_ROLES, 'view seasons');
+    const where = { organizationId: org.organization.id, ...(farmId ? { farmId } : {}) };
+    const [seasons, total] = await Promise.all([
+      this.prisma.productionSeason.findMany({
+        where,
+        include: { farm: { select: { id: true, name: true } }, harvests: { orderBy: { harvestedAt: 'asc' } } },
+        orderBy: [{ year: 'desc' }, { createdAt: 'desc' }],
+        ...skipTake(query),
+      }),
+      this.prisma.productionSeason.count({ where }),
+    ]);
+    const harvestIds = seasons.flatMap((s) => s.harvests.map((h) => h.id));
+    const used = harvestIds.length
+      ? await this.prisma.lotSource.groupBy({ by: ['harvestId'], where: { harvestId: { in: harvestIds } }, _sum: { quantity: true } })
+      : [];
+    const usedBy = new Map(used.map((u) => [u.harvestId, u._sum.quantity ?? new Decimal(0)]));
+    const items = seasons.map((s) => ({
+      ...s,
+      harvests: s.harvests.map((h) => ({ ...h, unassignedQuantity: harvestRemaining(h.quantity, [usedBy.get(h.id) ?? new Decimal(0)]).toString() })),
+    }));
+    return toPage(items, total, query);
+  }
+
   async recordHarvest(org: ActingOrganization, userId: string, seasonId: string, dto: { harvestedAt: string; quantity: string; notes?: string }) {
     requireRole(org, FARM_ROLES, 'record harvests');
     const season = await this.prisma.productionSeason.findFirst({ where: { id: seasonId, organizationId: org.organization.id } });
@@ -114,7 +140,7 @@ export class AgricultureService {
       for (const want of dto.harvests) {
         const harvest = harvests.find((h) => h.id === want.harvestId)!;
         // Lock-free but safe: the read and insert happen in one serializable-enough tx per harvest row.
-        await tx.$queryRaw`SELECT id FROM harvest_records WHERE id = ${harvest.id}::uuid FOR UPDATE`;
+        await tx.$queryRaw`SELECT id FROM ${Prisma.raw(qualified('harvest_records'))} WHERE id = ${harvest.id}::uuid FOR UPDATE`;
         const used = await tx.lotSource.findMany({ where: { harvestId: harvest.id }, select: { quantity: true } });
         const left = harvestRemaining(harvest.quantity, used.map((u) => u.quantity));
         if (new Decimal(want.quantity).greaterThan(left)) {
@@ -367,7 +393,7 @@ export class AgricultureService {
 
   private async lockedLot(tx: Tx, org: ActingOrganization, lotId: string) {
     const [row] = await tx.$queryRaw<{ id: string }[]>`
-      SELECT id FROM produce_lots WHERE id = ${lotId}::uuid AND organization_id = ${org.organization.id}::uuid FOR UPDATE`;
+      SELECT id FROM ${Prisma.raw(qualified('produce_lots'))} WHERE id = ${lotId}::uuid AND organization_id = ${org.organization.id}::uuid FOR UPDATE`;
     if (!row) throw notFound('Lot');
     const lot = await tx.produceLot.findUniqueOrThrow({ where: { id: lotId } });
     if (lot.status !== 'active' || !lot.quantity.greaterThan(0)) throw conflict('lot_depleted', `Lot ${lot.lotCode} has nothing left`);

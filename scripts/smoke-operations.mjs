@@ -3,24 +3,22 @@
 // concurrency), fulfilment, carrier and payment webhooks, invoicing,
 // disputes & performance, agriculture lineage, manufacturing, analytics.
 import { randomUUID } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
+  adminSession,
   call,
   check,
   finish,
   heading,
   inDays,
   newUser,
-  PASSWORD,
   PDF,
   PNG,
   register,
   signCallback,
-  totp,
   upload,
-  verifyEmail,
   waitFor,
 } from './smoke-lib.mjs';
 
@@ -30,26 +28,8 @@ const providerSecret = (name) => envOf('services/integration/.env').PROVIDERS.sp
 
 // =============================================================================
 heading('Platform administration (bootstrap admin with MFA)');
-const ADMIN_FILE = `${root}.smoke-admin.json`;
 const ADMIN_EMAIL = envOf('services/administration/.env').ADMIN_BOOTSTRAP_EMAILS.split(',')[0];
-let admin;
-if (existsSync(ADMIN_FILE)) {
-  const saved = JSON.parse(readFileSync(ADMIN_FILE, 'utf8'));
-  const login = await call('POST', '/auth/login', { body: { email: ADMIN_EMAIL, password: saved.password } });
-  const verified = await call('POST', '/auth/mfa/verify', { body: { mfaToken: login.body.mfaToken, code: totp(saved.secret) } });
-  admin = { token: verified.body.accessToken };
-} else {
-  const user = await register({ email: ADMIN_EMAIL, password: PASSWORD, displayName: 'Platform Admin' });
-  if (!user.token) {
-    console.error(`${ADMIN_EMAIL} already exists but ${ADMIN_FILE} is missing; reset the local database or remove that user.`);
-    process.exit(1);
-  }
-  await verifyEmail(user);
-  const setup = await call('POST', '/auth/mfa/setup', { token: user.token });
-  await call('POST', '/auth/mfa/enable', { token: user.token, body: { code: totp(setup.body.secret) } });
-  writeFileSync(ADMIN_FILE, JSON.stringify({ password: PASSWORD, secret: setup.body.secret }));
-  admin = { token: user.token };
-}
+const admin = await adminSession(root, ADMIN_EMAIL);
 let r = await call('GET', '/admin/me', { token: admin.token });
 check('bootstrap admin (verified email + MFA) is platform_admin', r.body.roles?.includes('platform_admin'), r.body);
 

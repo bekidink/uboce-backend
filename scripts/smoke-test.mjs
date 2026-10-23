@@ -102,6 +102,9 @@ for (const path of ['/internal/token', '/INTERNAL/token', '/%69nternal/token', '
   r = await call('POST', path, { body: { clientId: 'identity', clientSecret: 'x'.repeat(40) } });
   check(`internal route is unreachable: ${path}`, r.status === 404, r);
 }
+const docsPage = await fetch(API.replace('/api/v1', '/docs'));
+const spec = await fetch(API.replace('/api/v1', '/docs/specs/procurement.json')).then((x) => x.json());
+check('combined Swagger UI at /docs, with every service spec', docsPage.ok && Object.keys(spec.paths ?? {}).length > 0 && !Object.keys(spec.paths).some((p) => p.includes('internal')), spec.info);
 r = await call('GET', '/nope');
 check('unknown routes are 404 in the shared error shape', r.status === 404 && r.body.error?.code === 'not_found', r);
 const correlationId = `smoke-trace-${randomUUID()}`;

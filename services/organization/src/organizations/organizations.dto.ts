@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsUUID, Length, Matches } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { ArrayMaxSize, ArrayMinSize, IsEnum, IsOptional, IsString, IsUUID, Length, Matches } from 'class-validator';
 
 import { MembershipRole, OrganizationType } from '../generated/prisma/enums.js';
 
@@ -77,4 +78,13 @@ export class CreateBranchDto {
   @IsOptional()
   @Matches(COUNTRY)
   countryCode?: string;
+}
+
+export class DirectoryQueryDto {
+  @ApiProperty({ description: 'Comma-separated organization IDs (up to 100)', example: 'id1,id2' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.split(',').map((id) => id.trim()).filter(Boolean) : value))
+  @ArrayMinSize(1)
+  @ArrayMaxSize(100)
+  @IsUUID('all', { each: true })
+  ids: string[];
 }

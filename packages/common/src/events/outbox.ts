@@ -9,6 +9,8 @@ import {
 import type { EventEnvelope } from '@uboce/contracts';
 import type { Redis } from 'ioredis';
 
+import { qualified } from '../database.js';
+
 import { publishToStream } from './envelope.js';
 import { REDIS } from './redis.module.js';
 
@@ -67,7 +69,7 @@ export class OutboxRelay {
     const batchSize = this.options.batchSize ?? 100;
     return this.db.$transaction(async (tx) => {
       const rows = await tx.$queryRawUnsafe<{ id: string; payload: EventEnvelope }[]>(
-        `SELECT id, payload FROM outbox_events
+        `SELECT id, payload FROM ${qualified('outbox_events')}
          WHERE published_at IS NULL
          ORDER BY created_at
          LIMIT $1
@@ -83,7 +85,7 @@ export class OutboxRelay {
         } catch (error) {
           // Keep order: stop at the first failure and retry from here next tick.
           await tx.$executeRawUnsafe(
-            `UPDATE outbox_events SET attempts = attempts + 1, last_error = $2 WHERE id = $1::uuid`,
+            `UPDATE ${qualified('outbox_events')} SET attempts = attempts + 1, last_error = $2 WHERE id = $1::uuid`,
             row.id,
             String(error).slice(0, 1000),
           );
@@ -93,7 +95,7 @@ export class OutboxRelay {
 
       if (published.length > 0) {
         await tx.$executeRawUnsafe(
-          `UPDATE outbox_events SET published_at = now() WHERE id = ANY($1::uuid[])`,
+          `UPDATE ${qualified('outbox_events')} SET published_at = now() WHERE id = ANY($1::uuid[])`,
           published,
         );
       }

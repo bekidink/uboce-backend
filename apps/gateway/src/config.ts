@@ -20,6 +20,11 @@ const schema = z.object({
   AUTH_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).default(30),
   /** Hops in front of the gateway (load balancer) whose X-Forwarded-For is trusted. */
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).default(0),
+  /** Serve the combined Swagger UI at /docs. Turn off where the API surface should not be browsable. */
+  DOCS_ENABLED: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
   // One <SERVICE>_URL per upstream, e.g. IDENTITY_URL.
   ...Object.fromEntries(SERVICES.map((s) => [urlVar(s), z.string().min(1)])),
 });

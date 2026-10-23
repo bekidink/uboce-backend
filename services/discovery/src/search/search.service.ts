@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { toPage } from '@uboce/common';
+import { toPage, qualified } from '@uboce/common';
 
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
@@ -61,8 +61,8 @@ export class SearchService {
              p.attributes, p.variants, p.min_price, p.max_price, p.currency, p.published_at,
              o.name AS supplier_name, o.country_code AS supplier_country, o.verification_status AS supplier_verification,
              count(*) OVER () AS total
-      FROM product_listings p
-      JOIN organization_profiles o ON o.organization_id = p.organization_id
+      FROM ${Prisma.raw(qualified('product_listings'))} p
+      JOIN ${Prisma.raw(qualified('organization_profiles'))} o ON o.organization_id = p.organization_id
       WHERE ${Prisma.join(where, ' AND ')}
       ORDER BY ${order}
       LIMIT ${q.limit} OFFSET ${(q.page - 1) * q.limit}`;
@@ -102,8 +102,8 @@ export class SearchService {
     >`
       SELECT o.organization_id, o.name, o.type, o.country_code, o.verification_status,
              count(p.product_id) AS products, count(*) OVER () AS total
-      FROM organization_profiles o
-      JOIN product_listings p ON p.organization_id = o.organization_id
+      FROM ${Prisma.raw(qualified('organization_profiles'))} o
+      JOIN ${Prisma.raw(qualified('product_listings'))} p ON p.organization_id = o.organization_id
       WHERE ${Prisma.join(where, ' AND ')}
       GROUP BY o.organization_id
       ORDER BY products DESC, o.name ASC

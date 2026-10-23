@@ -1,5 +1,5 @@
 import { Inject, Injectable, type BeforeApplicationShutdown, type OnApplicationBootstrap } from '@nestjs/common';
-import { handleOnce, REDIS, StreamConsumer } from '@uboce/common';
+import { handleOnce, REDIS, StreamConsumer, qualified } from '@uboce/common';
 import type { DomainEvent, EventEnvelope, EventType, ProductPublishedV1 } from '@uboce/contracts';
 import type { Redis } from 'ioredis';
 
@@ -90,7 +90,7 @@ export class SearchIndexer implements OnApplicationBootstrap, BeforeApplicationS
     await tx.productListing.upsert({ where: { productId: e.data.productId }, update: row, create: { productId: e.data.productId, ...row } });
     // Searchable text: name, description, category and attribute values (e.g. "Yirgacheffe").
     const text = [e.data.name, e.data.description ?? '', e.data.categorySlug, ...Object.values(e.data.attributes)].join(' ');
-    await tx.$executeRaw`UPDATE product_listings SET search_document = to_tsvector('simple', ${text}) WHERE product_id = ${e.data.productId}::uuid`;
+    await tx.$executeRaw`UPDATE ${Prisma.raw(qualified('product_listings'))} SET search_document = to_tsvector('simple', ${text}) WHERE product_id = ${e.data.productId}::uuid`;
   }
 
   private async upsertOrganization(

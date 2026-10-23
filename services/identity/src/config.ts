@@ -20,7 +20,7 @@ export const env = loadEnv(
     /** Per IP, on each auth endpoint. Raise only for load tests. */
     AUTH_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).default(10),
     /** Web/mobile app base URL used in emailed links. */
-    APP_BASE_URL: z.string().default('http://localhost:3000'),
+    APP_BASE_URL: z.string().default('http://localhost:4200'),
   }),
 );
 

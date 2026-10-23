@@ -189,6 +189,12 @@ class GradeDto {
   notes?: string;
 }
 
+class SeasonsQueryDto extends PaginationQueryDto {
+  @IsOptional()
+  @IsUUID()
+  farmId?: string;
+}
+
 class LotsQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsIn(['active', 'depleted'])
@@ -222,6 +228,11 @@ export class AgricultureController {
   @Post('seasons')
   season(@ActingOrg() org: ActingOrganization, @Body() dto: SeasonDto) {
     return this.agriculture.createSeason(org, dto);
+  }
+
+  @Get('seasons')
+  seasons(@ActingOrg() org: ActingOrganization, @Query() query: SeasonsQueryDto) {
+    return this.agriculture.listSeasons(org, query.farmId, query);
   }
 
   @Post('seasons/:seasonId/harvests')

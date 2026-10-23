@@ -2,6 +2,7 @@ export * from './auth/index.js';
 export * from './bootstrap.js';
 export * from './context.js';
 export * from './core.js';
+export * from './database.js';
 export * from './env.js';
 export * from './errors.js';
 export * from './events/index.js';

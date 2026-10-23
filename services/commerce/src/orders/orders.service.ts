@@ -13,6 +13,7 @@ import {
   skipTake,
   toOutboxRow,
   toPage,
+  qualified,
 } from '@uboce/common';
 import type { DomainEvent, EventCatalog, EventType, InternalOrder } from '@uboce/contracts';
 
@@ -345,7 +346,7 @@ export class OrdersService {
   private async nextNumber(tx: Tx) {
     const year = new Date().getUTCFullYear();
     const [row] = await tx.$queryRaw<{ last: number }[]>`
-      INSERT INTO order_number_counters (year, last) VALUES (${year}, 1)
+      INSERT INTO ${Prisma.raw(qualified('order_number_counters'))} (year, last) VALUES (${year}, 1)
       ON CONFLICT (year) DO UPDATE SET last = order_number_counters.last + 1
       RETURNING last`;
     return `PO-${year}-${String(row!.last).padStart(6, '0')}`;

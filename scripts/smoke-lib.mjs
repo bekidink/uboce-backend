@@ -120,3 +120,47 @@ export async function upload(user, org, { classification, fileName, contentType,
 
 export const PDF = (label) => Buffer.from(`%PDF-1.4\n% ${label}\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n`);
 export const PNG = () => Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(64, 7)]);
+
+// ---- Local platform admin (shared by the smoke tests and the seed) ---------------
+
+/** Which database the services use (local Docker or a Supabase project), from Identity's .env. */
+function databaseKey(root, readFileSync) {
+  try {
+    const url = readFileSync(`${root}services/identity/.env`, 'utf8').match(/^DATABASE_URL=(.*)$/m)?.[1];
+    const u = new URL(url);
+    return `${decodeURIComponent(u.username).split('.')[1] ?? u.hostname}`;
+  } catch {
+    return 'local';
+  }
+}
+
+/**
+ * Signs in as the bootstrap admin (ADMIN_BOOTSTRAP_EMAILS), creating it with a
+ * verified email and MFA on first use. Its password and TOTP secret are kept in
+ * .smoke-admin.json (git-ignored), one entry per database the services use.
+ */
+export async function adminSession(root, adminEmail) {
+  const file = `${root}.smoke-admin.json`;
+  const { existsSync, readFileSync, writeFileSync } = await import('node:fs');
+  const key = databaseKey(root, readFileSync);
+  let all = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {};
+  if (typeof all.password === 'string') all = { localhost: all }; // older single-database format
+  const saved = all[key];
+  if (saved) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const login = await call('POST', '/auth/login', { body: { email: adminEmail, password: saved.password } });
+      const verified = await call('POST', '/auth/mfa/verify', { body: { mfaToken: login.body.mfaToken, code: totp(saved.secret) } });
+      if (verified.status === 200) return { token: verified.body.accessToken, email: adminEmail, password: saved.password };
+      // Each code works once: if this window's code was just used, wait for the next one.
+      await new Promise((r) => setTimeout(r, 30_000 - (Date.now() % 30_000) + 1000));
+    }
+    throw new Error(`Could not sign in as ${adminEmail} (saved login for database "${key}")`);
+  }
+  const user = await register({ email: adminEmail, password: PASSWORD, displayName: 'Platform Admin' });
+  if (!user.token) throw new Error(`${adminEmail} exists in database "${key}" but ${file} has no login for it; remove that user or reset the database.`);
+  await verifyEmail(user);
+  const setup = await call('POST', '/auth/mfa/setup', { token: user.token });
+  await call('POST', '/auth/mfa/enable', { token: user.token, body: { code: totp(setup.body.secret) } });
+  writeFileSync(file, JSON.stringify({ ...all, [key]: { password: PASSWORD, secret: setup.body.secret } }, null, 2));
+  return { token: user.token, email: adminEmail, password: PASSWORD };
+}

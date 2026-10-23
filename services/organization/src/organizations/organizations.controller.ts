@@ -6,6 +6,7 @@ import {
   AddMemberDto,
   CreateBranchDto,
   CreateOrganizationDto,
+  DirectoryQueryDto,
   UpdateMemberDto,
   UpdateOrganizationDto,
 } from './organizations.dto.js';
@@ -27,6 +28,12 @@ export class OrganizationsController {
   @Get()
   listMine(@CurrentUser() user: AuthUser, @Query() query: PaginationQueryDto) {
     return this.organizations.listMine(user.userId, query);
+  }
+
+  /** Public profiles (name, type, verification) of any organizations, so clients can show counterparties by name. */
+  @Get('directory')
+  directory(@Query() query: DirectoryQueryDto) {
+    return this.organizations.directory(query.ids);
   }
 
   @Get(':organizationId')

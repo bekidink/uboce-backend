@@ -9,6 +9,7 @@ import { pino } from 'pino';
 import { pinoHttp } from 'pino-http';
 
 import { corsOrigins, env, upstreams } from './config.js';
+import { docsRouter } from './docs.js';
 import { resolveService, type ServiceName } from './routes.js';
 
 const logger = pino({ level: env.LOG_LEVEL, base: { service: 'api-gateway' } });
@@ -84,6 +85,10 @@ app.get('/health/ready', async (_req, res) => {
   const ok = Object.values(all).every((s) => s === 'ok');
   res.status(ok ? 200 : 503).json({ status: ok ? 'ok' : 'down', checks: all });
 });
+
+// ---- API docs: one Swagger UI for every service (disable with DOCS_ENABLED=false) ----
+
+if (env.DOCS_ENABLED) app.use(docsRouter(upstreams, logger));
 
 // ---- Routing, rate limiting, proxying --------------------------------------------
 
