@@ -26,7 +26,10 @@
     "smoke:core": "node scripts/smoke-test.mjs",
     "seed": "node scripts/seed.mjs",
     "db:supabase": "node scripts/supabase-setup.mjs",
-    "db:local": "node scripts/supabase-setup.mjs local"
+    "db:local": "node scripts/supabase-setup.mjs local",
+    "render:generate": "node scripts/generate-render.mjs",
+    "deploy:secrets": "node scripts/deploy-secrets.mjs",
+    "deploy:push-env": "node scripts/render-push-env.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

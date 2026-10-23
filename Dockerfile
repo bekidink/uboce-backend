@@ -16,14 +16,18 @@ FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir /pnpm/store
 
-# ---- Build everything once --------------------------------------------------------
+# ---- Build: one deployable (TARGET) and the workspace packages it uses, or everything --------
 FROM deps AS build
+ARG TARGET
 COPY package.json tsconfig.base.json ./
 COPY packages ./packages
 COPY services ./services
 COPY apps ./apps
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm install --offline --frozen-lockfile --store-dir /pnpm/store
-RUN pnpm build
+RUN if [ -n "$TARGET" ]; then \
+      if [ -f "$TARGET/prisma/schema.prisma" ]; then pnpm --filter "./${TARGET}" prisma:generate; fi && \
+      pnpm --filter "{./${TARGET}}..." build; \
+    else pnpm build; fi
 
 # ---- Migration runner: applies each service's migrations to its own database --------
 FROM build AS migrate
@@ -41,4 +45,5 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=bundle --chown=node:node /out ./
 USER node
+# Services also run `npx prisma migrate deploy` from this image before each release.
 CMD ["node", "dist/main.js"]

@@ -15,6 +15,7 @@ import type {
   SendMessageRequest,
 } from '@uboce/contracts';
 
+import { serviceUrl } from '../urls.js';
 import { InternalCallError, type InternalClient } from './internal-client.js';
 
 abstract class ServiceClient {
@@ -27,7 +28,7 @@ abstract class ServiceClient {
   /** Fails on use, not at startup, so services only configure the peers they call. */
   protected url(path: string) {
     if (!this.baseUrl) throw new Error(`${this.setting} is not configured for this service`);
-    return `${this.baseUrl}/api/v1/internal${path}`;
+    return `${serviceUrl(this.baseUrl)}/api/v1/internal${path}`;
   }
 }
 

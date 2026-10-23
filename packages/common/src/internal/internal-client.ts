@@ -1,4 +1,5 @@
 import { CORRELATION_HEADER, currentCorrelationId } from '../context.js';
+import { serviceUrl } from '../urls.js';
 
 export interface InternalClientOptions {
   /** Identity base URL, e.g. http://localhost:4101 */
@@ -74,7 +75,7 @@ export class InternalClient {
   }
 
   private async fetchToken(): Promise<string> {
-    const res = await fetch(`${this.options.identityUrl}/api/v1/internal/token`, {
+    const res = await fetch(`${serviceUrl(this.options.identityUrl)}/api/v1/internal/token`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ clientId: this.options.clientId, clientSecret: this.options.clientSecret }),

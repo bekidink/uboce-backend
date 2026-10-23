@@ -180,6 +180,13 @@ S3 storage stay local either way.
 - **Rate limits:** local `.env` values are raised so `pnpm smoke` can run; production should keep the
   code defaults (10/min per auth endpoint at Identity, 30/min auth and 300/min overall at the gateway).
 
+## Deploying
+
+The backend deploys to Render as one Blueprint (`render.yaml`): the gateway as the public web
+service, 21 private services, SeaweedFS storage with a disk, Render Key Value, and Supabase for
+Postgres. Each service runs its own migrations before every release. Step by step, including
+secrets (`pnpm deploy:secrets`, `pnpm deploy:push-env`): [docs/DEPLOY.md](docs/DEPLOY.md).
+
 ## Decisions still open (PRD §17)
 
 These are business, legal or vendor choices the code is ready for but cannot make:

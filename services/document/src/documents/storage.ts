@@ -12,6 +12,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
+import { serviceUrl } from '@uboce/common';
 
 import { env } from '../config.js';
 
@@ -32,9 +33,9 @@ const client = (endpoint: string) =>
 @Injectable()
 export class Storage implements OnApplicationBootstrap {
   private readonly logger = new Logger(Storage.name);
-  private readonly internal = client(env.S3_ENDPOINT);
+  private readonly internal = client(serviceUrl(env.S3_ENDPOINT));
   /** Signs URLs with the host clients can reach (differs from the internal one in containers). */
-  private readonly signer = client(env.S3_PUBLIC_ENDPOINT ?? env.S3_ENDPOINT);
+  private readonly signer = client(serviceUrl(env.S3_PUBLIC_ENDPOINT ?? env.S3_ENDPOINT));
 
   async onApplicationBootstrap() {
     try {

@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 
+import { serviceUrl } from '@uboce/common';
 import { z } from 'zod';
 
 import { type ServiceName, SERVICES } from './routes.js';
@@ -35,6 +36,6 @@ if (!parsed.success) {
 }
 export const env = parsed.data as z.infer<typeof schema> & Record<string, string>;
 
-export const upstreams = Object.fromEntries(SERVICES.map((s) => [s, env[urlVar(s)]!])) as Record<ServiceName, string>;
+export const upstreams = Object.fromEntries(SERVICES.map((s) => [s, serviceUrl(env[urlVar(s)]!)])) as Record<ServiceName, string>;
 
 export const corsOrigins = new Set(env.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean));
