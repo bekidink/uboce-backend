@@ -29,7 +29,12 @@
     "db:local": "node scripts/supabase-setup.mjs local",
     "render:generate": "node scripts/generate-render.mjs",
     "deploy:secrets": "node scripts/deploy-secrets.mjs",
-    "deploy:push-env": "node scripts/render-push-env.mjs"
+    "deploy:push-env": "node scripts/render-push-env.mjs",
+    "vps:generate": "node scripts/generate-vps.mjs",
+    "vps:env": "node scripts/vps-env.mjs",
+    "hf:config": "node scripts/hf-config.mjs",
+    "hf:push": "node scripts/hf-push.mjs",
+    "admin:code": "node scripts/admin-code.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

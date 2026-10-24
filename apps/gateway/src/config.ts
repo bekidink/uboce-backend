@@ -26,6 +26,12 @@ const schema = z.object({
     .enum(['true', 'false'])
     .default('true')
     .transform((v) => v === 'true'),
+  /** Serve a built web app (index.html + assets) from this directory for every non-API path. */
+  WEB_ROOT: z.string().optional(),
+  /** Extra origins the web app may connect to (e.g. the S3 host it uploads to), space-separated. */
+  WEB_CONNECT_SRC: z.string().default(''),
+  /** Origins allowed to embed the app in a frame (e.g. https://huggingface.co), space-separated. */
+  FRAME_ANCESTORS: z.string().default(''),
   // One <SERVICE>_URL per upstream, e.g. IDENTITY_URL.
   ...Object.fromEntries(SERVICES.map((s) => [urlVar(s), z.string().min(1)])),
 });

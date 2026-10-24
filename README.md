@@ -182,10 +182,15 @@ S3 storage stay local either way.
 
 ## Deploying
 
-The backend deploys to Render as one Blueprint (`render.yaml`): the gateway as the public web
-service, 21 private services, SeaweedFS storage with a disk, Render Key Value, and Supabase for
-Postgres. Each service runs its own migrations before every release. Step by step, including
-secrets (`pnpm deploy:secrets`, `pnpm deploy:push-env`): [docs/DEPLOY.md](docs/DEPLOY.md).
+- **One VPS (recommended to start):** Docker Compose with all services, Redis, SeaweedFS and a
+  migration step, behind Caddy for automatic HTTPS; images built by CI and published to GitHub
+  Container Registry; Supabase for Postgres. [docs/DEPLOY-VPS.md](docs/DEPLOY-VPS.md)
+  (`pnpm deploy:secrets`, `pnpm vps:env`, `deploy/vps/deploy.sh user@server`).
+- **Render:** one Blueprint (`render.yaml`) with the gateway as the public web service and 21
+  private services. Needs a paid Render plan. [docs/DEPLOY.md](docs/DEPLOY.md).
+
+Both are generated from `infrastructure/services.json` and the services' `.env.example` files, and
+share the same secrets (`secrets/render.json`).
 
 ## Decisions still open (PRD §17)
 

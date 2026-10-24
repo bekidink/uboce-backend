@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import path from 'node:path';
 
 import { CORRELATION_HEADER, hitRateLimit } from '@uboce/common';
 import express, { type NextFunction, type Request, type Response } from 'express';
@@ -43,7 +44,20 @@ app.use(
   }),
 );
 
-app.use(helmet());
+const words = (v: string) => v.split(/\s+/).filter(Boolean);
+const frameAncestors = words(env.FRAME_ANCESTORS);
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        'connect-src': ["'self'", ...words(env.WEB_CONNECT_SRC)],
+        'frame-ancestors': ["'self'", ...frameAncestors],
+      },
+    },
+    // X-Frame-Options can't name other origins; CSP frame-ancestors governs framing instead.
+    ...(frameAncestors.length ? { frameguard: false } : {}),
+  }),
+);
 
 // CORS: explicit allowlist only. Native mobile apps don't send Origin and are unaffected.
 app.use((req, res, next) => {
@@ -89,6 +103,23 @@ app.get('/health/ready', async (_req, res) => {
 // ---- API docs: one Swagger UI for every service (disable with DOCS_ENABLED=false) ----
 
 if (env.DOCS_ENABLED) app.use(docsRouter(upstreams, logger));
+
+// ---- Web app (optional): one origin for the site and its API, no CORS needed --------
+
+if (env.WEB_ROOT) {
+  const webRoot = path.resolve(env.WEB_ROOT);
+  const isApiPath = (p: string) => p === '/api' || p.startsWith('/api/') || p.startsWith('/docs') || p.startsWith('/health');
+  const files = express.static(webRoot, {
+    index: false,
+    setHeaders: (res, file) => {
+      // Vite fingerprints everything under assets/, so it can be cached forever.
+      res.setHeader('cache-control', file.includes(`${path.sep}assets${path.sep}`) ? 'public, max-age=31536000, immutable' : 'no-cache');
+    },
+  });
+  app.use((req, res, next) => (isApiPath(req.path) ? next() : files(req, res, next)));
+  // Client-side routes (/dashboard, /rfqs/…) all load the app shell.
+  app.get(/.*/, (req, res, next) => (isApiPath(req.path) ? next() : res.setHeader('cache-control', 'no-cache').sendFile(path.join(webRoot, 'index.html'))));
+}
 
 // ---- Routing, rate limiting, proxying --------------------------------------------
 

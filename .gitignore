@@ -10,3 +10,10 @@ secrets/
 *.log
 .DS_Store
 .smoke-admin.json
+# VPS deployment: generated env files and server-side secrets
+deploy/vps/env/
+deploy/vps/secrets/
+deploy/vps/web/*
+!deploy/vps/web/README.txt
+# Hugging Face deployment: the generated configuration secret
+deploy/huggingface/UBOCE_CONFIG.txt
