@@ -1,8 +1,11 @@
-// Order lifecycle (PRD 5.8). Every status change goes through `assertTransition`.
+// Order lifecycle (PRD 5.8, addendum 2.6). Every status change goes through `assertTransition`.
 
 export type OrderStatus =
   | 'pending_confirmation'
   | 'confirmed'
+  | 'ready_for_pickup'
+  | 'uncollected'
+  | 'delivery_failed'
   | 'partially_fulfilled'
   | 'fulfilled'
   | 'closed'
@@ -27,12 +30,34 @@ const TRANSITIONS: Record<OrderStatus, Transition[]> = {
   confirmed: [
     { to: 'partially_fulfilled', by: ['system'] },
     { to: 'fulfilled', by: ['system'] },
+    // Pickup orders: the supplier has the goods ready at the collection point.
+    { to: 'ready_for_pickup', by: ['supplier'] },
+    { to: 'delivery_failed', by: ['supplier', 'system'] },
     // Before dispatch only; after that a corrective workflow is needed (PRD 8.5).
     { to: 'cancelled', by: ['buyer'] },
     { to: 'exception', by: ['system'] },
   ],
+  ready_for_pickup: [
+    // Collected: the supplier hands the goods over.
+    { to: 'fulfilled', by: ['supplier'] },
+    { to: 'uncollected', by: ['supplier'] },
+    { to: 'cancelled', by: ['buyer'] },
+  ],
+  uncollected: [
+    // A new pickup appointment, or give up.
+    { to: 'ready_for_pickup', by: ['supplier'] },
+    { to: 'cancelled', by: ['buyer', 'supplier'] },
+  ],
+  delivery_failed: [
+    // Retry the delivery, or cancel.
+    { to: 'confirmed', by: ['supplier', 'system'] },
+    { to: 'cancelled', by: ['buyer', 'supplier'] },
+    { to: 'partially_fulfilled', by: ['system'] },
+    { to: 'fulfilled', by: ['system'] },
+  ],
   partially_fulfilled: [
     { to: 'fulfilled', by: ['system'] },
+    { to: 'delivery_failed', by: ['supplier', 'system'] },
     { to: 'exception', by: ['system'] },
   ],
   fulfilled: [{ to: 'closed', by: ['buyer', 'system'] }],
@@ -56,4 +81,39 @@ export class InvalidTransitionError extends Error {
 
 export function assertTransition(from: OrderStatus, to: OrderStatus, by: OrderParty | 'system') {
   if (!canTransition(from, to, by)) throw new InvalidTransitionError(from, to, by);
+}
+
+// ---- Policy arithmetic (pure) ------------------------------------------------------------
+
+export interface PolicySnapshot {
+  id: string;
+  version: number;
+  name: string;
+  freeCancellationHours: number;
+  cancellationFeePct: string;
+  noShowFeePct: string;
+  returnWindowDays: number;
+  restockingFeePct: string;
+  pickupHoldHours: number;
+  terms: string | null;
+}
+
+/** Fee for a buyer cancelling: free until confirmation + the free window, then the policy percentage. */
+export function cancellationFeePct(policy: PolicySnapshot | null, status: OrderStatus, confirmedAt: Date | null, now = new Date()): number {
+  if (!policy || status === 'pending_confirmation' || !confirmedAt) return 0;
+  const freeUntil = confirmedAt.getTime() + policy.freeCancellationHours * 3_600_000;
+  return now.getTime() <= freeUntil ? 0 : Number(policy.cancellationFeePct);
+}
+
+/** Whether a return may still be requested. */
+export function withinReturnWindow(policy: PolicySnapshot | null, fulfilledAt: Date | null, now = new Date()) {
+  if (!policy || policy.returnWindowDays <= 0 || !fulfilledAt) return false;
+  return now.getTime() <= fulfilledAt.getTime() + policy.returnWindowDays * 86_400_000;
+}
+
+/** Discount for a promotion on a subtotal (never more than the subtotal). */
+export function discountFor(p: { kind: 'percent' | 'fixed'; value: number; maxDiscount: number | null }, subtotal: number) {
+  const raw = p.kind === 'percent' ? (subtotal * p.value) / 100 : p.value;
+  const capped = p.maxDiscount !== null ? Math.min(raw, p.maxDiscount) : raw;
+  return Math.max(0, Math.min(subtotal, Math.round(capped * 100) / 100));
 }

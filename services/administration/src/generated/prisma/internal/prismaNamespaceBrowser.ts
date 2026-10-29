@@ -54,6 +54,8 @@ export const ModelName = {
   PlatformRoleGrant: 'PlatformRoleGrant',
   Setting: 'Setting',
   FeatureFlag: 'FeatureFlag',
+  Entitlement: 'Entitlement',
+  BusinessTypeModule: 'BusinessTypeModule',
   AuditEntry: 'AuditEntry',
   OutboxEvent: 'OutboxEvent'
 } as const
@@ -110,6 +112,30 @@ export const FeatureFlagScalarFieldEnum = {
 } as const
 
 export type FeatureFlagScalarFieldEnum = (typeof FeatureFlagScalarFieldEnum)[keyof typeof FeatureFlagScalarFieldEnum]
+
+
+export const EntitlementScalarFieldEnum = {
+  organizationId: 'organizationId',
+  moduleKey: 'moduleKey',
+  enabled: 'enabled',
+  validUntil: 'validUntil',
+  note: 'note',
+  updatedByUserId: 'updatedByUserId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EntitlementScalarFieldEnum = (typeof EntitlementScalarFieldEnum)[keyof typeof EntitlementScalarFieldEnum]
+
+
+export const BusinessTypeModuleScalarFieldEnum = {
+  organizationType: 'organizationType',
+  moduleKey: 'moduleKey',
+  enabled: 'enabled',
+  updatedByUserId: 'updatedByUserId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BusinessTypeModuleScalarFieldEnum = (typeof BusinessTypeModuleScalarFieldEnum)[keyof typeof BusinessTypeModuleScalarFieldEnum]
 
 
 export const AuditEntryScalarFieldEnum = {

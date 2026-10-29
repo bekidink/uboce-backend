@@ -108,6 +108,75 @@ export class NotificationEventHandlers implements OnApplicationBootstrap, Before
         KycVerificationDecided: this.on('KycVerificationDecided', async (e) =>
           e.data.decision === 'submitted' ? [] : [{ userId: e.data.subjectId, template: 'verification_update', vars: { kind: 'kyc', decision: e.data.decision } }],
         ),
+        // ---- PRD addendum v1.1 ----
+        PurchaseOrderFulfillmentUpdated: this.on('PurchaseOrderFulfillmentUpdated', async (e) =>
+          ['ready_for_pickup', 'uncollected', 'delivery_failed', 'exception'].includes(e.data.status)
+            ? this.toMembers([e.data.buyerOrganizationId], BUYING_ROLES, 'order_update', { orderId: e.data.orderId, orderNumber: e.data.orderNumber, status: e.data.status, side: 'buyer' })
+            : [],
+        ),
+        ShipmentStatusChanged: this.on('ShipmentStatusChanged', async (e) =>
+          ['delayed', 'failed'].includes(e.data.status)
+            ? this.toMembers([e.data.consigneeOrganizationId, e.data.shipperOrganizationId, ...(e.data.carrierOrganizationId ? [e.data.carrierOrganizationId] : [])], [...BUYING_ROLES, ...SALES_ROLES, 'logistics_operator'], 'shipment_update', {
+                shipmentId: e.data.shipmentId,
+                status: e.data.status,
+              })
+            : [],
+        ),
+        ReturnRequested: this.on('ReturnRequested', async (e) =>
+          this.toMembers([e.data.supplierOrganizationId], SALES_ROLES, 'return_requested', { returnId: e.data.returnId, orderNumber: e.data.orderNumber }),
+        ),
+        ReturnStatusChanged: this.on('ReturnStatusChanged', async (e) =>
+          this.toMembers([e.data.buyerOrganizationId], BUYING_ROLES, 'return_update', { returnId: e.data.returnId, orderNumber: e.data.orderNumber, status: e.data.status }),
+        ),
+        RefundStatusChanged: this.on('RefundStatusChanged', async (e) =>
+          ['succeeded', 'failed', 'rejected'].includes(e.data.status)
+            ? this.toMembers([e.data.buyerOrganizationId], [...BUYING_ROLES, 'finance_officer'], 'refund_update', {
+                refundId: e.data.refundId,
+                amount: e.data.amount,
+                currency: e.data.currency,
+                status: e.data.status,
+              })
+            : this.toMembers([e.data.sellerOrganizationId], ['owner', 'admin', 'finance_officer'], 'refund_update', {
+                refundId: e.data.refundId,
+                amount: e.data.amount,
+                currency: e.data.currency,
+                status: e.data.status,
+              }),
+        ),
+        OrderChargeAssessed: this.on('OrderChargeAssessed', async (e) =>
+          this.toMembers([e.data.buyerOrganizationId], [...BUYING_ROLES, 'finance_officer'], 'fee_charged', {
+            orderId: e.data.orderId,
+            orderNumber: e.data.orderNumber,
+            kind: e.data.kind.replace('_', ' '),
+            amount: e.data.amount,
+            currency: e.data.currency,
+          }),
+        ),
+        QualityClaimOpened: this.on('QualityClaimOpened', async (e) =>
+          this.toMembers([e.data.supplierOrganizationId], [...SALES_ROLES, 'quality_inspector'], 'claim_opened', { claimId: e.data.claimId, reason: e.data.reason }),
+        ),
+        ShipmentCarrierChanged: this.on('ShipmentCarrierChanged', async (e) => {
+          if (e.data.status === 'requested') {
+            const shipper = await this.organizations.getOrganization(e.data.shipperOrganizationId).catch(() => null);
+            return this.toMembers([e.data.carrierOrganizationId], ['owner', 'admin', 'logistics_operator'], 'carrier_request', {
+              shipmentId: e.data.shipmentId,
+              orderNumber: e.data.orderNumber,
+              organizationName: shipper?.name ?? 'A supplier',
+            });
+          }
+          if (e.data.status === 'accepted' || e.data.status === 'declined') {
+            return this.toMembers([e.data.shipperOrganizationId], [...SALES_ROLES, 'logistics_operator'], 'carrier_answer', {
+              shipmentId: e.data.shipmentId,
+              orderNumber: e.data.orderNumber,
+              status: e.data.status,
+              note: e.data.note ?? '',
+            });
+          }
+          return [];
+        }),
+        ReviewPublished: this.on('ReviewPublished', async (e) =>
+          this.toMembers([e.data.subjectOrganizationId], SALES_ROLES, 'review_published', { rating: String(e.data.rating) }),
+        ),
         KybVerificationDecided: this.on('KybVerificationDecided', async (e) =>
           e.data.decision === 'submitted' ? [] : this.toMembers([e.data.subjectId], ['owner', 'admin'], 'verification_update', { kind: 'kyb', decision: e.data.decision }),
         ),

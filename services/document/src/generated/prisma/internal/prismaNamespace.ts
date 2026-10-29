@@ -770,6 +770,7 @@ export const DocumentScalarFieldEnum = {
   rejectionReason: 'rejectionReason',
   retentionUntil: 'retentionUntil',
   legalHold: 'legalHold',
+  isPublic: 'isPublic',
   createdAt: 'createdAt',
   uploadedAt: 'uploadedAt',
   deletedAt: 'deletedAt'

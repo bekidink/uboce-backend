@@ -14,6 +14,7 @@ import {
   requireRole,
   type ServiceCaller,
   WarehousesClient,
+  RequiresModule,
 } from '@uboce/common';
 import { Type } from 'class-transformer';
 import {
@@ -143,6 +144,7 @@ class InternalReserveDto {
 @ApiTags('inventory')
 @ApiBearerAuth()
 @ActsForOrganization()
+@RequiresModule('inventory')
 @Controller('inventory')
 export class InventoryController {
   constructor(

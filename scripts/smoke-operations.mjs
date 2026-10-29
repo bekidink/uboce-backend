@@ -129,8 +129,10 @@ const general = (await call('GET', '/catalog/categories')).body.find((c) => c.sl
 const product = async (name, category, attributes, price) => {
   const p = (await call('POST', '/catalog/products', { token: sam.token, org: supplier, body: { name, categoryId: category.id, unitOfMeasure: 'kg', attributes, variants: [{ sku: `SKU-${randomUUID().slice(0, 8)}`, name: '1 kg', price, currency: 'ETB' }] } })).body;
   await call('POST', `/catalog/products/${p.id}/publish`, { token: sam.token, org: supplier });
+  variantOf[p.id] = p.variants[0].id;
   return p.id;
 };
+const variantOf = {};
 const green = await product('Yirgacheffe green coffee', coffee, { origin: 'Yirgacheffe', grade: '1', process: 'washed' }, '420.00');
 const roasted = await product('Yirgacheffe roasted coffee', general, {}, '900.00');
 
@@ -198,7 +200,7 @@ const po = async (qty) =>
       token: bea.token,
       org: buyer,
       headers: { 'idempotency-key': `po-${randomUUID()}` },
-      body: { supplierOrganizationId: supplier, currency: 'ETB', deliveryLocation: 'Addis Ababa', lines: [{ productId: green, description: 'Green coffee', quantity: qty, unitOfMeasure: 'kg', unitPrice: '420.00' }] },
+      body: { supplierOrganizationId: supplier, currency: 'ETB', deliveryLocation: 'Addis Ababa', lines: [{ variantId: variantOf[green], quantity: qty }] },
     })
   ).body;
 const order = await po('50');

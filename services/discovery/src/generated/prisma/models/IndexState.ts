@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model IndexState
- * Index freshness (PRD 5.6): when we last applied an event, and how old it was.
+ * 
  */
 export type IndexStateModel = runtime.Types.Result.DefaultSelection<Prisma.$IndexStatePayload>
 

@@ -11,6 +11,8 @@ export const DECREASING = new Set(['issue', 'transfer_out', 'production_issue'])
 export interface BalanceState {
   onHand: Decimal;
   reserved: Decimal;
+  /** Damaged + quarantined: on hand but not sellable (PRD addendum 2.1). */
+  held?: Decimal;
 }
 
 /**
@@ -30,11 +32,36 @@ export function applyMovement(
 
   const onHand = balance.onHand.plus(quantity);
   const reserved = balance.reserved.minus(fromReserved);
+  const held = balance.held ?? new Decimal(0);
   if (reserved.isNegative()) return { error: 'Cannot release more than is reserved' };
   if (onHand.isNegative()) return { error: 'Not enough stock on hand' };
-  // Free stock may not go negative: other orders' reservations must stay covered.
-  if (onHand.lessThan(reserved)) return { error: 'Not enough unreserved stock' };
+  // Free stock may not go negative: reservations and damaged/quarantined stock must stay covered.
+  if (onHand.lessThan(reserved.plus(held))) return { error: held.greaterThan(0) ? 'Not enough sellable stock (some is damaged or quarantined)' : 'Not enough unreserved stock' };
   return { next: { onHand, reserved } };
+}
+
+/**
+ * Moves stock between states. Out of "available" needs free (unreserved, sellable) stock;
+ * out of damaged/quarantined needs that much in the state.
+ */
+export function changeState(
+  balance: { onHand: Decimal; reserved: Decimal; damaged: Decimal; quarantined: Decimal },
+  from: 'available' | 'damaged' | 'quarantined',
+  to: 'available' | 'damaged' | 'quarantined',
+  quantity: Decimal,
+): { next: { damaged: Decimal; quarantined: Decimal } } | { error: string } {
+  if (from === to) return { error: 'Pick two different states' };
+  if (!quantity.greaterThan(0)) return { error: 'Quantity must be more than 0' };
+  const next = { damaged: balance.damaged, quarantined: balance.quarantined };
+  if (from === 'available') {
+    const free = balance.onHand.minus(balance.reserved).minus(balance.damaged).minus(balance.quarantined);
+    if (quantity.greaterThan(free)) return { error: `Only ${free.toString()} is available` };
+  } else {
+    if (quantity.greaterThan(next[from])) return { error: `Only ${next[from].toString()} is ${from}` };
+    next[from] = next[from].minus(quantity);
+  }
+  if (to !== 'available') next[to] = next[to].plus(quantity);
+  return { next };
 }
 
 export interface Candidate {

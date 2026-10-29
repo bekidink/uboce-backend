@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model OutboxEvent
- * Transactional outbox (PRD 8.3).
+ * 
  */
 export type OutboxEventModel = runtime.Types.Result.DefaultSelection<Prisma.$OutboxEventPayload>
 
@@ -385,14 +385,6 @@ export type OutboxEventMinOrderByAggregateInput = {
 
 export type OutboxEventSumOrderByAggregateInput = {
   attempts?: Prisma.SortOrder
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 

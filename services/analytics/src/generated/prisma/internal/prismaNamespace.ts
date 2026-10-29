@@ -398,6 +398,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   DailyMetric: 'DailyMetric',
+  ActivityEvent: 'ActivityEvent',
+  ReportTemplate: 'ReportTemplate',
   IndexState: 'IndexState',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
@@ -416,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "dailyMetric" | "indexState" | "outboxEvent" | "processedEvent"
+    modelProps: "dailyMetric" | "activityEvent" | "reportTemplate" | "indexState" | "outboxEvent" | "processedEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -491,6 +493,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.DailyMetricCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.DailyMetricCountAggregateOutputType> | number
+        }
+      }
+    }
+    ActivityEvent: {
+      payload: Prisma.$ActivityEventPayload<ExtArgs>
+      fields: Prisma.ActivityEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActivityEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActivityEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        findFirst: {
+          args: Prisma.ActivityEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActivityEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        findMany: {
+          args: Prisma.ActivityEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+        }
+        create: {
+          args: Prisma.ActivityEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        createMany: {
+          args: Prisma.ActivityEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActivityEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+        }
+        delete: {
+          args: Prisma.ActivityEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        update: {
+          args: Prisma.ActivityEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActivityEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActivityEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActivityEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActivityEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        aggregate: {
+          args: Prisma.ActivityEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActivityEvent>
+        }
+        groupBy: {
+          args: Prisma.ActivityEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActivityEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReportTemplate: {
+      payload: Prisma.$ReportTemplatePayload<ExtArgs>
+      fields: Prisma.ReportTemplateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReportTemplateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReportTemplateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>
+        }
+        findFirst: {
+          args: Prisma.ReportTemplateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReportTemplateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>
+        }
+        findMany: {
+          args: Prisma.ReportTemplateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>[]
+        }
+        create: {
+          args: Prisma.ReportTemplateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>
+        }
+        createMany: {
+          args: Prisma.ReportTemplateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReportTemplateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>[]
+        }
+        delete: {
+          args: Prisma.ReportTemplateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>
+        }
+        update: {
+          args: Prisma.ReportTemplateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>
+        }
+        deleteMany: {
+          args: Prisma.ReportTemplateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReportTemplateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReportTemplateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>[]
+        }
+        upsert: {
+          args: Prisma.ReportTemplateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportTemplatePayload>
+        }
+        aggregate: {
+          args: Prisma.ReportTemplateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReportTemplate>
+        }
+        groupBy: {
+          args: Prisma.ReportTemplateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReportTemplateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReportTemplateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReportTemplateCountAggregateOutputType> | number
         }
       }
     }
@@ -766,6 +916,41 @@ export const DailyMetricScalarFieldEnum = {
 export type DailyMetricScalarFieldEnum = (typeof DailyMetricScalarFieldEnum)[keyof typeof DailyMetricScalarFieldEnum]
 
 
+export const ActivityEventScalarFieldEnum = {
+  eventId: 'eventId',
+  organizationId: 'organizationId',
+  eventType: 'eventType',
+  area: 'area',
+  summary: 'summary',
+  reference: 'reference',
+  aggregateId: 'aggregateId',
+  branchId: 'branchId',
+  actorUserId: 'actorUserId',
+  own: 'own',
+  occurredAt: 'occurredAt',
+  data: 'data'
+} as const
+
+export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
+
+
+export const ReportTemplateScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  description: 'description',
+  dataset: 'dataset',
+  columns: 'columns',
+  filters: 'filters',
+  format: 'format',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReportTemplateScalarFieldEnum = (typeof ReportTemplateScalarFieldEnum)[keyof typeof ReportTemplateScalarFieldEnum]
+
+
 export const IndexStateScalarFieldEnum = {
   id: 'id',
   lastEventOccurredAt: 'lastEventOccurredAt',
@@ -882,6 +1067,13 @@ export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
  * Reference to a field of type 'Decimal[]'
  */
 export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -1078,6 +1270,8 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   dailyMetric?: Prisma.DailyMetricOmit
+  activityEvent?: Prisma.ActivityEventOmit
+  reportTemplate?: Prisma.ReportTemplateOmit
   indexState?: Prisma.IndexStateOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit

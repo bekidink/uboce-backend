@@ -11,6 +11,8 @@
 export type * from './models/PlatformRoleGrant.js'
 export type * from './models/Setting.js'
 export type * from './models/FeatureFlag.js'
+export type * from './models/Entitlement.js'
+export type * from './models/BusinessTypeModule.js'
 export type * from './models/AuditEntry.js'
 export type * from './models/OutboxEvent.js'
 export type * from './commonInputTypes.js'

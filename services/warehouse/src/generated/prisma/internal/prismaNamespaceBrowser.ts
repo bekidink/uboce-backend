@@ -56,6 +56,8 @@ export const ModelName = {
   Receipt: 'Receipt',
   ReceiptLine: 'ReceiptLine',
   Transfer: 'Transfer',
+  TransferRequest: 'TransferRequest',
+  TransferRequestLine: 'TransferRequestLine',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -85,6 +87,7 @@ export const WarehouseScalarFieldEnum = {
   region: 'region',
   city: 'city',
   addressLine: 'addressLine',
+  branchId: 'branchId',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -152,6 +155,45 @@ export const TransferScalarFieldEnum = {
 } as const
 
 export type TransferScalarFieldEnum = (typeof TransferScalarFieldEnum)[keyof typeof TransferScalarFieldEnum]
+
+
+export const TransferRequestScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  number: 'number',
+  fromWarehouseId: 'fromWarehouseId',
+  toWarehouseId: 'toWarehouseId',
+  fromBranchId: 'fromBranchId',
+  toBranchId: 'toBranchId',
+  status: 'status',
+  note: 'note',
+  responseNote: 'responseNote',
+  neededBy: 'neededBy',
+  requestedByUserId: 'requestedByUserId',
+  respondedByUserId: 'respondedByUserId',
+  dispatchedByUserId: 'dispatchedByUserId',
+  receivedByUserId: 'receivedByUserId',
+  respondedAt: 'respondedAt',
+  dispatchedAt: 'dispatchedAt',
+  receivedAt: 'receivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TransferRequestScalarFieldEnum = (typeof TransferRequestScalarFieldEnum)[keyof typeof TransferRequestScalarFieldEnum]
+
+
+export const TransferRequestLineScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  itemId: 'itemId',
+  description: 'description',
+  requestedQuantity: 'requestedQuantity',
+  approvedQuantity: 'approvedQuantity',
+  receivedQuantity: 'receivedQuantity'
+} as const
+
+export type TransferRequestLineScalarFieldEnum = (typeof TransferRequestLineScalarFieldEnum)[keyof typeof TransferRequestLineScalarFieldEnum]
 
 
 export const OutboxEventScalarFieldEnum = {

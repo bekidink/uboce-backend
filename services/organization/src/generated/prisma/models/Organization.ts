@@ -32,6 +32,8 @@ export type OrganizationMinAggregateOutputType = {
   countryCode: string | null
   status: $Enums.OrganizationStatus | null
   verificationStatus: $Enums.VerificationStatus | null
+  contactPhone: string | null
+  contactEmail: string | null
   createdByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -45,6 +47,8 @@ export type OrganizationMaxAggregateOutputType = {
   countryCode: string | null
   status: $Enums.OrganizationStatus | null
   verificationStatus: $Enums.VerificationStatus | null
+  contactPhone: string | null
+  contactEmail: string | null
   createdByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -58,6 +62,9 @@ export type OrganizationCountAggregateOutputType = {
   countryCode: number
   status: number
   verificationStatus: number
+  businessModels: number
+  contactPhone: number
+  contactEmail: number
   createdByUserId: number
   createdAt: number
   updatedAt: number
@@ -73,6 +80,8 @@ export type OrganizationMinAggregateInputType = {
   countryCode?: true
   status?: true
   verificationStatus?: true
+  contactPhone?: true
+  contactEmail?: true
   createdByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -86,6 +95,8 @@ export type OrganizationMaxAggregateInputType = {
   countryCode?: true
   status?: true
   verificationStatus?: true
+  contactPhone?: true
+  contactEmail?: true
   createdByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +110,9 @@ export type OrganizationCountAggregateInputType = {
   countryCode?: true
   status?: true
   verificationStatus?: true
+  businessModels?: true
+  contactPhone?: true
+  contactEmail?: true
   createdByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -185,6 +199,9 @@ export type OrganizationGroupByOutputType = {
   countryCode: string
   status: $Enums.OrganizationStatus
   verificationStatus: $Enums.VerificationStatus
+  businessModels: $Enums.BusinessModel[]
+  contactPhone: string | null
+  contactEmail: string | null
   createdByUserId: string
   createdAt: Date
   updatedAt: Date
@@ -219,6 +236,9 @@ export type OrganizationWhereInput = {
   countryCode?: Prisma.StringFilter<"Organization"> | string
   status?: Prisma.EnumOrganizationStatusFilter<"Organization"> | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Organization"> | $Enums.VerificationStatus
+  businessModels?: Prisma.EnumBusinessModelNullableListFilter<"Organization">
+  contactPhone?: Prisma.StringNullableFilter<"Organization"> | string | null
+  contactEmail?: Prisma.StringNullableFilter<"Organization"> | string | null
   createdByUserId?: Prisma.UuidFilter<"Organization"> | string
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
@@ -235,6 +255,9 @@ export type OrganizationOrderByWithRelationInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  businessModels?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -254,6 +277,9 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   countryCode?: Prisma.StringFilter<"Organization"> | string
   status?: Prisma.EnumOrganizationStatusFilter<"Organization"> | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Organization"> | $Enums.VerificationStatus
+  businessModels?: Prisma.EnumBusinessModelNullableListFilter<"Organization">
+  contactPhone?: Prisma.StringNullableFilter<"Organization"> | string | null
+  contactEmail?: Prisma.StringNullableFilter<"Organization"> | string | null
   createdByUserId?: Prisma.UuidFilter<"Organization"> | string
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
@@ -270,6 +296,9 @@ export type OrganizationOrderByWithAggregationInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  businessModels?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -289,6 +318,9 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   countryCode?: Prisma.StringWithAggregatesFilter<"Organization"> | string
   status?: Prisma.EnumOrganizationStatusWithAggregatesFilter<"Organization"> | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusWithAggregatesFilter<"Organization"> | $Enums.VerificationStatus
+  businessModels?: Prisma.EnumBusinessModelNullableListFilter<"Organization">
+  contactPhone?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
+  contactEmail?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
   createdByUserId?: Prisma.UuidWithAggregatesFilter<"Organization"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Organization"> | Date | string
@@ -302,6 +334,9 @@ export type OrganizationCreateInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -318,6 +353,9 @@ export type OrganizationUncheckedCreateInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -334,6 +372,9 @@ export type OrganizationUpdateInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -350,6 +391,9 @@ export type OrganizationUncheckedUpdateInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -366,6 +410,9 @@ export type OrganizationCreateManyInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -379,6 +426,9 @@ export type OrganizationUpdateManyMutationInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -392,9 +442,20 @@ export type OrganizationUncheckedUpdateManyInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type EnumBusinessModelNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.BusinessModel[] | Prisma.ListEnumBusinessModelFieldRefInput<$PrismaModel> | null
+  has?: $Enums.BusinessModel | Prisma.EnumBusinessModelFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.BusinessModel[] | Prisma.ListEnumBusinessModelFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.BusinessModel[] | Prisma.ListEnumBusinessModelFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type OrganizationCountOrderByAggregateInput = {
@@ -405,6 +466,9 @@ export type OrganizationCountOrderByAggregateInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  businessModels?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrder
+  contactEmail?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -418,6 +482,8 @@ export type OrganizationMaxOrderByAggregateInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrder
+  contactEmail?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -431,6 +497,8 @@ export type OrganizationMinOrderByAggregateInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrder
+  contactEmail?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -439,6 +507,10 @@ export type OrganizationMinOrderByAggregateInput = {
 export type OrganizationScalarRelationFilter = {
   is?: Prisma.OrganizationWhereInput
   isNot?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationCreatebusinessModelsInput = {
+  set: $Enums.BusinessModel[]
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -459,6 +531,11 @@ export type EnumOrganizationStatusFieldUpdateOperationsInput = {
 
 export type EnumVerificationStatusFieldUpdateOperationsInput = {
   set?: $Enums.VerificationStatus
+}
+
+export type OrganizationUpdatebusinessModelsInput = {
+  set?: $Enums.BusinessModel[]
+  push?: $Enums.BusinessModel | $Enums.BusinessModel[]
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -515,6 +592,9 @@ export type OrganizationCreateWithoutMembershipsInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -530,6 +610,9 @@ export type OrganizationUncheckedCreateWithoutMembershipsInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -561,6 +644,9 @@ export type OrganizationUpdateWithoutMembershipsInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -576,6 +662,9 @@ export type OrganizationUncheckedUpdateWithoutMembershipsInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -591,6 +680,9 @@ export type OrganizationCreateWithoutBranchesInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -606,6 +698,9 @@ export type OrganizationUncheckedCreateWithoutBranchesInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -637,6 +732,9 @@ export type OrganizationUpdateWithoutBranchesInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -652,6 +750,9 @@ export type OrganizationUncheckedUpdateWithoutBranchesInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -667,6 +768,9 @@ export type OrganizationCreateWithoutInvitationsInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -682,6 +786,9 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   countryCode?: string
   status?: $Enums.OrganizationStatus
   verificationStatus?: $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationCreatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: string | null
+  contactEmail?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -713,6 +820,9 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -728,6 +838,9 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  businessModels?: Prisma.OrganizationUpdatebusinessModelsInput | $Enums.BusinessModel[]
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -792,6 +905,9 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  businessModels?: boolean
+  contactPhone?: boolean
+  contactEmail?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -809,6 +925,9 @@ export type OrganizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  businessModels?: boolean
+  contactPhone?: boolean
+  contactEmail?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -822,6 +941,9 @@ export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  businessModels?: boolean
+  contactPhone?: boolean
+  contactEmail?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -835,12 +957,15 @@ export type OrganizationSelectScalar = {
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  businessModels?: boolean
+  contactPhone?: boolean
+  contactEmail?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "legalName" | "type" | "countryCode" | "status" | "verificationStatus" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["organization"]>
+export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "legalName" | "type" | "countryCode" | "status" | "verificationStatus" | "businessModels" | "contactPhone" | "contactEmail" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Organization$membershipsArgs<ExtArgs>
   branches?: boolean | Prisma.Organization$branchesArgs<ExtArgs>
@@ -868,6 +993,9 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     countryCode: string
     status: $Enums.OrganizationStatus
     verificationStatus: $Enums.VerificationStatus
+    businessModels: $Enums.BusinessModel[]
+    contactPhone: string | null
+    contactEmail: string | null
     /**
      * Identity user ID (external reference — no cross-database foreign key).
      */
@@ -1307,6 +1435,9 @@ export interface OrganizationFieldRefs {
   readonly countryCode: Prisma.FieldRef<"Organization", 'String'>
   readonly status: Prisma.FieldRef<"Organization", 'OrganizationStatus'>
   readonly verificationStatus: Prisma.FieldRef<"Organization", 'VerificationStatus'>
+  readonly businessModels: Prisma.FieldRef<"Organization", 'BusinessModel[]'>
+  readonly contactPhone: Prisma.FieldRef<"Organization", 'String'>
+  readonly contactEmail: Prisma.FieldRef<"Organization", 'String'>
   readonly createdByUserId: Prisma.FieldRef<"Organization", 'String'>
   readonly createdAt: Prisma.FieldRef<"Organization", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Organization", 'DateTime'>

@@ -33,7 +33,38 @@ export type Product = Prisma.ProductModel
  */
 export type ProductVariant = Prisma.ProductVariantModel
 /**
- * Model OutboxEvent
+ * Model ProductMedia
  * Transactional outbox (PRD 8.3).
+ * Product images (Document service, classification product_image). Position 0 is the primary image.
+ */
+export type ProductMedia = Prisma.ProductMediaModel
+/**
+ * Model VariantPriceTier
+ * Bulk pricing: from minQuantity up, the unit price is unitPrice.
+ */
+export type VariantPriceTier = Prisma.VariantPriceTierModel
+/**
+ * Model ProductOptionGroup
+ * Add-ons and choices, e.g. "Packaging: jute bag (+0) / GrainPro bag (+35)".
+ */
+export type ProductOptionGroup = Prisma.ProductOptionGroupModel
+/**
+ * Model ProductOption
+ * 
+ */
+export type ProductOption = Prisma.ProductOptionModel
+/**
+ * Model PriceList
+ * Negotiated or location prices (PRD addendum 2.4): for some buyers (none = everyone), optionally one location.
+ */
+export type PriceList = Prisma.PriceListModel
+/**
+ * Model PriceListEntry
+ * 
+ */
+export type PriceListEntry = Prisma.PriceListEntryModel
+/**
+ * Model OutboxEvent
+ * 
  */
 export type OutboxEvent = Prisma.OutboxEventModel

@@ -10,6 +10,7 @@
  */
 export type * from './models/ProductListing.js'
 export type * from './models/OrganizationProfile.js'
+export type * from './models/ProductStock.js'
 export type * from './models/IndexState.js'
 export type * from './models/ProcessedEvent.js'
 export type * from './commonInputTypes.js'

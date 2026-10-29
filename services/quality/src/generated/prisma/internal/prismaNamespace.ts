@@ -400,6 +400,12 @@ export const ModelName = {
   Inspection: 'Inspection',
   InspectionLine: 'InspectionLine',
   Nonconformance: 'Nonconformance',
+  QualitySpec: 'QualitySpec',
+  Certification: 'Certification',
+  QualityClaim: 'QualityClaim',
+  Review: 'Review',
+  ScorecardSnapshot: 'ScorecardSnapshot',
+  ClaimCounter: 'ClaimCounter',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -417,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "inspection" | "inspectionLine" | "nonconformance" | "outboxEvent" | "processedEvent"
+    modelProps: "inspection" | "inspectionLine" | "nonconformance" | "qualitySpec" | "certification" | "qualityClaim" | "review" | "scorecardSnapshot" | "claimCounter" | "outboxEvent" | "processedEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -640,6 +646,450 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NonconformanceCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NonconformanceCountAggregateOutputType> | number
+        }
+      }
+    }
+    QualitySpec: {
+      payload: Prisma.$QualitySpecPayload<ExtArgs>
+      fields: Prisma.QualitySpecFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QualitySpecFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QualitySpecFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>
+        }
+        findFirst: {
+          args: Prisma.QualitySpecFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QualitySpecFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>
+        }
+        findMany: {
+          args: Prisma.QualitySpecFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>[]
+        }
+        create: {
+          args: Prisma.QualitySpecCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>
+        }
+        createMany: {
+          args: Prisma.QualitySpecCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QualitySpecCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>[]
+        }
+        delete: {
+          args: Prisma.QualitySpecDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>
+        }
+        update: {
+          args: Prisma.QualitySpecUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>
+        }
+        deleteMany: {
+          args: Prisma.QualitySpecDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QualitySpecUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QualitySpecUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>[]
+        }
+        upsert: {
+          args: Prisma.QualitySpecUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualitySpecPayload>
+        }
+        aggregate: {
+          args: Prisma.QualitySpecAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQualitySpec>
+        }
+        groupBy: {
+          args: Prisma.QualitySpecGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QualitySpecGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QualitySpecCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QualitySpecCountAggregateOutputType> | number
+        }
+      }
+    }
+    Certification: {
+      payload: Prisma.$CertificationPayload<ExtArgs>
+      fields: Prisma.CertificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CertificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CertificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>
+        }
+        findFirst: {
+          args: Prisma.CertificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CertificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>
+        }
+        findMany: {
+          args: Prisma.CertificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>[]
+        }
+        create: {
+          args: Prisma.CertificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>
+        }
+        createMany: {
+          args: Prisma.CertificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CertificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>[]
+        }
+        delete: {
+          args: Prisma.CertificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>
+        }
+        update: {
+          args: Prisma.CertificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.CertificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CertificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CertificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.CertificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificationPayload>
+        }
+        aggregate: {
+          args: Prisma.CertificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCertification>
+        }
+        groupBy: {
+          args: Prisma.CertificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CertificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CertificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CertificationCountAggregateOutputType> | number
+        }
+      }
+    }
+    QualityClaim: {
+      payload: Prisma.$QualityClaimPayload<ExtArgs>
+      fields: Prisma.QualityClaimFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QualityClaimFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QualityClaimFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>
+        }
+        findFirst: {
+          args: Prisma.QualityClaimFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QualityClaimFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>
+        }
+        findMany: {
+          args: Prisma.QualityClaimFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>[]
+        }
+        create: {
+          args: Prisma.QualityClaimCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>
+        }
+        createMany: {
+          args: Prisma.QualityClaimCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QualityClaimCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>[]
+        }
+        delete: {
+          args: Prisma.QualityClaimDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>
+        }
+        update: {
+          args: Prisma.QualityClaimUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>
+        }
+        deleteMany: {
+          args: Prisma.QualityClaimDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QualityClaimUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QualityClaimUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>[]
+        }
+        upsert: {
+          args: Prisma.QualityClaimUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QualityClaimPayload>
+        }
+        aggregate: {
+          args: Prisma.QualityClaimAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQualityClaim>
+        }
+        groupBy: {
+          args: Prisma.QualityClaimGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QualityClaimGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QualityClaimCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QualityClaimCountAggregateOutputType> | number
+        }
+      }
+    }
+    Review: {
+      payload: Prisma.$ReviewPayload<ExtArgs>
+      fields: Prisma.ReviewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReviewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReviewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>
+        }
+        findFirst: {
+          args: Prisma.ReviewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReviewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>
+        }
+        findMany: {
+          args: Prisma.ReviewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>[]
+        }
+        create: {
+          args: Prisma.ReviewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>
+        }
+        createMany: {
+          args: Prisma.ReviewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReviewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>[]
+        }
+        delete: {
+          args: Prisma.ReviewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>
+        }
+        update: {
+          args: Prisma.ReviewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReviewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReviewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReviewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReviewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewPayload>
+        }
+        aggregate: {
+          args: Prisma.ReviewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReview>
+        }
+        groupBy: {
+          args: Prisma.ReviewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReviewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReviewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReviewCountAggregateOutputType> | number
+        }
+      }
+    }
+    ScorecardSnapshot: {
+      payload: Prisma.$ScorecardSnapshotPayload<ExtArgs>
+      fields: Prisma.ScorecardSnapshotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScorecardSnapshotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScorecardSnapshotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>
+        }
+        findFirst: {
+          args: Prisma.ScorecardSnapshotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScorecardSnapshotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>
+        }
+        findMany: {
+          args: Prisma.ScorecardSnapshotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>[]
+        }
+        create: {
+          args: Prisma.ScorecardSnapshotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>
+        }
+        createMany: {
+          args: Prisma.ScorecardSnapshotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScorecardSnapshotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>[]
+        }
+        delete: {
+          args: Prisma.ScorecardSnapshotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>
+        }
+        update: {
+          args: Prisma.ScorecardSnapshotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScorecardSnapshotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScorecardSnapshotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScorecardSnapshotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScorecardSnapshotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScorecardSnapshotPayload>
+        }
+        aggregate: {
+          args: Prisma.ScorecardSnapshotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScorecardSnapshot>
+        }
+        groupBy: {
+          args: Prisma.ScorecardSnapshotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScorecardSnapshotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScorecardSnapshotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScorecardSnapshotCountAggregateOutputType> | number
+        }
+      }
+    }
+    ClaimCounter: {
+      payload: Prisma.$ClaimCounterPayload<ExtArgs>
+      fields: Prisma.ClaimCounterFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClaimCounterFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClaimCounterFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>
+        }
+        findFirst: {
+          args: Prisma.ClaimCounterFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClaimCounterFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>
+        }
+        findMany: {
+          args: Prisma.ClaimCounterFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>[]
+        }
+        create: {
+          args: Prisma.ClaimCounterCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>
+        }
+        createMany: {
+          args: Prisma.ClaimCounterCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ClaimCounterCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>[]
+        }
+        delete: {
+          args: Prisma.ClaimCounterDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>
+        }
+        update: {
+          args: Prisma.ClaimCounterUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>
+        }
+        deleteMany: {
+          args: Prisma.ClaimCounterDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClaimCounterUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ClaimCounterUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>[]
+        }
+        upsert: {
+          args: Prisma.ClaimCounterUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClaimCounterPayload>
+        }
+        aggregate: {
+          args: Prisma.ClaimCounterAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClaimCounter>
+        }
+        groupBy: {
+          args: Prisma.ClaimCounterGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClaimCounterGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClaimCounterCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClaimCounterCountAggregateOutputType> | number
         }
       }
     }
@@ -877,6 +1327,114 @@ export const NonconformanceScalarFieldEnum = {
 export type NonconformanceScalarFieldEnum = (typeof NonconformanceScalarFieldEnum)[keyof typeof NonconformanceScalarFieldEnum]
 
 
+export const QualitySpecScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  productId: 'productId',
+  version: 'version',
+  name: 'name',
+  parameters: 'parameters',
+  active: 'active',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type QualitySpecScalarFieldEnum = (typeof QualitySpecScalarFieldEnum)[keyof typeof QualitySpecScalarFieldEnum]
+
+
+export const CertificationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  productId: 'productId',
+  kind: 'kind',
+  certificateNumber: 'certificateNumber',
+  issuer: 'issuer',
+  issuedAt: 'issuedAt',
+  expiresAt: 'expiresAt',
+  documentId: 'documentId',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CertificationScalarFieldEnum = (typeof CertificationScalarFieldEnum)[keyof typeof CertificationScalarFieldEnum]
+
+
+export const QualityClaimScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  orderId: 'orderId',
+  orderLineId: 'orderLineId',
+  orderNumber: 'orderNumber',
+  buyerOrganizationId: 'buyerOrganizationId',
+  supplierOrganizationId: 'supplierOrganizationId',
+  reason: 'reason',
+  description: 'description',
+  affectedQuantity: 'affectedQuantity',
+  evidenceDocumentIds: 'evidenceDocumentIds',
+  status: 'status',
+  resolution: 'resolution',
+  supplierResponse: 'supplierResponse',
+  openedByUserId: 'openedByUserId',
+  respondedByUserId: 'respondedByUserId',
+  respondedAt: 'respondedAt',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QualityClaimScalarFieldEnum = (typeof QualityClaimScalarFieldEnum)[keyof typeof QualityClaimScalarFieldEnum]
+
+
+export const ReviewScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  reviewerOrganizationId: 'reviewerOrganizationId',
+  reviewerUserId: 'reviewerUserId',
+  subjectOrganizationId: 'subjectOrganizationId',
+  productId: 'productId',
+  subjectKey: 'subjectKey',
+  rating: 'rating',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  moderationNote: 'moderationNote',
+  moderatedByUserId: 'moderatedByUserId',
+  supplierReply: 'supplierReply',
+  repliedAt: 'repliedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
+
+
+export const ScorecardSnapshotScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  period: 'period',
+  inspections: 'inspections',
+  inspectionsPassed: 'inspectionsPassed',
+  nonconformances: 'nonconformances',
+  claimsOpened: 'claimsOpened',
+  claimsAccepted: 'claimsAccepted',
+  reviewCount: 'reviewCount',
+  averageRating: 'averageRating',
+  score: 'score',
+  formulaVersion: 'formulaVersion',
+  computedAt: 'computedAt'
+} as const
+
+export type ScorecardSnapshotScalarFieldEnum = (typeof ScorecardSnapshotScalarFieldEnum)[keyof typeof ScorecardSnapshotScalarFieldEnum]
+
+
+export const ClaimCounterScalarFieldEnum = {
+  key: 'key',
+  last: 'last'
+} as const
+
+export type ClaimCounterScalarFieldEnum = (typeof ClaimCounterScalarFieldEnum)[keyof typeof ClaimCounterScalarFieldEnum]
+
+
 export const OutboxEventScalarFieldEnum = {
   id: 'id',
   eventType: 'eventType',
@@ -1080,6 +1638,41 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'ClaimStatus'
+ */
+export type EnumClaimStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClaimStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ClaimStatus[]'
+ */
+export type ListEnumClaimStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClaimStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ReviewStatus'
+ */
+export type EnumReviewStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReviewStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ReviewStatus[]'
+ */
+export type ListEnumReviewStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReviewStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1246,6 +1839,12 @@ export type GlobalOmitConfig = {
   inspection?: Prisma.InspectionOmit
   inspectionLine?: Prisma.InspectionLineOmit
   nonconformance?: Prisma.NonconformanceOmit
+  qualitySpec?: Prisma.QualitySpecOmit
+  certification?: Prisma.CertificationOmit
+  qualityClaim?: Prisma.QualityClaimOmit
+  review?: Prisma.ReviewOmit
+  scorecardSnapshot?: Prisma.ScorecardSnapshotOmit
+  claimCounter?: Prisma.ClaimCounterOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit
 }

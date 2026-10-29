@@ -12,6 +12,9 @@
 export const OrderStatus = {
   pending_confirmation: 'pending_confirmation',
   confirmed: 'confirmed',
+  ready_for_pickup: 'ready_for_pickup',
+  uncollected: 'uncollected',
+  delivery_failed: 'delivery_failed',
   partially_fulfilled: 'partially_fulfilled',
   fulfilled: 'fulfilled',
   closed: 'closed',
@@ -28,3 +31,30 @@ export const OrderSource = {
 } as const
 
 export type OrderSource = (typeof OrderSource)[keyof typeof OrderSource]
+
+
+export const FulfillmentMethod = {
+  delivery: 'delivery',
+  pickup: 'pickup'
+} as const
+
+export type FulfillmentMethod = (typeof FulfillmentMethod)[keyof typeof FulfillmentMethod]
+
+
+export const ReturnStatus = {
+  requested: 'requested',
+  approved: 'approved',
+  rejected: 'rejected',
+  received: 'received',
+  cancelled: 'cancelled'
+} as const
+
+export type ReturnStatus = (typeof ReturnStatus)[keyof typeof ReturnStatus]
+
+
+export const PromotionKind = {
+  percent: 'percent',
+  fixed: 'fixed'
+} as const
+
+export type PromotionKind = (typeof PromotionKind)[keyof typeof PromotionKind]

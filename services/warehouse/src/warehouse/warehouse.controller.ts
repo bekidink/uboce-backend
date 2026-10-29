@@ -9,6 +9,7 @@ import {
   Internal,
   IsDecimalString,
   PaginationQueryDto,
+  RequiresModule,
 } from '@uboce/common';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsBoolean, IsOptional, IsString, IsUUID, Length, Matches, ValidateNested } from 'class-validator';
@@ -41,6 +42,11 @@ class CreateWarehouseDto {
   @IsString()
   @Length(1, 300)
   addressLine?: string;
+
+  /** Organization location (branch) the warehouse belongs to. */
+  @IsOptional()
+  @IsUUID()
+  branchId?: string;
 }
 
 class LocationDto {
@@ -127,6 +133,7 @@ class TransferDto {
 @ApiTags('warehouse')
 @ApiBearerAuth()
 @ActsForOrganization()
+@RequiresModule('warehouse')
 @Controller('warehouse')
 export class WarehouseController {
   constructor(private readonly warehouse: WarehouseService) {}

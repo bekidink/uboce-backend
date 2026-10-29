@@ -47,6 +47,16 @@ export { Prisma }
  */
 export type DailyMetric = Prisma.DailyMetricModel
 /**
+ * Model ActivityEvent
+ * What happened in an organization, one row per organization involved in each event (activity log / audit trail).
+ */
+export type ActivityEvent = Prisma.ActivityEventModel
+/**
+ * Model ReportTemplate
+ * A saved report layout: which dataset, columns, filters and file format (PRD: report templates).
+ */
+export type ReportTemplate = Prisma.ReportTemplateModel
+/**
  * Model IndexState
  * 
  */

@@ -52,6 +52,36 @@ export type Shipment = Prisma.ShipmentModel
  */
 export type ShipmentItem = Prisma.ShipmentItemModel
 /**
+ * Model ShipmentOrder
+ * Orders carried by a shipment; several when consolidated (same shipper and consignee).
+ */
+export type ShipmentOrder = Prisma.ShipmentOrderModel
+/**
+ * Model ShipmentPackage
+ * 
+ */
+export type ShipmentPackage = Prisma.ShipmentPackageModel
+/**
+ * Model Carrier
+ * A carrier an organization works with, or its own fleet.
+ */
+export type Carrier = Prisma.CarrierModel
+/**
+ * Model Vehicle
+ * 
+ */
+export type Vehicle = Prisma.VehicleModel
+/**
+ * Model Driver
+ * A driver of the organization; userId links the UBOCE account they sign in with (role "driver").
+ */
+export type Driver = Prisma.DriverModel
+/**
+ * Model DriverAssignment
+ * 
+ */
+export type DriverAssignment = Prisma.DriverAssignmentModel
+/**
  * Model TrackingEvent
  * 
  */

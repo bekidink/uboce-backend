@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { Prisma } from '../generated/prisma/client.js';
-import { allocate, applyMovement } from './rules.js';
+import { allocate, applyMovement, changeState } from './rules.js';
 
 const d = (v: string | number) => new Prisma.Decimal(v);
 const bal = (onHand: number, reserved = 0) => ({ onHand: d(onHand), reserved: d(reserved) });
@@ -59,5 +59,19 @@ describe('zero quantities (Decimal treats 0 as "positive")', () => {
       { warehouseId: 'full', available: d(5) },
     ]);
     expect(picks?.map((p) => p.warehouseId)).toEqual(['full']);
+  });
+});
+
+describe('stock states', () => {
+  const b = (onHand: number, reserved: number, damaged = 0, quarantined = 0) => ({ onHand: d(onHand), reserved: d(reserved), damaged: d(damaged), quarantined: d(quarantined) });
+  it('damaged and quarantined stock is not sellable', () => {
+    expect(applyMovement({ onHand: d(10), reserved: d(0), held: d(6) }, 'issue', d(-5))).toHaveProperty('error');
+    expect(applyMovement({ onHand: d(10), reserved: d(0), held: d(6) }, 'issue', d(-4))).toEqual({ next: { onHand: d(6), reserved: d(0) } });
+  });
+  it('moves stock between states within what is free', () => {
+    expect(changeState(b(10, 4), 'available', 'damaged', d(6))).toEqual({ next: { damaged: d(6), quarantined: d(0) } });
+    expect(changeState(b(10, 4), 'available', 'damaged', d(7))).toHaveProperty('error');
+    expect(changeState(b(10, 0, 3), 'damaged', 'quarantined', d(2))).toEqual({ next: { damaged: d(1), quarantined: d(2) } });
+    expect(changeState(b(10, 0, 0, 2), 'quarantined', 'available', d(3))).toHaveProperty('error');
   });
 });

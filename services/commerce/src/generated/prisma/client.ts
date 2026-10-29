@@ -57,8 +57,34 @@ export type OrderLine = Prisma.OrderLineModel
  */
 export type OrderStatusHistory = Prisma.OrderStatusHistoryModel
 /**
- * Model OrderNumberCounter
+ * Model OrderFulfillmentChange
  * Per-year counter behind order numbers.
+ * Which location fulfils an order, and every change to it (PRD addendum 2.1).
+ */
+export type OrderFulfillmentChange = Prisma.OrderFulfillmentChangeModel
+/**
+ * Model CancellationPolicy
+ * A supplier's cancellation and return terms. Versions are immutable; orders keep a snapshot (PRD addendum 2.6).
+ */
+export type CancellationPolicy = Prisma.CancellationPolicyModel
+/**
+ * Model ReturnRequest
+ * 
+ */
+export type ReturnRequest = Prisma.ReturnRequestModel
+/**
+ * Model Promotion
+ * Supplier promotions (PRD addendum 2.4): automatic when code is null, otherwise a coupon.
+ */
+export type Promotion = Prisma.PromotionModel
+/**
+ * Model PromotionRedemption
+ * 
+ */
+export type PromotionRedemption = Prisma.PromotionRedemptionModel
+/**
+ * Model OrderNumberCounter
+ * 
  */
 export type OrderNumberCounter = Prisma.OrderNumberCounterModel
 /**

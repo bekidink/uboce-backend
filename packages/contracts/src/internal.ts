@@ -20,6 +20,12 @@ export interface InternalMembership {
   membershipId: string;
   userId: string;
   role: string;
+  /** Locations (branch IDs) the member is limited to; empty means the whole organization. */
+  locationIds: string[];
+  /** From the member's role template: only these module:action permissions. Null: no template (role decides). */
+  permissions?: string[] | null;
+  /** Largest commitment the member may approve, from the role template. Null: no limit. */
+  approvalLimit?: { amount: string; currency: string } | null;
   organization: InternalOrganization;
 }
 
@@ -33,6 +39,17 @@ export interface InternalOrganization {
 }
 
 /** Organization: GET /internal/organizations/:organizationId/members?roles=a,b */
+/** An organization location (branch): store, warehouse site, collection point… */
+export interface InternalBranch {
+  id: string;
+  organizationId: string;
+  name: string;
+  kind: string;
+  active: boolean;
+  pickupEnabled: boolean;
+  fulfillment: boolean;
+}
+
 export interface InternalOrganizationMember {
   userId: string;
   role: string;
@@ -112,6 +129,8 @@ export interface InternalDocument {
 /** Finance: POST /internal/payment-notifications (from Integration, already verified) */
 export interface PaymentNotification {
   provider: string;
+  /** Provider fee, when the provider reports it. */
+  fee?: string | null;
   externalReference: string;
   invoiceNumber: string;
   amount: string;
@@ -140,5 +159,78 @@ export interface InternalOrder {
   currency: string;
   total: string;
   deliveryLocation: string | null;
+  /** Order-level discount from promotions/coupons (already subtracted from total). */
+  discountTotal: string;
+  promotionCode: string | null;
+  fulfillmentBranchId: string | null;
   lines: { id: string; lineNumber: number; productId: string | null; description: string; quantity: string; unitOfMeasure: string; unitPrice: string; lineTotal: string; fulfilledQuantity: string }[];
+}
+
+/** Catalog: POST /internal/catalog/quote — server-side prices and snapshots for order lines (PRD addendum 2.3–2.4). */
+export interface CatalogQuoteRequest {
+  supplierOrganizationId: string;
+  buyerOrganizationId: string;
+  currency: string;
+  /** The supplier location fulfilling the order, for location price lists. */
+  branchId?: string | null;
+  lines: { variantId: string; quantity: string; optionIds?: string[] }[];
+}
+
+export interface ProductSnapshot {
+  productId: string;
+  productName: string;
+  variantId: string;
+  variantName: string;
+  sku: string;
+  barcode: string | null;
+  categorySlug: string;
+  unitOfMeasure: string;
+  attributes: Record<string, string>;
+  variantAttributes: Record<string, string>;
+  options: { groupName: string; optionId: string; name: string; priceDelta: string }[];
+  imageDocumentId: string | null;
+  packSize: string | null;
+  preorder: boolean;
+  capturedAt: string;
+}
+
+export interface CatalogQuoteLine {
+  variantId: string;
+  productId: string;
+  description: string;
+  quantity: string;
+  unitOfMeasure: string;
+  /** Final unit price including options. */
+  unitPrice: string;
+  /** The variant's list price, before tiers or price lists. */
+  listPrice: string;
+  priceSource: 'list' | 'tier' | 'price_list';
+  priceListId: string | null;
+  leadTimeDays: number | null;
+  snapshot: ProductSnapshot;
+}
+
+export interface CatalogQuote {
+  currency: string;
+  lines: CatalogQuoteLine[];
+  subtotal: string;
+}
+
+/** Finance: POST /internal/refund-notifications (from Integration, already verified) */
+export interface RefundNotification {
+  provider: string;
+  refundNumber: string;
+  status: 'succeeded' | 'failed';
+  providerRef?: string;
+  reason?: string;
+}
+
+/** Logistics: GET /internal/shipments/:id — the parties to a shipment. */
+export interface InternalShipment {
+  id: string;
+  orderNumber: string;
+  shipperOrganizationId: string;
+  consigneeOrganizationId: string;
+  carrierOrganizationId: string | null;
+  status: string;
 }

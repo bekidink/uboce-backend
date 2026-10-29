@@ -8,6 +8,7 @@ import {
   CurrentUser,
   IsDecimalString,
   PaginationQueryDto,
+  RequiresModule,
 } from '@uboce/common';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, IsIn, IsObject, IsOptional, IsString, IsUUID, Length, ValidateNested } from 'class-validator';
@@ -118,6 +119,7 @@ class ListDto extends PaginationQueryDto {
 @ApiTags('quality')
 @ApiBearerAuth()
 @ActsForOrganization()
+@RequiresModule('quality')
 @Controller('quality')
 export class QualityController {
   constructor(private readonly quality: QualityService) {}

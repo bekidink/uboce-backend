@@ -53,6 +53,12 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Shipment: 'Shipment',
   ShipmentItem: 'ShipmentItem',
+  ShipmentOrder: 'ShipmentOrder',
+  ShipmentPackage: 'ShipmentPackage',
+  Carrier: 'Carrier',
+  Vehicle: 'Vehicle',
+  Driver: 'Driver',
+  DriverAssignment: 'DriverAssignment',
   TrackingEvent: 'TrackingEvent',
   DeliveryEvidence: 'DeliveryEvidence',
   DeliveryException: 'DeliveryException',
@@ -87,6 +93,16 @@ export const ShipmentScalarFieldEnum = {
   carrierName: 'carrierName',
   trackingNumber: 'trackingNumber',
   status: 'status',
+  pickupWindowStart: 'pickupWindowStart',
+  pickupWindowEnd: 'pickupWindowEnd',
+  freightPayer: 'freightPayer',
+  incoterm: 'incoterm',
+  freightCost: 'freightCost',
+  freightCurrency: 'freightCurrency',
+  carrierId: 'carrierId',
+  carrierOrganizationId: 'carrierOrganizationId',
+  carrierStatus: 'carrierStatus',
+  carrierNote: 'carrierNote',
   expectedDeliveryAt: 'expectedDeliveryAt',
   dispatchedAt: 'dispatchedAt',
   deliveredAt: 'deliveredAt',
@@ -103,6 +119,7 @@ export const ShipmentItemScalarFieldEnum = {
   shipmentId: 'shipmentId',
   lineNumber: 'lineNumber',
   orderLineId: 'orderLineId',
+  orderId: 'orderId',
   itemId: 'itemId',
   description: 'description',
   quantity: 'quantity',
@@ -110,6 +127,85 @@ export const ShipmentItemScalarFieldEnum = {
 } as const
 
 export type ShipmentItemScalarFieldEnum = (typeof ShipmentItemScalarFieldEnum)[keyof typeof ShipmentItemScalarFieldEnum]
+
+
+export const ShipmentOrderScalarFieldEnum = {
+  shipmentId: 'shipmentId',
+  orderId: 'orderId',
+  orderNumber: 'orderNumber'
+} as const
+
+export type ShipmentOrderScalarFieldEnum = (typeof ShipmentOrderScalarFieldEnum)[keyof typeof ShipmentOrderScalarFieldEnum]
+
+
+export const ShipmentPackageScalarFieldEnum = {
+  id: 'id',
+  shipmentId: 'shipmentId',
+  reference: 'reference',
+  weightKg: 'weightKg',
+  lengthCm: 'lengthCm',
+  widthCm: 'widthCm',
+  heightCm: 'heightCm',
+  contents: 'contents'
+} as const
+
+export type ShipmentPackageScalarFieldEnum = (typeof ShipmentPackageScalarFieldEnum)[keyof typeof ShipmentPackageScalarFieldEnum]
+
+
+export const CarrierScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  kind: 'kind',
+  phone: 'phone',
+  trackingProvider: 'trackingProvider',
+  carrierOrganizationId: 'carrierOrganizationId',
+  active: 'active',
+  createdAt: 'createdAt'
+} as const
+
+export type CarrierScalarFieldEnum = (typeof CarrierScalarFieldEnum)[keyof typeof CarrierScalarFieldEnum]
+
+
+export const VehicleScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  plateNumber: 'plateNumber',
+  type: 'type',
+  capacityKg: 'capacityKg',
+  active: 'active',
+  createdAt: 'createdAt'
+} as const
+
+export type VehicleScalarFieldEnum = (typeof VehicleScalarFieldEnum)[keyof typeof VehicleScalarFieldEnum]
+
+
+export const DriverScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  name: 'name',
+  phone: 'phone',
+  licenseNumber: 'licenseNumber',
+  active: 'active',
+  createdAt: 'createdAt'
+} as const
+
+export type DriverScalarFieldEnum = (typeof DriverScalarFieldEnum)[keyof typeof DriverScalarFieldEnum]
+
+
+export const DriverAssignmentScalarFieldEnum = {
+  id: 'id',
+  shipmentId: 'shipmentId',
+  driverId: 'driverId',
+  vehicleId: 'vehicleId',
+  status: 'status',
+  assignedByUserId: 'assignedByUserId',
+  assignedAt: 'assignedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DriverAssignmentScalarFieldEnum = (typeof DriverAssignmentScalarFieldEnum)[keyof typeof DriverAssignmentScalarFieldEnum]
 
 
 export const TrackingEventScalarFieldEnum = {

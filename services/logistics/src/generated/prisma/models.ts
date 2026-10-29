@@ -10,6 +10,12 @@
  */
 export type * from './models/Shipment.js'
 export type * from './models/ShipmentItem.js'
+export type * from './models/ShipmentOrder.js'
+export type * from './models/ShipmentPackage.js'
+export type * from './models/Carrier.js'
+export type * from './models/Vehicle.js'
+export type * from './models/Driver.js'
+export type * from './models/DriverAssignment.js'
 export type * from './models/TrackingEvent.js'
 export type * from './models/DeliveryEvidence.js'
 export type * from './models/DeliveryException.js'

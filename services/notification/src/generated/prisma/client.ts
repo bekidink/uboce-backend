@@ -62,7 +62,23 @@ export type Notification = Prisma.NotificationModel
  */
 export type DeliveryAttempt = Prisma.DeliveryAttemptModel
 /**
- * Model ProcessedEvent
+ * Model Conversation
  * Inbox: events already handled by this service, for idempotent consumption.
+ * B2B chat between organizations (PRD addendum 2.9), optionally about a record (RFQ, order…).
+ */
+export type Conversation = Prisma.ConversationModel
+/**
+ * Model ConversationParticipant
+ * Organizations in a conversation; every member who can act for one may read and write.
+ */
+export type ConversationParticipant = Prisma.ConversationParticipantModel
+/**
+ * Model ChatMessage
+ * 
+ */
+export type ChatMessage = Prisma.ChatMessageModel
+/**
+ * Model ProcessedEvent
+ * 
  */
 export type ProcessedEvent = Prisma.ProcessedEventModel

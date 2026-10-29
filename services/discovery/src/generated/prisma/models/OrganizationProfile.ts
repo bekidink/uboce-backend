@@ -20,8 +20,20 @@ export type OrganizationProfileModel = runtime.Types.Result.DefaultSelection<Pri
 
 export type AggregateOrganizationProfile = {
   _count: OrganizationProfileCountAggregateOutputType | null
+  _avg: OrganizationProfileAvgAggregateOutputType | null
+  _sum: OrganizationProfileSumAggregateOutputType | null
   _min: OrganizationProfileMinAggregateOutputType | null
   _max: OrganizationProfileMaxAggregateOutputType | null
+}
+
+export type OrganizationProfileAvgAggregateOutputType = {
+  ratingSum: number | null
+  ratingCount: number | null
+}
+
+export type OrganizationProfileSumAggregateOutputType = {
+  ratingSum: number | null
+  ratingCount: number | null
 }
 
 export type OrganizationProfileMinAggregateOutputType = {
@@ -31,6 +43,8 @@ export type OrganizationProfileMinAggregateOutputType = {
   countryCode: string | null
   status: string | null
   verificationStatus: string | null
+  ratingSum: number | null
+  ratingCount: number | null
   sourceOccurredAt: Date | null
   indexedAt: Date | null
 }
@@ -42,6 +56,8 @@ export type OrganizationProfileMaxAggregateOutputType = {
   countryCode: string | null
   status: string | null
   verificationStatus: string | null
+  ratingSum: number | null
+  ratingCount: number | null
   sourceOccurredAt: Date | null
   indexedAt: Date | null
 }
@@ -53,11 +69,25 @@ export type OrganizationProfileCountAggregateOutputType = {
   countryCode: number
   status: number
   verificationStatus: number
+  ratingSum: number
+  ratingCount: number
+  serviceAreas: number
+  pickupCities: number
   sourceOccurredAt: number
   indexedAt: number
   _all: number
 }
 
+
+export type OrganizationProfileAvgAggregateInputType = {
+  ratingSum?: true
+  ratingCount?: true
+}
+
+export type OrganizationProfileSumAggregateInputType = {
+  ratingSum?: true
+  ratingCount?: true
+}
 
 export type OrganizationProfileMinAggregateInputType = {
   organizationId?: true
@@ -66,6 +96,8 @@ export type OrganizationProfileMinAggregateInputType = {
   countryCode?: true
   status?: true
   verificationStatus?: true
+  ratingSum?: true
+  ratingCount?: true
   sourceOccurredAt?: true
   indexedAt?: true
 }
@@ -77,6 +109,8 @@ export type OrganizationProfileMaxAggregateInputType = {
   countryCode?: true
   status?: true
   verificationStatus?: true
+  ratingSum?: true
+  ratingCount?: true
   sourceOccurredAt?: true
   indexedAt?: true
 }
@@ -88,6 +122,10 @@ export type OrganizationProfileCountAggregateInputType = {
   countryCode?: true
   status?: true
   verificationStatus?: true
+  ratingSum?: true
+  ratingCount?: true
+  serviceAreas?: true
+  pickupCities?: true
   sourceOccurredAt?: true
   indexedAt?: true
   _all?: true
@@ -131,6 +169,18 @@ export type OrganizationProfileAggregateArgs<ExtArgs extends runtime.Types.Exten
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: OrganizationProfileAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: OrganizationProfileSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: OrganizationProfileMinAggregateInputType
@@ -161,6 +211,8 @@ export type OrganizationProfileGroupByArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   _count?: OrganizationProfileCountAggregateInputType | true
+  _avg?: OrganizationProfileAvgAggregateInputType
+  _sum?: OrganizationProfileSumAggregateInputType
   _min?: OrganizationProfileMinAggregateInputType
   _max?: OrganizationProfileMaxAggregateInputType
 }
@@ -172,9 +224,15 @@ export type OrganizationProfileGroupByOutputType = {
   countryCode: string
   status: string
   verificationStatus: string
+  ratingSum: number
+  ratingCount: number
+  serviceAreas: string[]
+  pickupCities: string[]
   sourceOccurredAt: Date
   indexedAt: Date
   _count: OrganizationProfileCountAggregateOutputType | null
+  _avg: OrganizationProfileAvgAggregateOutputType | null
+  _sum: OrganizationProfileSumAggregateOutputType | null
   _min: OrganizationProfileMinAggregateOutputType | null
   _max: OrganizationProfileMaxAggregateOutputType | null
 }
@@ -204,6 +262,10 @@ export type OrganizationProfileWhereInput = {
   countryCode?: Prisma.StringFilter<"OrganizationProfile"> | string
   status?: Prisma.StringFilter<"OrganizationProfile"> | string
   verificationStatus?: Prisma.StringFilter<"OrganizationProfile"> | string
+  ratingSum?: Prisma.IntFilter<"OrganizationProfile"> | number
+  ratingCount?: Prisma.IntFilter<"OrganizationProfile"> | number
+  serviceAreas?: Prisma.StringNullableListFilter<"OrganizationProfile">
+  pickupCities?: Prisma.StringNullableListFilter<"OrganizationProfile">
   sourceOccurredAt?: Prisma.DateTimeFilter<"OrganizationProfile"> | Date | string
   indexedAt?: Prisma.DateTimeFilter<"OrganizationProfile"> | Date | string
 }
@@ -215,6 +277,10 @@ export type OrganizationProfileOrderByWithRelationInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  ratingSum?: Prisma.SortOrder
+  ratingCount?: Prisma.SortOrder
+  serviceAreas?: Prisma.SortOrder
+  pickupCities?: Prisma.SortOrder
   sourceOccurredAt?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
 }
@@ -229,6 +295,10 @@ export type OrganizationProfileWhereUniqueInput = Prisma.AtLeast<{
   countryCode?: Prisma.StringFilter<"OrganizationProfile"> | string
   status?: Prisma.StringFilter<"OrganizationProfile"> | string
   verificationStatus?: Prisma.StringFilter<"OrganizationProfile"> | string
+  ratingSum?: Prisma.IntFilter<"OrganizationProfile"> | number
+  ratingCount?: Prisma.IntFilter<"OrganizationProfile"> | number
+  serviceAreas?: Prisma.StringNullableListFilter<"OrganizationProfile">
+  pickupCities?: Prisma.StringNullableListFilter<"OrganizationProfile">
   sourceOccurredAt?: Prisma.DateTimeFilter<"OrganizationProfile"> | Date | string
   indexedAt?: Prisma.DateTimeFilter<"OrganizationProfile"> | Date | string
 }, "organizationId">
@@ -240,11 +310,17 @@ export type OrganizationProfileOrderByWithAggregationInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  ratingSum?: Prisma.SortOrder
+  ratingCount?: Prisma.SortOrder
+  serviceAreas?: Prisma.SortOrder
+  pickupCities?: Prisma.SortOrder
   sourceOccurredAt?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
   _count?: Prisma.OrganizationProfileCountOrderByAggregateInput
+  _avg?: Prisma.OrganizationProfileAvgOrderByAggregateInput
   _max?: Prisma.OrganizationProfileMaxOrderByAggregateInput
   _min?: Prisma.OrganizationProfileMinOrderByAggregateInput
+  _sum?: Prisma.OrganizationProfileSumOrderByAggregateInput
 }
 
 export type OrganizationProfileScalarWhereWithAggregatesInput = {
@@ -257,6 +333,10 @@ export type OrganizationProfileScalarWhereWithAggregatesInput = {
   countryCode?: Prisma.StringWithAggregatesFilter<"OrganizationProfile"> | string
   status?: Prisma.StringWithAggregatesFilter<"OrganizationProfile"> | string
   verificationStatus?: Prisma.StringWithAggregatesFilter<"OrganizationProfile"> | string
+  ratingSum?: Prisma.IntWithAggregatesFilter<"OrganizationProfile"> | number
+  ratingCount?: Prisma.IntWithAggregatesFilter<"OrganizationProfile"> | number
+  serviceAreas?: Prisma.StringNullableListFilter<"OrganizationProfile">
+  pickupCities?: Prisma.StringNullableListFilter<"OrganizationProfile">
   sourceOccurredAt?: Prisma.DateTimeWithAggregatesFilter<"OrganizationProfile"> | Date | string
   indexedAt?: Prisma.DateTimeWithAggregatesFilter<"OrganizationProfile"> | Date | string
 }
@@ -268,6 +348,10 @@ export type OrganizationProfileCreateInput = {
   countryCode: string
   status: string
   verificationStatus: string
+  ratingSum?: number
+  ratingCount?: number
+  serviceAreas?: Prisma.OrganizationProfileCreateserviceAreasInput | string[]
+  pickupCities?: Prisma.OrganizationProfileCreatepickupCitiesInput | string[]
   sourceOccurredAt: Date | string
   indexedAt?: Date | string
 }
@@ -279,6 +363,10 @@ export type OrganizationProfileUncheckedCreateInput = {
   countryCode: string
   status: string
   verificationStatus: string
+  ratingSum?: number
+  ratingCount?: number
+  serviceAreas?: Prisma.OrganizationProfileCreateserviceAreasInput | string[]
+  pickupCities?: Prisma.OrganizationProfileCreatepickupCitiesInput | string[]
   sourceOccurredAt: Date | string
   indexedAt?: Date | string
 }
@@ -290,6 +378,10 @@ export type OrganizationProfileUpdateInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  ratingSum?: Prisma.IntFieldUpdateOperationsInput | number
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  serviceAreas?: Prisma.OrganizationProfileUpdateserviceAreasInput | string[]
+  pickupCities?: Prisma.OrganizationProfileUpdatepickupCitiesInput | string[]
   sourceOccurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indexedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -301,6 +393,10 @@ export type OrganizationProfileUncheckedUpdateInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  ratingSum?: Prisma.IntFieldUpdateOperationsInput | number
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  serviceAreas?: Prisma.OrganizationProfileUpdateserviceAreasInput | string[]
+  pickupCities?: Prisma.OrganizationProfileUpdatepickupCitiesInput | string[]
   sourceOccurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indexedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -312,6 +408,10 @@ export type OrganizationProfileCreateManyInput = {
   countryCode: string
   status: string
   verificationStatus: string
+  ratingSum?: number
+  ratingCount?: number
+  serviceAreas?: Prisma.OrganizationProfileCreateserviceAreasInput | string[]
+  pickupCities?: Prisma.OrganizationProfileCreatepickupCitiesInput | string[]
   sourceOccurredAt: Date | string
   indexedAt?: Date | string
 }
@@ -323,6 +423,10 @@ export type OrganizationProfileUpdateManyMutationInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  ratingSum?: Prisma.IntFieldUpdateOperationsInput | number
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  serviceAreas?: Prisma.OrganizationProfileUpdateserviceAreasInput | string[]
+  pickupCities?: Prisma.OrganizationProfileUpdatepickupCitiesInput | string[]
   sourceOccurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indexedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -334,6 +438,10 @@ export type OrganizationProfileUncheckedUpdateManyInput = {
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  ratingSum?: Prisma.IntFieldUpdateOperationsInput | number
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  serviceAreas?: Prisma.OrganizationProfileUpdateserviceAreasInput | string[]
+  pickupCities?: Prisma.OrganizationProfileUpdatepickupCitiesInput | string[]
   sourceOccurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indexedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -345,8 +453,17 @@ export type OrganizationProfileCountOrderByAggregateInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  ratingSum?: Prisma.SortOrder
+  ratingCount?: Prisma.SortOrder
+  serviceAreas?: Prisma.SortOrder
+  pickupCities?: Prisma.SortOrder
   sourceOccurredAt?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
+}
+
+export type OrganizationProfileAvgOrderByAggregateInput = {
+  ratingSum?: Prisma.SortOrder
+  ratingCount?: Prisma.SortOrder
 }
 
 export type OrganizationProfileMaxOrderByAggregateInput = {
@@ -356,6 +473,8 @@ export type OrganizationProfileMaxOrderByAggregateInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  ratingSum?: Prisma.SortOrder
+  ratingCount?: Prisma.SortOrder
   sourceOccurredAt?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
 }
@@ -367,8 +486,41 @@ export type OrganizationProfileMinOrderByAggregateInput = {
   countryCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  ratingSum?: Prisma.SortOrder
+  ratingCount?: Prisma.SortOrder
   sourceOccurredAt?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
+}
+
+export type OrganizationProfileSumOrderByAggregateInput = {
+  ratingSum?: Prisma.SortOrder
+  ratingCount?: Prisma.SortOrder
+}
+
+export type OrganizationProfileCreateserviceAreasInput = {
+  set: string[]
+}
+
+export type OrganizationProfileCreatepickupCitiesInput = {
+  set: string[]
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type OrganizationProfileUpdateserviceAreasInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type OrganizationProfileUpdatepickupCitiesInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 
@@ -380,6 +532,10 @@ export type OrganizationProfileSelect<ExtArgs extends runtime.Types.Extensions.I
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  ratingSum?: boolean
+  ratingCount?: boolean
+  serviceAreas?: boolean
+  pickupCities?: boolean
   sourceOccurredAt?: boolean
   indexedAt?: boolean
 }, ExtArgs["result"]["organizationProfile"]>
@@ -391,6 +547,10 @@ export type OrganizationProfileSelectCreateManyAndReturn<ExtArgs extends runtime
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  ratingSum?: boolean
+  ratingCount?: boolean
+  serviceAreas?: boolean
+  pickupCities?: boolean
   sourceOccurredAt?: boolean
   indexedAt?: boolean
 }, ExtArgs["result"]["organizationProfile"]>
@@ -402,6 +562,10 @@ export type OrganizationProfileSelectUpdateManyAndReturn<ExtArgs extends runtime
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  ratingSum?: boolean
+  ratingCount?: boolean
+  serviceAreas?: boolean
+  pickupCities?: boolean
   sourceOccurredAt?: boolean
   indexedAt?: boolean
 }, ExtArgs["result"]["organizationProfile"]>
@@ -413,11 +577,15 @@ export type OrganizationProfileSelectScalar = {
   countryCode?: boolean
   status?: boolean
   verificationStatus?: boolean
+  ratingSum?: boolean
+  ratingCount?: boolean
+  serviceAreas?: boolean
+  pickupCities?: boolean
   sourceOccurredAt?: boolean
   indexedAt?: boolean
 }
 
-export type OrganizationProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"organizationId" | "name" | "type" | "countryCode" | "status" | "verificationStatus" | "sourceOccurredAt" | "indexedAt", ExtArgs["result"]["organizationProfile"]>
+export type OrganizationProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"organizationId" | "name" | "type" | "countryCode" | "status" | "verificationStatus" | "ratingSum" | "ratingCount" | "serviceAreas" | "pickupCities" | "sourceOccurredAt" | "indexedAt", ExtArgs["result"]["organizationProfile"]>
 
 export type $OrganizationProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "OrganizationProfile"
@@ -429,6 +597,16 @@ export type $OrganizationProfilePayload<ExtArgs extends runtime.Types.Extensions
     countryCode: string
     status: string
     verificationStatus: string
+    /**
+     * From published business reviews (Quality).
+     */
+    ratingSum: number
+    ratingCount: number
+    /**
+     * Where the organization delivers / lets buyers collect (Organization locations).
+     */
+    serviceAreas: string[]
+    pickupCities: string[]
     sourceOccurredAt: Date
     indexedAt: Date
   }, ExtArgs["result"]["organizationProfile"]>
@@ -860,6 +1038,10 @@ export interface OrganizationProfileFieldRefs {
   readonly countryCode: Prisma.FieldRef<"OrganizationProfile", 'String'>
   readonly status: Prisma.FieldRef<"OrganizationProfile", 'String'>
   readonly verificationStatus: Prisma.FieldRef<"OrganizationProfile", 'String'>
+  readonly ratingSum: Prisma.FieldRef<"OrganizationProfile", 'Int'>
+  readonly ratingCount: Prisma.FieldRef<"OrganizationProfile", 'Int'>
+  readonly serviceAreas: Prisma.FieldRef<"OrganizationProfile", 'String[]'>
+  readonly pickupCities: Prisma.FieldRef<"OrganizationProfile", 'String[]'>
   readonly sourceOccurredAt: Prisma.FieldRef<"OrganizationProfile", 'DateTime'>
   readonly indexedAt: Prisma.FieldRef<"OrganizationProfile", 'DateTime'>
 }

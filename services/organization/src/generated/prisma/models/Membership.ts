@@ -33,6 +33,8 @@ export type MembershipMinAggregateOutputType = {
   addedByUserId: string | null
   createdAt: Date | null
   revokedAt: Date | null
+  suspendedAt: Date | null
+  roleTemplateId: string | null
 }
 
 export type MembershipMaxAggregateOutputType = {
@@ -44,6 +46,8 @@ export type MembershipMaxAggregateOutputType = {
   addedByUserId: string | null
   createdAt: Date | null
   revokedAt: Date | null
+  suspendedAt: Date | null
+  roleTemplateId: string | null
 }
 
 export type MembershipCountAggregateOutputType = {
@@ -55,6 +59,8 @@ export type MembershipCountAggregateOutputType = {
   addedByUserId: number
   createdAt: number
   revokedAt: number
+  suspendedAt: number
+  roleTemplateId: number
   _all: number
 }
 
@@ -68,6 +74,8 @@ export type MembershipMinAggregateInputType = {
   addedByUserId?: true
   createdAt?: true
   revokedAt?: true
+  suspendedAt?: true
+  roleTemplateId?: true
 }
 
 export type MembershipMaxAggregateInputType = {
@@ -79,6 +87,8 @@ export type MembershipMaxAggregateInputType = {
   addedByUserId?: true
   createdAt?: true
   revokedAt?: true
+  suspendedAt?: true
+  roleTemplateId?: true
 }
 
 export type MembershipCountAggregateInputType = {
@@ -90,6 +100,8 @@ export type MembershipCountAggregateInputType = {
   addedByUserId?: true
   createdAt?: true
   revokedAt?: true
+  suspendedAt?: true
+  roleTemplateId?: true
   _all?: true
 }
 
@@ -174,6 +186,8 @@ export type MembershipGroupByOutputType = {
   addedByUserId: string
   createdAt: Date
   revokedAt: Date | null
+  suspendedAt: Date | null
+  roleTemplateId: string | null
   _count: MembershipCountAggregateOutputType | null
   _min: MembershipMinAggregateOutputType | null
   _max: MembershipMaxAggregateOutputType | null
@@ -206,7 +220,11 @@ export type MembershipWhereInput = {
   addedByUserId?: Prisma.UuidFilter<"Membership"> | string
   createdAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
   revokedAt?: Prisma.DateTimeNullableFilter<"Membership"> | Date | string | null
+  suspendedAt?: Prisma.DateTimeNullableFilter<"Membership"> | Date | string | null
+  roleTemplateId?: Prisma.UuidNullableFilter<"Membership"> | string | null
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  locations?: Prisma.MembershipLocationListRelationFilter
+  roleTemplate?: Prisma.XOR<Prisma.RoleTemplateNullableScalarRelationFilter, Prisma.RoleTemplateWhereInput> | null
 }
 
 export type MembershipOrderByWithRelationInput = {
@@ -218,7 +236,11 @@ export type MembershipOrderByWithRelationInput = {
   addedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  roleTemplateId?: Prisma.SortOrderInput | Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
+  locations?: Prisma.MembershipLocationOrderByRelationAggregateInput
+  roleTemplate?: Prisma.RoleTemplateOrderByWithRelationInput
 }
 
 export type MembershipWhereUniqueInput = Prisma.AtLeast<{
@@ -234,7 +256,11 @@ export type MembershipWhereUniqueInput = Prisma.AtLeast<{
   addedByUserId?: Prisma.UuidFilter<"Membership"> | string
   createdAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
   revokedAt?: Prisma.DateTimeNullableFilter<"Membership"> | Date | string | null
+  suspendedAt?: Prisma.DateTimeNullableFilter<"Membership"> | Date | string | null
+  roleTemplateId?: Prisma.UuidNullableFilter<"Membership"> | string | null
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  locations?: Prisma.MembershipLocationListRelationFilter
+  roleTemplate?: Prisma.XOR<Prisma.RoleTemplateNullableScalarRelationFilter, Prisma.RoleTemplateWhereInput> | null
 }, "id" | "organizationId_userId">
 
 export type MembershipOrderByWithAggregationInput = {
@@ -246,6 +272,8 @@ export type MembershipOrderByWithAggregationInput = {
   addedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  roleTemplateId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.MembershipCountOrderByAggregateInput
   _max?: Prisma.MembershipMaxOrderByAggregateInput
   _min?: Prisma.MembershipMinOrderByAggregateInput
@@ -263,6 +291,8 @@ export type MembershipScalarWhereWithAggregatesInput = {
   addedByUserId?: Prisma.UuidWithAggregatesFilter<"Membership"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Membership"> | Date | string
   revokedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Membership"> | Date | string | null
+  suspendedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Membership"> | Date | string | null
+  roleTemplateId?: Prisma.UuidNullableWithAggregatesFilter<"Membership"> | string | null
 }
 
 export type MembershipCreateInput = {
@@ -273,7 +303,10 @@ export type MembershipCreateInput = {
   addedByUserId: string
   createdAt?: Date | string
   revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutMembershipsInput
+  locations?: Prisma.MembershipLocationCreateNestedManyWithoutMembershipInput
+  roleTemplate?: Prisma.RoleTemplateCreateNestedOneWithoutMembershipsInput
 }
 
 export type MembershipUncheckedCreateInput = {
@@ -285,6 +318,9 @@ export type MembershipUncheckedCreateInput = {
   addedByUserId: string
   createdAt?: Date | string
   revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  roleTemplateId?: string | null
+  locations?: Prisma.MembershipLocationUncheckedCreateNestedManyWithoutMembershipInput
 }
 
 export type MembershipUpdateInput = {
@@ -295,7 +331,10 @@ export type MembershipUpdateInput = {
   addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutMembershipsNestedInput
+  locations?: Prisma.MembershipLocationUpdateManyWithoutMembershipNestedInput
+  roleTemplate?: Prisma.RoleTemplateUpdateOneWithoutMembershipsNestedInput
 }
 
 export type MembershipUncheckedUpdateInput = {
@@ -307,6 +346,9 @@ export type MembershipUncheckedUpdateInput = {
   addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  roleTemplateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locations?: Prisma.MembershipLocationUncheckedUpdateManyWithoutMembershipNestedInput
 }
 
 export type MembershipCreateManyInput = {
@@ -318,6 +360,8 @@ export type MembershipCreateManyInput = {
   addedByUserId: string
   createdAt?: Date | string
   revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  roleTemplateId?: string | null
 }
 
 export type MembershipUpdateManyMutationInput = {
@@ -328,6 +372,7 @@ export type MembershipUpdateManyMutationInput = {
   addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type MembershipUncheckedUpdateManyInput = {
@@ -339,6 +384,8 @@ export type MembershipUncheckedUpdateManyInput = {
   addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  roleTemplateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MembershipListRelationFilter = {
@@ -365,6 +412,8 @@ export type MembershipCountOrderByAggregateInput = {
   addedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrder
+  roleTemplateId?: Prisma.SortOrder
 }
 
 export type MembershipMaxOrderByAggregateInput = {
@@ -376,6 +425,8 @@ export type MembershipMaxOrderByAggregateInput = {
   addedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrder
+  roleTemplateId?: Prisma.SortOrder
 }
 
 export type MembershipMinOrderByAggregateInput = {
@@ -387,6 +438,13 @@ export type MembershipMinOrderByAggregateInput = {
   addedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrder
+  roleTemplateId?: Prisma.SortOrder
+}
+
+export type MembershipScalarRelationFilter = {
+  is?: Prisma.MembershipWhereInput
+  isNot?: Prisma.MembershipWhereInput
 }
 
 export type MembershipCreateNestedManyWithoutOrganizationInput = {
@@ -443,6 +501,62 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type MembershipCreateNestedManyWithoutRoleTemplateInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutRoleTemplateInput, Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput> | Prisma.MembershipCreateWithoutRoleTemplateInput[] | Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput | Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput[]
+  createMany?: Prisma.MembershipCreateManyRoleTemplateInputEnvelope
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+}
+
+export type MembershipUncheckedCreateNestedManyWithoutRoleTemplateInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutRoleTemplateInput, Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput> | Prisma.MembershipCreateWithoutRoleTemplateInput[] | Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput | Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput[]
+  createMany?: Prisma.MembershipCreateManyRoleTemplateInputEnvelope
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+}
+
+export type MembershipUpdateManyWithoutRoleTemplateNestedInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutRoleTemplateInput, Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput> | Prisma.MembershipCreateWithoutRoleTemplateInput[] | Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput | Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput[]
+  upsert?: Prisma.MembershipUpsertWithWhereUniqueWithoutRoleTemplateInput | Prisma.MembershipUpsertWithWhereUniqueWithoutRoleTemplateInput[]
+  createMany?: Prisma.MembershipCreateManyRoleTemplateInputEnvelope
+  set?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  disconnect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  delete?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  update?: Prisma.MembershipUpdateWithWhereUniqueWithoutRoleTemplateInput | Prisma.MembershipUpdateWithWhereUniqueWithoutRoleTemplateInput[]
+  updateMany?: Prisma.MembershipUpdateManyWithWhereWithoutRoleTemplateInput | Prisma.MembershipUpdateManyWithWhereWithoutRoleTemplateInput[]
+  deleteMany?: Prisma.MembershipScalarWhereInput | Prisma.MembershipScalarWhereInput[]
+}
+
+export type MembershipUncheckedUpdateManyWithoutRoleTemplateNestedInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutRoleTemplateInput, Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput> | Prisma.MembershipCreateWithoutRoleTemplateInput[] | Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput | Prisma.MembershipCreateOrConnectWithoutRoleTemplateInput[]
+  upsert?: Prisma.MembershipUpsertWithWhereUniqueWithoutRoleTemplateInput | Prisma.MembershipUpsertWithWhereUniqueWithoutRoleTemplateInput[]
+  createMany?: Prisma.MembershipCreateManyRoleTemplateInputEnvelope
+  set?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  disconnect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  delete?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  update?: Prisma.MembershipUpdateWithWhereUniqueWithoutRoleTemplateInput | Prisma.MembershipUpdateWithWhereUniqueWithoutRoleTemplateInput[]
+  updateMany?: Prisma.MembershipUpdateManyWithWhereWithoutRoleTemplateInput | Prisma.MembershipUpdateManyWithWhereWithoutRoleTemplateInput[]
+  deleteMany?: Prisma.MembershipScalarWhereInput | Prisma.MembershipScalarWhereInput[]
+}
+
+export type MembershipCreateNestedOneWithoutLocationsInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutLocationsInput, Prisma.MembershipUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutLocationsInput
+  connect?: Prisma.MembershipWhereUniqueInput
+}
+
+export type MembershipUpdateOneRequiredWithoutLocationsNestedInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutLocationsInput, Prisma.MembershipUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutLocationsInput
+  upsert?: Prisma.MembershipUpsertWithoutLocationsInput
+  connect?: Prisma.MembershipWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MembershipUpdateToOneWithWhereWithoutLocationsInput, Prisma.MembershipUpdateWithoutLocationsInput>, Prisma.MembershipUncheckedUpdateWithoutLocationsInput>
+}
+
 export type MembershipCreateWithoutOrganizationInput = {
   id?: string
   userId: string
@@ -451,6 +565,9 @@ export type MembershipCreateWithoutOrganizationInput = {
   addedByUserId: string
   createdAt?: Date | string
   revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  locations?: Prisma.MembershipLocationCreateNestedManyWithoutMembershipInput
+  roleTemplate?: Prisma.RoleTemplateCreateNestedOneWithoutMembershipsInput
 }
 
 export type MembershipUncheckedCreateWithoutOrganizationInput = {
@@ -461,6 +578,9 @@ export type MembershipUncheckedCreateWithoutOrganizationInput = {
   addedByUserId: string
   createdAt?: Date | string
   revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  roleTemplateId?: string | null
+  locations?: Prisma.MembershipLocationUncheckedCreateNestedManyWithoutMembershipInput
 }
 
 export type MembershipCreateOrConnectWithoutOrganizationInput = {
@@ -501,6 +621,128 @@ export type MembershipScalarWhereInput = {
   addedByUserId?: Prisma.UuidFilter<"Membership"> | string
   createdAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
   revokedAt?: Prisma.DateTimeNullableFilter<"Membership"> | Date | string | null
+  suspendedAt?: Prisma.DateTimeNullableFilter<"Membership"> | Date | string | null
+  roleTemplateId?: Prisma.UuidNullableFilter<"Membership"> | string | null
+}
+
+export type MembershipCreateWithoutRoleTemplateInput = {
+  id?: string
+  userId: string
+  role: $Enums.MembershipRole
+  status?: $Enums.MembershipStatus
+  addedByUserId: string
+  createdAt?: Date | string
+  revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  organization: Prisma.OrganizationCreateNestedOneWithoutMembershipsInput
+  locations?: Prisma.MembershipLocationCreateNestedManyWithoutMembershipInput
+}
+
+export type MembershipUncheckedCreateWithoutRoleTemplateInput = {
+  id?: string
+  organizationId: string
+  userId: string
+  role: $Enums.MembershipRole
+  status?: $Enums.MembershipStatus
+  addedByUserId: string
+  createdAt?: Date | string
+  revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  locations?: Prisma.MembershipLocationUncheckedCreateNestedManyWithoutMembershipInput
+}
+
+export type MembershipCreateOrConnectWithoutRoleTemplateInput = {
+  where: Prisma.MembershipWhereUniqueInput
+  create: Prisma.XOR<Prisma.MembershipCreateWithoutRoleTemplateInput, Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput>
+}
+
+export type MembershipCreateManyRoleTemplateInputEnvelope = {
+  data: Prisma.MembershipCreateManyRoleTemplateInput | Prisma.MembershipCreateManyRoleTemplateInput[]
+  skipDuplicates?: boolean
+}
+
+export type MembershipUpsertWithWhereUniqueWithoutRoleTemplateInput = {
+  where: Prisma.MembershipWhereUniqueInput
+  update: Prisma.XOR<Prisma.MembershipUpdateWithoutRoleTemplateInput, Prisma.MembershipUncheckedUpdateWithoutRoleTemplateInput>
+  create: Prisma.XOR<Prisma.MembershipCreateWithoutRoleTemplateInput, Prisma.MembershipUncheckedCreateWithoutRoleTemplateInput>
+}
+
+export type MembershipUpdateWithWhereUniqueWithoutRoleTemplateInput = {
+  where: Prisma.MembershipWhereUniqueInput
+  data: Prisma.XOR<Prisma.MembershipUpdateWithoutRoleTemplateInput, Prisma.MembershipUncheckedUpdateWithoutRoleTemplateInput>
+}
+
+export type MembershipUpdateManyWithWhereWithoutRoleTemplateInput = {
+  where: Prisma.MembershipScalarWhereInput
+  data: Prisma.XOR<Prisma.MembershipUpdateManyMutationInput, Prisma.MembershipUncheckedUpdateManyWithoutRoleTemplateInput>
+}
+
+export type MembershipCreateWithoutLocationsInput = {
+  id?: string
+  userId: string
+  role: $Enums.MembershipRole
+  status?: $Enums.MembershipStatus
+  addedByUserId: string
+  createdAt?: Date | string
+  revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  organization: Prisma.OrganizationCreateNestedOneWithoutMembershipsInput
+  roleTemplate?: Prisma.RoleTemplateCreateNestedOneWithoutMembershipsInput
+}
+
+export type MembershipUncheckedCreateWithoutLocationsInput = {
+  id?: string
+  organizationId: string
+  userId: string
+  role: $Enums.MembershipRole
+  status?: $Enums.MembershipStatus
+  addedByUserId: string
+  createdAt?: Date | string
+  revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  roleTemplateId?: string | null
+}
+
+export type MembershipCreateOrConnectWithoutLocationsInput = {
+  where: Prisma.MembershipWhereUniqueInput
+  create: Prisma.XOR<Prisma.MembershipCreateWithoutLocationsInput, Prisma.MembershipUncheckedCreateWithoutLocationsInput>
+}
+
+export type MembershipUpsertWithoutLocationsInput = {
+  update: Prisma.XOR<Prisma.MembershipUpdateWithoutLocationsInput, Prisma.MembershipUncheckedUpdateWithoutLocationsInput>
+  create: Prisma.XOR<Prisma.MembershipCreateWithoutLocationsInput, Prisma.MembershipUncheckedCreateWithoutLocationsInput>
+  where?: Prisma.MembershipWhereInput
+}
+
+export type MembershipUpdateToOneWithWhereWithoutLocationsInput = {
+  where?: Prisma.MembershipWhereInput
+  data: Prisma.XOR<Prisma.MembershipUpdateWithoutLocationsInput, Prisma.MembershipUncheckedUpdateWithoutLocationsInput>
+}
+
+export type MembershipUpdateWithoutLocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMembershipRoleFieldUpdateOperationsInput | $Enums.MembershipRole
+  status?: Prisma.EnumMembershipStatusFieldUpdateOperationsInput | $Enums.MembershipStatus
+  addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutMembershipsNestedInput
+  roleTemplate?: Prisma.RoleTemplateUpdateOneWithoutMembershipsNestedInput
+}
+
+export type MembershipUncheckedUpdateWithoutLocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMembershipRoleFieldUpdateOperationsInput | $Enums.MembershipRole
+  status?: Prisma.EnumMembershipStatusFieldUpdateOperationsInput | $Enums.MembershipStatus
+  addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  roleTemplateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MembershipCreateManyOrganizationInput = {
@@ -511,6 +753,8 @@ export type MembershipCreateManyOrganizationInput = {
   addedByUserId: string
   createdAt?: Date | string
   revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  roleTemplateId?: string | null
 }
 
 export type MembershipUpdateWithoutOrganizationInput = {
@@ -521,6 +765,9 @@ export type MembershipUpdateWithoutOrganizationInput = {
   addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  locations?: Prisma.MembershipLocationUpdateManyWithoutMembershipNestedInput
+  roleTemplate?: Prisma.RoleTemplateUpdateOneWithoutMembershipsNestedInput
 }
 
 export type MembershipUncheckedUpdateWithoutOrganizationInput = {
@@ -531,6 +778,9 @@ export type MembershipUncheckedUpdateWithoutOrganizationInput = {
   addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  roleTemplateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locations?: Prisma.MembershipLocationUncheckedUpdateManyWithoutMembershipNestedInput
 }
 
 export type MembershipUncheckedUpdateManyWithoutOrganizationInput = {
@@ -541,8 +791,89 @@ export type MembershipUncheckedUpdateManyWithoutOrganizationInput = {
   addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  roleTemplateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
+export type MembershipCreateManyRoleTemplateInput = {
+  id?: string
+  organizationId: string
+  userId: string
+  role: $Enums.MembershipRole
+  status?: $Enums.MembershipStatus
+  addedByUserId: string
+  createdAt?: Date | string
+  revokedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+}
+
+export type MembershipUpdateWithoutRoleTemplateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMembershipRoleFieldUpdateOperationsInput | $Enums.MembershipRole
+  status?: Prisma.EnumMembershipStatusFieldUpdateOperationsInput | $Enums.MembershipStatus
+  addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutMembershipsNestedInput
+  locations?: Prisma.MembershipLocationUpdateManyWithoutMembershipNestedInput
+}
+
+export type MembershipUncheckedUpdateWithoutRoleTemplateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMembershipRoleFieldUpdateOperationsInput | $Enums.MembershipRole
+  status?: Prisma.EnumMembershipStatusFieldUpdateOperationsInput | $Enums.MembershipStatus
+  addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  locations?: Prisma.MembershipLocationUncheckedUpdateManyWithoutMembershipNestedInput
+}
+
+export type MembershipUncheckedUpdateManyWithoutRoleTemplateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMembershipRoleFieldUpdateOperationsInput | $Enums.MembershipRole
+  status?: Prisma.EnumMembershipStatusFieldUpdateOperationsInput | $Enums.MembershipStatus
+  addedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+
+/**
+ * Count Type MembershipCountOutputType
+ */
+
+export type MembershipCountOutputType = {
+  locations: number
+}
+
+export type MembershipCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  locations?: boolean | MembershipCountOutputTypeCountLocationsArgs
+}
+
+/**
+ * MembershipCountOutputType without action
+ */
+export type MembershipCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MembershipCountOutputType
+   */
+  select?: Prisma.MembershipCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MembershipCountOutputType without action
+ */
+export type MembershipCountOutputTypeCountLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MembershipLocationWhereInput
+}
 
 
 export type MembershipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -554,7 +885,12 @@ export type MembershipSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   addedByUserId?: boolean
   createdAt?: boolean
   revokedAt?: boolean
+  suspendedAt?: boolean
+  roleTemplateId?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  locations?: boolean | Prisma.Membership$locationsArgs<ExtArgs>
+  roleTemplate?: boolean | Prisma.Membership$roleTemplateArgs<ExtArgs>
+  _count?: boolean | Prisma.MembershipCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["membership"]>
 
 export type MembershipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -566,7 +902,10 @@ export type MembershipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   addedByUserId?: boolean
   createdAt?: boolean
   revokedAt?: boolean
+  suspendedAt?: boolean
+  roleTemplateId?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  roleTemplate?: boolean | Prisma.Membership$roleTemplateArgs<ExtArgs>
 }, ExtArgs["result"]["membership"]>
 
 export type MembershipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -578,7 +917,10 @@ export type MembershipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   addedByUserId?: boolean
   createdAt?: boolean
   revokedAt?: boolean
+  suspendedAt?: boolean
+  roleTemplateId?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  roleTemplate?: boolean | Prisma.Membership$roleTemplateArgs<ExtArgs>
 }, ExtArgs["result"]["membership"]>
 
 export type MembershipSelectScalar = {
@@ -590,23 +932,35 @@ export type MembershipSelectScalar = {
   addedByUserId?: boolean
   createdAt?: boolean
   revokedAt?: boolean
+  suspendedAt?: boolean
+  roleTemplateId?: boolean
 }
 
-export type MembershipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "userId" | "role" | "status" | "addedByUserId" | "createdAt" | "revokedAt", ExtArgs["result"]["membership"]>
+export type MembershipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "userId" | "role" | "status" | "addedByUserId" | "createdAt" | "revokedAt" | "suspendedAt" | "roleTemplateId", ExtArgs["result"]["membership"]>
 export type MembershipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  locations?: boolean | Prisma.Membership$locationsArgs<ExtArgs>
+  roleTemplate?: boolean | Prisma.Membership$roleTemplateArgs<ExtArgs>
+  _count?: boolean | Prisma.MembershipCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MembershipIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  roleTemplate?: boolean | Prisma.Membership$roleTemplateArgs<ExtArgs>
 }
 export type MembershipIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  roleTemplate?: boolean | Prisma.Membership$roleTemplateArgs<ExtArgs>
 }
 
 export type $MembershipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Membership"
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs>
+    /**
+     * Locations this member may act at; none means the whole organization.
+     */
+    locations: Prisma.$MembershipLocationPayload<ExtArgs>[]
+    roleTemplate: Prisma.$RoleTemplatePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -620,6 +974,11 @@ export type $MembershipPayload<ExtArgs extends runtime.Types.Extensions.Internal
     addedByUserId: string
     createdAt: Date
     revokedAt: Date | null
+    suspendedAt: Date | null
+    /**
+     * Narrows the role to the template's permissions and approval limit (PRD addendum 2.2).
+     */
+    roleTemplateId: string | null
   }, ExtArgs["result"]["membership"]>
   composites: {}
 }
@@ -1015,6 +1374,8 @@ readonly fields: MembershipFieldRefs;
 export interface Prisma__MembershipClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  locations<T extends Prisma.Membership$locationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Membership$locationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MembershipLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  roleTemplate<T extends Prisma.Membership$roleTemplateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Membership$roleTemplateArgs<ExtArgs>>): Prisma.Prisma__RoleTemplateClient<runtime.Types.Result.GetResult<Prisma.$RoleTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1052,6 +1413,8 @@ export interface MembershipFieldRefs {
   readonly addedByUserId: Prisma.FieldRef<"Membership", 'String'>
   readonly createdAt: Prisma.FieldRef<"Membership", 'DateTime'>
   readonly revokedAt: Prisma.FieldRef<"Membership", 'DateTime'>
+  readonly suspendedAt: Prisma.FieldRef<"Membership", 'DateTime'>
+  readonly roleTemplateId: Prisma.FieldRef<"Membership", 'String'>
 }
     
 
@@ -1450,6 +1813,49 @@ export type MembershipDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many Memberships to delete.
    */
   limit?: number
+}
+
+/**
+ * Membership.locations
+ */
+export type Membership$locationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MembershipLocation
+   */
+  select?: Prisma.MembershipLocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MembershipLocation
+   */
+  omit?: Prisma.MembershipLocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MembershipLocationInclude<ExtArgs> | null
+  where?: Prisma.MembershipLocationWhereInput
+  orderBy?: Prisma.MembershipLocationOrderByWithRelationInput | Prisma.MembershipLocationOrderByWithRelationInput[]
+  cursor?: Prisma.MembershipLocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MembershipLocationScalarFieldEnum | Prisma.MembershipLocationScalarFieldEnum[]
+}
+
+/**
+ * Membership.roleTemplate
+ */
+export type Membership$roleTemplateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RoleTemplate
+   */
+  select?: Prisma.RoleTemplateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RoleTemplate
+   */
+  omit?: Prisma.RoleTemplateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RoleTemplateInclude<ExtArgs> | null
+  where?: Prisma.RoleTemplateWhereInput
 }
 
 /**

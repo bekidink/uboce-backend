@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   ProductListing: 'ProductListing',
   OrganizationProfile: 'OrganizationProfile',
+  ProductStock: 'ProductStock',
   IndexState: 'IndexState',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -80,6 +81,7 @@ export const ProductListingScalarFieldEnum = {
   description: 'description',
   categoryId: 'categoryId',
   categorySlug: 'categorySlug',
+  categoryPath: 'categoryPath',
   unitOfMeasure: 'unitOfMeasure',
   attributes: 'attributes',
   variants: 'variants',
@@ -88,7 +90,14 @@ export const ProductListingScalarFieldEnum = {
   currency: 'currency',
   publishedAt: 'publishedAt',
   sourceOccurredAt: 'sourceOccurredAt',
-  indexedAt: 'indexedAt'
+  indexedAt: 'indexedAt',
+  searchText: 'searchText',
+  minOrderQuantity: 'minOrderQuantity',
+  imageDocumentId: 'imageDocumentId',
+  availableFrom: 'availableFrom',
+  availableUntil: 'availableUntil',
+  allowPreorder: 'allowPreorder',
+  madeToOrder: 'madeToOrder'
 } as const
 
 export type ProductListingScalarFieldEnum = (typeof ProductListingScalarFieldEnum)[keyof typeof ProductListingScalarFieldEnum]
@@ -101,11 +110,25 @@ export const OrganizationProfileScalarFieldEnum = {
   countryCode: 'countryCode',
   status: 'status',
   verificationStatus: 'verificationStatus',
+  ratingSum: 'ratingSum',
+  ratingCount: 'ratingCount',
+  serviceAreas: 'serviceAreas',
+  pickupCities: 'pickupCities',
   sourceOccurredAt: 'sourceOccurredAt',
   indexedAt: 'indexedAt'
 } as const
 
 export type OrganizationProfileScalarFieldEnum = (typeof OrganizationProfileScalarFieldEnum)[keyof typeof OrganizationProfileScalarFieldEnum]
+
+
+export const ProductStockScalarFieldEnum = {
+  organizationId: 'organizationId',
+  itemId: 'itemId',
+  onHand: 'onHand',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductStockScalarFieldEnum = (typeof ProductStockScalarFieldEnum)[keyof typeof ProductStockScalarFieldEnum]
 
 
 export const IndexStateScalarFieldEnum = {

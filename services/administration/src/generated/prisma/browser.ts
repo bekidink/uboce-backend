@@ -33,6 +33,16 @@ export type Setting = Prisma.SettingModel
  */
 export type FeatureFlag = Prisma.FeatureFlagModel
 /**
+ * Model Entitlement
+ * Which optional modules an organization may use (PRD addendum 2.10). No row = the module's default.
+ */
+export type Entitlement = Prisma.EntitlementModel
+/**
+ * Model BusinessTypeModule
+ * Which modules a business (organization) type gets by default; drives every such organization's sidebar.
+ */
+export type BusinessTypeModule = Prisma.BusinessTypeModuleModel
+/**
  * Model AuditEntry
  * Append-only record of every administrative action (PRD 5.21, 9).
  */

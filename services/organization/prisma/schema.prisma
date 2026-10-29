@@ -51,11 +51,30 @@ enum MembershipRole {
   logistics_operator
   finance_officer
   auditor
+  /// Sees and updates only the shipments assigned to them (PRD addendum 2.8).
+  driver
 }
 
 enum MembershipStatus {
   active
+  /// Temporarily blocked (PRD addendum 2.2): keeps role and location scope, loses all access.
+  suspended
   revoked
+}
+
+/// How the business sells (PRD addendum 2.1). An organization may run several (hybrid).
+enum BusinessModel {
+  wholesale
+  retail
+  made_to_order
+}
+
+enum LocationKind {
+  head_office
+  store
+  warehouse
+  collection_point
+  production_site
 }
 
 model Organization {
@@ -67,6 +86,9 @@ model Organization {
   countryCode        String             @default("ET") @map("country_code") @db.Char(2)
   status             OrganizationStatus @default(active)
   verificationStatus VerificationStatus @default(unverified) @map("verification_status")
+  businessModels     BusinessModel[]    @default([]) @map("business_models")
+  contactPhone       String?            @map("contact_phone")
+  contactEmail       String?            @map("contact_email")
   /// Identity user ID (external reference — no cross-database foreign key).
   createdByUserId    String             @map("created_by_user_id") @db.Uuid
   createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -89,8 +111,14 @@ model Membership {
   addedByUserId  String           @map("added_by_user_id") @db.Uuid
   createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
   revokedAt      DateTime?        @map("revoked_at") @db.Timestamptz(3)
+  suspendedAt    DateTime?        @map("suspended_at") @db.Timestamptz(3)
+  /// Narrows the role to the template's permissions and approval limit (PRD addendum 2.2).
+  roleTemplateId String?          @map("role_template_id") @db.Uuid
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  /// Locations this member may act at; none means the whole organization.
+  locations    MembershipLocation[]
+  roleTemplate RoleTemplate?        @relation(fields: [roleTemplateId], references: [id])
 
   /// One membership row per user per organization; revoking keeps the row for history.
   @@unique([organizationId, userId])
@@ -99,20 +127,67 @@ model Membership {
 }
 
 model Branch {
-  id             String   @id @default(uuid()) @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
   name           String
   region         String?
   city           String?
-  addressLine    String?  @map("address_line")
-  countryCode    String   @default("ET") @map("country_code") @db.Char(2)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  addressLine    String?      @map("address_line")
+  countryCode    String       @default("ET") @map("country_code") @db.Char(2)
+  kind           LocationKind @default(store)
+  phone          String?
+  email          String?
+  latitude       Decimal?     @db.Decimal(9, 6)
+  longitude      Decimal?     @db.Decimal(9, 6)
+  /// Weekly hours: [{ day: 0-6 (Sunday = 0), opens: "08:00", closes: "18:00" }]. Days not listed are closed.
+  operatingHours Json         @default("[]") @map("operating_hours")
+  /// Regions/cities this location delivers to.
+  serviceAreas   String[]     @default([]) @map("service_areas")
+  pickupEnabled  Boolean      @default(false) @map("pickup_enabled")
+  /// Can fulfil (ship) orders.
+  fulfillment    Boolean      @default(true)
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  members      MembershipLocation[]
 
   @@index([organizationId])
   @@map("branches")
+}
+
+/// A named set of permissions with an optional approval limit, e.g. "Junior buyer — up to 50,000 ETB".
+model RoleTemplate {
+  id               String   @id @default(uuid()) @db.Uuid
+  organizationId   String   @map("organization_id") @db.Uuid
+  name             String
+  description      String?
+  /// module:action keys (see PERMISSIONS in contracts).
+  permissions      String[]
+  approvalLimit    Decimal? @map("approval_limit") @db.Decimal(18, 4)
+  approvalCurrency String?  @map("approval_currency") @db.Char(3)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  memberships Membership[]
+
+  @@unique([organizationId, name])
+  @@map("role_templates")
+}
+
+/// Staff-to-location assignment (PRD addendum 2.2: location-scoped access).
+model MembershipLocation {
+  membershipId String   @map("membership_id") @db.Uuid
+  branchId     String   @map("branch_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  branch     Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@id([membershipId, branchId])
+  @@index([branchId])
+  @@map("membership_locations")
 }
 
 enum InvitationStatus {
@@ -123,19 +198,19 @@ enum InvitationStatus {
 
 /// An invitation to join, sent by email or SMS. Only the token's SHA-256 is stored.
 model Invitation {
-  id              String           @id @default(uuid()) @db.Uuid
-  organizationId  String           @map("organization_id") @db.Uuid
+  id               String           @id @default(uuid()) @db.Uuid
+  organizationId   String           @map("organization_id") @db.Uuid
   /// Lowercased. Exactly one of email/phone is set.
-  email           String?
-  phone           String?
-  role            MembershipRole
-  tokenHash       String           @unique @map("token_hash")
-  status          InvitationStatus @default(pending)
-  invitedByUserId String           @map("invited_by_user_id") @db.Uuid
-  acceptedByUserId String?         @map("accepted_by_user_id") @db.Uuid
-  expiresAt       DateTime         @map("expires_at") @db.Timestamptz(3)
-  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
-  respondedAt     DateTime?        @map("responded_at") @db.Timestamptz(3)
+  email            String?
+  phone            String?
+  role             MembershipRole
+  tokenHash        String           @unique @map("token_hash")
+  status           InvitationStatus @default(pending)
+  invitedByUserId  String           @map("invited_by_user_id") @db.Uuid
+  acceptedByUserId String?          @map("accepted_by_user_id") @db.Uuid
+  expiresAt        DateTime         @map("expires_at") @db.Timestamptz(3)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  respondedAt      DateTime?        @map("responded_at") @db.Timestamptz(3)
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
 

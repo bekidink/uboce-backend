@@ -7,7 +7,7 @@ export const env = loadEnv(
   baseEnvSchema.merge(internalCallsEnvSchema).extend({
     /**
      * Webhook providers as `name:kind:secret` triples, comma-separated, where
-     * kind is `payment` or `carrier`. Secrets are shared with each provider.
+     * kind is `payment`, `carrier` or `chapa` (Chapa's own webhook format). Secrets are shared with each provider.
      */
     PROVIDERS: z.string().default(''),
     /** How old a signed callback may be before it's refused as a replay. */
@@ -17,13 +17,13 @@ export const env = loadEnv(
 
 export interface ProviderConfig {
   name: string;
-  kind: 'payment' | 'carrier';
+  kind: 'payment' | 'carrier' | 'chapa';
   secret: string;
 }
 
 export const providers = new Map<string, ProviderConfig>(
   env.PROVIDERS.split(',')
     .map((triple) => triple.trim().split(':'))
-    .filter((parts): parts is [string, string, string] => parts.length === 3 && (parts[1] === 'payment' || parts[1] === 'carrier') && parts[2]!.length >= 16)
+    .filter((parts): parts is [string, string, string] => parts.length === 3 && (parts[1] === 'payment' || parts[1] === 'carrier' || parts[1] === 'chapa') && parts[2]!.length >= 16)
     .map(([name, kind, secret]) => [name, { name, kind: kind as ProviderConfig['kind'], secret }]),
 );

@@ -11,6 +11,8 @@
 export type * from './models/Organization.js'
 export type * from './models/Membership.js'
 export type * from './models/Branch.js'
+export type * from './models/RoleTemplate.js'
+export type * from './models/MembershipLocation.js'
 export type * from './models/Invitation.js'
 export type * from './models/OutboxEvent.js'
 export type * from './models/ProcessedEvent.js'

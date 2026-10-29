@@ -32,6 +32,8 @@ model Warehouse {
   region         String?
   city           String?
   addressLine    String?         @map("address_line")
+  /// Organization location (branch) this warehouse belongs to; staff limited to locations only see their own.
+  branchId       String?         @map("branch_id") @db.Uuid
   status         WarehouseStatus @default(active)
   createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -40,6 +42,7 @@ model Warehouse {
   receipts  Receipt[]
 
   @@unique([organizationId, code])
+  @@index([organizationId, branchId])
   @@map("warehouses")
 }
 
@@ -99,19 +102,66 @@ model ReceiptLine {
 }
 
 model Transfer {
-  id               String   @id @default(uuid()) @db.Uuid
-  organizationId   String   @map("organization_id") @db.Uuid
-  fromWarehouseId  String   @map("from_warehouse_id") @db.Uuid
-  toWarehouseId    String   @map("to_warehouse_id") @db.Uuid
-  itemId           String   @map("item_id") @db.Uuid
-  quantity         Decimal  @db.Decimal(18, 4)
+  id              String   @id @default(uuid()) @db.Uuid
+  organizationId  String   @map("organization_id") @db.Uuid
+  fromWarehouseId String   @map("from_warehouse_id") @db.Uuid
+  toWarehouseId   String   @map("to_warehouse_id") @db.Uuid
+  itemId          String   @map("item_id") @db.Uuid
+  quantity        Decimal  @db.Decimal(18, 4)
   /// out_posted after the first leg, completed after both. Retrying finishes a half-done transfer.
-  status           String
-  createdByUserId  String   @map("created_by_user_id") @db.Uuid
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  status          String
+  createdByUserId String   @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@index([organizationId, createdAt])
   @@map("transfers")
+}
+
+/// A branch asks another branch for stock (PRD: branch-to-branch transfers). Source approves and dispatches; destination receives.
+model TransferRequest {
+  id                 String                @id @default(uuid()) @db.Uuid
+  organizationId     String                @map("organization_id") @db.Uuid
+  number             String
+  fromWarehouseId    String                @map("from_warehouse_id") @db.Uuid
+  toWarehouseId      String                @map("to_warehouse_id") @db.Uuid
+  fromBranchId       String?               @map("from_branch_id") @db.Uuid
+  toBranchId         String?               @map("to_branch_id") @db.Uuid
+  /// requested → approved → in_transit → received; or rejected / cancelled.
+  status             String                @default("requested")
+  note               String?
+  responseNote       String?               @map("response_note")
+  neededBy           DateTime?             @map("needed_by") @db.Date
+  requestedByUserId  String                @map("requested_by_user_id") @db.Uuid
+  respondedByUserId  String?               @map("responded_by_user_id") @db.Uuid
+  dispatchedByUserId String?               @map("dispatched_by_user_id") @db.Uuid
+  receivedByUserId   String?               @map("received_by_user_id") @db.Uuid
+  respondedAt        DateTime?             @map("responded_at") @db.Timestamptz(3)
+  dispatchedAt       DateTime?             @map("dispatched_at") @db.Timestamptz(3)
+  receivedAt         DateTime?             @map("received_at") @db.Timestamptz(3)
+  createdAt          DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
+  lines              TransferRequestLine[]
+
+  @@unique([organizationId, number])
+  @@index([organizationId, status])
+  @@index([fromWarehouseId])
+  @@index([toWarehouseId])
+  @@map("transfer_requests")
+}
+
+model TransferRequestLine {
+  id                String          @id @default(uuid()) @db.Uuid
+  requestId         String          @map("request_id") @db.Uuid
+  itemId            String          @map("item_id") @db.Uuid
+  description       String
+  requestedQuantity Decimal         @map("requested_quantity") @db.Decimal(18, 4)
+  /// Set by the source on approval (may be less than requested).
+  approvedQuantity  Decimal?        @map("approved_quantity") @db.Decimal(18, 4)
+  receivedQuantity  Decimal?        @map("received_quantity") @db.Decimal(18, 4)
+  request           TransferRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@map("transfer_request_lines")
 }
 
 /// Transactional outbox (PRD 8.3).

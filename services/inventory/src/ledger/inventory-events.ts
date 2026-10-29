@@ -43,6 +43,12 @@ export class InventoryEvents extends EventConsumer<Tx> {
       PurchaseOrderCancelled: this.on('PurchaseOrderCancelled', async (e) => {
         await this.ledger.release('order', e.data.orderId);
       }),
+      // Pickup orders have no shipment: the handover issues the reserved stock.
+      PurchaseOrderFulfillmentUpdated: this.on('PurchaseOrderFulfillmentUpdated', async (e) => {
+        if (!e.data.handover) return;
+        const result = await this.ledger.consumeForHandover(e.data.orderId);
+        this.logger.log(`Pickup handover for order ${e.data.orderId}: ${result.issued} line(s) issued`);
+      }),
     };
   }
 }

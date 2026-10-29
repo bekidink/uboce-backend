@@ -56,6 +56,9 @@ export const ModelName = {
   PaymentReference: 'PaymentReference',
   Reconciliation: 'Reconciliation',
   CreditNote: 'CreditNote',
+  PaymentIntent: 'PaymentIntent',
+  Refund: 'Refund',
+  Settlement: 'Settlement',
   DocumentCounter: 'DocumentCounter',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
@@ -162,6 +165,72 @@ export const CreditNoteScalarFieldEnum = {
 } as const
 
 export type CreditNoteScalarFieldEnum = (typeof CreditNoteScalarFieldEnum)[keyof typeof CreditNoteScalarFieldEnum]
+
+
+export const PaymentIntentScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  provider: 'provider',
+  providerRef: 'providerRef',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  checkoutUrl: 'checkoutUrl',
+  fee: 'fee',
+  failureReason: 'failureReason',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentIntentScalarFieldEnum = (typeof PaymentIntentScalarFieldEnum)[keyof typeof PaymentIntentScalarFieldEnum]
+
+
+export const RefundScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  sellerOrganizationId: 'sellerOrganizationId',
+  buyerOrganizationId: 'buyerOrganizationId',
+  invoiceId: 'invoiceId',
+  orderId: 'orderId',
+  returnId: 'returnId',
+  amount: 'amount',
+  currency: 'currency',
+  reason: 'reason',
+  status: 'status',
+  method: 'method',
+  provider: 'provider',
+  providerRef: 'providerRef',
+  failureReason: 'failureReason',
+  requestedByUserId: 'requestedByUserId',
+  approvedByUserId: 'approvedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RefundScalarFieldEnum = (typeof RefundScalarFieldEnum)[keyof typeof RefundScalarFieldEnum]
+
+
+export const SettlementScalarFieldEnum = {
+  id: 'id',
+  sellerOrganizationId: 'sellerOrganizationId',
+  provider: 'provider',
+  currency: 'currency',
+  periodStart: 'periodStart',
+  periodEnd: 'periodEnd',
+  paymentCount: 'paymentCount',
+  grossAmount: 'grossAmount',
+  feeTotal: 'feeTotal',
+  refundTotal: 'refundTotal',
+  netAmount: 'netAmount',
+  status: 'status',
+  payoutRef: 'payoutRef',
+  paidAt: 'paidAt',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
 
 
 export const DocumentCounterScalarFieldEnum = {

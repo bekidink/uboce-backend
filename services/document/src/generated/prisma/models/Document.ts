@@ -51,6 +51,7 @@ export type DocumentMinAggregateOutputType = {
   rejectionReason: string | null
   retentionUntil: Date | null
   legalHold: boolean | null
+  isPublic: boolean | null
   createdAt: Date | null
   uploadedAt: Date | null
   deletedAt: Date | null
@@ -71,6 +72,7 @@ export type DocumentMaxAggregateOutputType = {
   rejectionReason: string | null
   retentionUntil: Date | null
   legalHold: boolean | null
+  isPublic: boolean | null
   createdAt: Date | null
   uploadedAt: Date | null
   deletedAt: Date | null
@@ -91,6 +93,7 @@ export type DocumentCountAggregateOutputType = {
   rejectionReason: number
   retentionUntil: number
   legalHold: number
+  isPublic: number
   createdAt: number
   uploadedAt: number
   deletedAt: number
@@ -123,6 +126,7 @@ export type DocumentMinAggregateInputType = {
   rejectionReason?: true
   retentionUntil?: true
   legalHold?: true
+  isPublic?: true
   createdAt?: true
   uploadedAt?: true
   deletedAt?: true
@@ -143,6 +147,7 @@ export type DocumentMaxAggregateInputType = {
   rejectionReason?: true
   retentionUntil?: true
   legalHold?: true
+  isPublic?: true
   createdAt?: true
   uploadedAt?: true
   deletedAt?: true
@@ -163,6 +168,7 @@ export type DocumentCountAggregateInputType = {
   rejectionReason?: true
   retentionUntil?: true
   legalHold?: true
+  isPublic?: true
   createdAt?: true
   uploadedAt?: true
   deletedAt?: true
@@ -270,6 +276,7 @@ export type DocumentGroupByOutputType = {
   rejectionReason: string | null
   retentionUntil: Date | null
   legalHold: boolean
+  isPublic: boolean
   createdAt: Date
   uploadedAt: Date | null
   deletedAt: Date | null
@@ -313,6 +320,7 @@ export type DocumentWhereInput = {
   rejectionReason?: Prisma.StringNullableFilter<"Document"> | string | null
   retentionUntil?: Prisma.DateTimeNullableFilter<"Document"> | Date | string | null
   legalHold?: Prisma.BoolFilter<"Document"> | boolean
+  isPublic?: Prisma.BoolFilter<"Document"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   uploadedAt?: Prisma.DateTimeNullableFilter<"Document"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Document"> | Date | string | null
@@ -335,6 +343,7 @@ export type DocumentOrderByWithRelationInput = {
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   retentionUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   legalHold?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -360,6 +369,7 @@ export type DocumentWhereUniqueInput = Prisma.AtLeast<{
   rejectionReason?: Prisma.StringNullableFilter<"Document"> | string | null
   retentionUntil?: Prisma.DateTimeNullableFilter<"Document"> | Date | string | null
   legalHold?: Prisma.BoolFilter<"Document"> | boolean
+  isPublic?: Prisma.BoolFilter<"Document"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   uploadedAt?: Prisma.DateTimeNullableFilter<"Document"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Document"> | Date | string | null
@@ -382,6 +392,7 @@ export type DocumentOrderByWithAggregationInput = {
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   retentionUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   legalHold?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -410,6 +421,7 @@ export type DocumentScalarWhereWithAggregatesInput = {
   rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"Document"> | string | null
   retentionUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
   legalHold?: Prisma.BoolWithAggregatesFilter<"Document"> | boolean
+  isPublic?: Prisma.BoolWithAggregatesFilter<"Document"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Document"> | Date | string
   uploadedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
@@ -430,6 +442,7 @@ export type DocumentCreateInput = {
   rejectionReason?: string | null
   retentionUntil?: Date | string | null
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -452,6 +465,7 @@ export type DocumentUncheckedCreateInput = {
   rejectionReason?: string | null
   retentionUntil?: Date | string | null
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -474,6 +488,7 @@ export type DocumentUpdateInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -496,6 +511,7 @@ export type DocumentUncheckedUpdateInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -518,6 +534,7 @@ export type DocumentCreateManyInput = {
   rejectionReason?: string | null
   retentionUntil?: Date | string | null
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -538,6 +555,7 @@ export type DocumentUpdateManyMutationInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -558,6 +576,7 @@ export type DocumentUncheckedUpdateManyInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -578,6 +597,7 @@ export type DocumentCountOrderByAggregateInput = {
   rejectionReason?: Prisma.SortOrder
   retentionUntil?: Prisma.SortOrder
   legalHold?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -603,6 +623,7 @@ export type DocumentMaxOrderByAggregateInput = {
   rejectionReason?: Prisma.SortOrder
   retentionUntil?: Prisma.SortOrder
   legalHold?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -623,6 +644,7 @@ export type DocumentMinOrderByAggregateInput = {
   rejectionReason?: Prisma.SortOrder
   retentionUntil?: Prisma.SortOrder
   legalHold?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -725,6 +747,7 @@ export type DocumentCreateWithoutGrantsInput = {
   rejectionReason?: string | null
   retentionUntil?: Date | string | null
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -746,6 +769,7 @@ export type DocumentUncheckedCreateWithoutGrantsInput = {
   rejectionReason?: string | null
   retentionUntil?: Date | string | null
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -783,6 +807,7 @@ export type DocumentUpdateWithoutGrantsInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -804,6 +829,7 @@ export type DocumentUncheckedUpdateWithoutGrantsInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -825,6 +851,7 @@ export type DocumentCreateWithoutAccessLogInput = {
   rejectionReason?: string | null
   retentionUntil?: Date | string | null
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -846,6 +873,7 @@ export type DocumentUncheckedCreateWithoutAccessLogInput = {
   rejectionReason?: string | null
   retentionUntil?: Date | string | null
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -883,6 +911,7 @@ export type DocumentUpdateWithoutAccessLogInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -904,6 +933,7 @@ export type DocumentUncheckedUpdateWithoutAccessLogInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retentionUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legalHold?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -965,6 +995,7 @@ export type DocumentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   rejectionReason?: boolean
   retentionUntil?: boolean
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
@@ -988,6 +1019,7 @@ export type DocumentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   rejectionReason?: boolean
   retentionUntil?: boolean
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
@@ -1008,6 +1040,7 @@ export type DocumentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   rejectionReason?: boolean
   retentionUntil?: boolean
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
@@ -1028,12 +1061,13 @@ export type DocumentSelectScalar = {
   rejectionReason?: boolean
   retentionUntil?: boolean
   legalHold?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
 }
 
-export type DocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerUserId" | "ownerOrganizationId" | "classification" | "fileName" | "contentType" | "declaredSize" | "sizeBytes" | "sha256" | "storageKey" | "status" | "rejectionReason" | "retentionUntil" | "legalHold" | "createdAt" | "uploadedAt" | "deletedAt", ExtArgs["result"]["document"]>
+export type DocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerUserId" | "ownerOrganizationId" | "classification" | "fileName" | "contentType" | "declaredSize" | "sizeBytes" | "sha256" | "storageKey" | "status" | "rejectionReason" | "retentionUntil" | "legalHold" | "isPublic" | "createdAt" | "uploadedAt" | "deletedAt", ExtArgs["result"]["document"]>
 export type DocumentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   grants?: boolean | Prisma.Document$grantsArgs<ExtArgs>
   accessLog?: boolean | Prisma.Document$accessLogArgs<ExtArgs>
@@ -1063,6 +1097,10 @@ export type $DocumentPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     rejectionReason: string | null
     retentionUntil: Date | null
     legalHold: boolean
+    /**
+     * Product images published by Catalog: anyone may view them (PRD addendum 2.3).
+     */
+    isPublic: boolean
     createdAt: Date
     uploadedAt: Date | null
     deletedAt: Date | null
@@ -1505,6 +1543,7 @@ export interface DocumentFieldRefs {
   readonly rejectionReason: Prisma.FieldRef<"Document", 'String'>
   readonly retentionUntil: Prisma.FieldRef<"Document", 'DateTime'>
   readonly legalHold: Prisma.FieldRef<"Document", 'Boolean'>
+  readonly isPublic: Prisma.FieldRef<"Document", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Document", 'DateTime'>
   readonly uploadedAt: Prisma.FieldRef<"Document", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Document", 'DateTime'>

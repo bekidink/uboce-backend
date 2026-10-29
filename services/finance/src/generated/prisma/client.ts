@@ -67,6 +67,21 @@ export type Reconciliation = Prisma.ReconciliationModel
  */
 export type CreditNote = Prisma.CreditNoteModel
 /**
+ * Model PaymentIntent
+ * One attempt to collect an invoice through a payment provider (PRD addendum 2.7).
+ */
+export type PaymentIntent = Prisma.PaymentIntentModel
+/**
+ * Model Refund
+ * Money going back to a buyer: after a return, an overpayment or a goodwill gesture.
+ */
+export type Refund = Prisma.RefundModel
+/**
+ * Model Settlement
+ * A provider payout to a seller for a period: what came in, fees, refunds and the net (PRD addendum 2.7).
+ */
+export type Settlement = Prisma.SettlementModel
+/**
  * Model DocumentCounter
  * 
  */

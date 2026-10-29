@@ -43,3 +43,24 @@ export const Severity = {
 } as const
 
 export type Severity = (typeof Severity)[keyof typeof Severity]
+
+
+export const ClaimStatus = {
+  open: 'open',
+  accepted: 'accepted',
+  rejected: 'rejected',
+  escalated: 'escalated',
+  resolved: 'resolved'
+} as const
+
+export type ClaimStatus = (typeof ClaimStatus)[keyof typeof ClaimStatus]
+
+
+export const ReviewStatus = {
+  pending: 'pending',
+  published: 'published',
+  hidden: 'hidden',
+  rejected: 'rejected'
+} as const
+
+export type ReviewStatus = (typeof ReviewStatus)[keyof typeof ReviewStatus]

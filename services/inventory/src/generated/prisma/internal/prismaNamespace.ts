@@ -401,6 +401,9 @@ export const ModelName = {
   StockBalance: 'StockBalance',
   StockReservation: 'StockReservation',
   StockReservationLine: 'StockReservationLine',
+  StockStateChange: 'StockStateChange',
+  CycleCount: 'CycleCount',
+  CycleCountLine: 'CycleCountLine',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -418,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "stockMovement" | "stockBalance" | "stockReservation" | "stockReservationLine" | "outboxEvent" | "processedEvent"
+    modelProps: "stockMovement" | "stockBalance" | "stockReservation" | "stockReservationLine" | "stockStateChange" | "cycleCount" | "cycleCountLine" | "outboxEvent" | "processedEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -718,6 +721,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StockStateChange: {
+      payload: Prisma.$StockStateChangePayload<ExtArgs>
+      fields: Prisma.StockStateChangeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StockStateChangeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StockStateChangeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>
+        }
+        findFirst: {
+          args: Prisma.StockStateChangeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StockStateChangeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>
+        }
+        findMany: {
+          args: Prisma.StockStateChangeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>[]
+        }
+        create: {
+          args: Prisma.StockStateChangeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>
+        }
+        createMany: {
+          args: Prisma.StockStateChangeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StockStateChangeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>[]
+        }
+        delete: {
+          args: Prisma.StockStateChangeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>
+        }
+        update: {
+          args: Prisma.StockStateChangeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>
+        }
+        deleteMany: {
+          args: Prisma.StockStateChangeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StockStateChangeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StockStateChangeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>[]
+        }
+        upsert: {
+          args: Prisma.StockStateChangeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockStateChangePayload>
+        }
+        aggregate: {
+          args: Prisma.StockStateChangeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStockStateChange>
+        }
+        groupBy: {
+          args: Prisma.StockStateChangeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StockStateChangeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StockStateChangeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StockStateChangeCountAggregateOutputType> | number
+        }
+      }
+    }
+    CycleCount: {
+      payload: Prisma.$CycleCountPayload<ExtArgs>
+      fields: Prisma.CycleCountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CycleCountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CycleCountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>
+        }
+        findFirst: {
+          args: Prisma.CycleCountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CycleCountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>
+        }
+        findMany: {
+          args: Prisma.CycleCountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>[]
+        }
+        create: {
+          args: Prisma.CycleCountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>
+        }
+        createMany: {
+          args: Prisma.CycleCountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CycleCountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>[]
+        }
+        delete: {
+          args: Prisma.CycleCountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>
+        }
+        update: {
+          args: Prisma.CycleCountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>
+        }
+        deleteMany: {
+          args: Prisma.CycleCountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CycleCountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CycleCountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>[]
+        }
+        upsert: {
+          args: Prisma.CycleCountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountPayload>
+        }
+        aggregate: {
+          args: Prisma.CycleCountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCycleCount>
+        }
+        groupBy: {
+          args: Prisma.CycleCountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CycleCountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CycleCountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CycleCountCountAggregateOutputType> | number
+        }
+      }
+    }
+    CycleCountLine: {
+      payload: Prisma.$CycleCountLinePayload<ExtArgs>
+      fields: Prisma.CycleCountLineFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CycleCountLineFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CycleCountLineFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>
+        }
+        findFirst: {
+          args: Prisma.CycleCountLineFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CycleCountLineFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>
+        }
+        findMany: {
+          args: Prisma.CycleCountLineFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>[]
+        }
+        create: {
+          args: Prisma.CycleCountLineCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>
+        }
+        createMany: {
+          args: Prisma.CycleCountLineCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CycleCountLineCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>[]
+        }
+        delete: {
+          args: Prisma.CycleCountLineDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>
+        }
+        update: {
+          args: Prisma.CycleCountLineUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>
+        }
+        deleteMany: {
+          args: Prisma.CycleCountLineDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CycleCountLineUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CycleCountLineUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>[]
+        }
+        upsert: {
+          args: Prisma.CycleCountLineUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CycleCountLinePayload>
+        }
+        aggregate: {
+          args: Prisma.CycleCountLineAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCycleCountLine>
+        }
+        groupBy: {
+          args: Prisma.CycleCountLineGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CycleCountLineGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CycleCountLineCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CycleCountLineCountAggregateOutputType> | number
+        }
+      }
+    }
     OutboxEvent: {
       payload: Prisma.$OutboxEventPayload<ExtArgs>
       fields: Prisma.OutboxEventFieldRefs
@@ -933,6 +1158,8 @@ export const StockBalanceScalarFieldEnum = {
   itemId: 'itemId',
   onHand: 'onHand',
   reserved: 'reserved',
+  damaged: 'damaged',
+  quarantined: 'quarantined',
   updatedAt: 'updatedAt'
 } as const
 
@@ -963,6 +1190,54 @@ export const StockReservationLineScalarFieldEnum = {
 } as const
 
 export type StockReservationLineScalarFieldEnum = (typeof StockReservationLineScalarFieldEnum)[keyof typeof StockReservationLineScalarFieldEnum]
+
+
+export const StockStateChangeScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  warehouseId: 'warehouseId',
+  itemId: 'itemId',
+  fromState: 'fromState',
+  toState: 'toState',
+  quantity: 'quantity',
+  reason: 'reason',
+  sourceType: 'sourceType',
+  sourceId: 'sourceId',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+} as const
+
+export type StockStateChangeScalarFieldEnum = (typeof StockStateChangeScalarFieldEnum)[keyof typeof StockStateChangeScalarFieldEnum]
+
+
+export const CycleCountScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  organizationId: 'organizationId',
+  warehouseId: 'warehouseId',
+  status: 'status',
+  note: 'note',
+  createdByUserId: 'createdByUserId',
+  submittedByUserId: 'submittedByUserId',
+  approvedByUserId: 'approvedByUserId',
+  createdAt: 'createdAt',
+  submittedAt: 'submittedAt',
+  approvedAt: 'approvedAt'
+} as const
+
+export type CycleCountScalarFieldEnum = (typeof CycleCountScalarFieldEnum)[keyof typeof CycleCountScalarFieldEnum]
+
+
+export const CycleCountLineScalarFieldEnum = {
+  id: 'id',
+  cycleCountId: 'cycleCountId',
+  itemId: 'itemId',
+  expectedQuantity: 'expectedQuantity',
+  countedQuantity: 'countedQuantity',
+  note: 'note'
+} as const
+
+export type CycleCountLineScalarFieldEnum = (typeof CycleCountLineScalarFieldEnum)[keyof typeof CycleCountLineScalarFieldEnum]
 
 
 export const OutboxEventScalarFieldEnum = {
@@ -1122,6 +1397,34 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'StockState'
+ */
+export type EnumStockStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockState'>
+    
+
+
+/**
+ * Reference to a field of type 'StockState[]'
+ */
+export type ListEnumStockStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CycleCountStatus'
+ */
+export type EnumCycleCountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CycleCountStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CycleCountStatus[]'
+ */
+export type ListEnumCycleCountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CycleCountStatus[]'>
     
 
 
@@ -1307,6 +1610,9 @@ export type GlobalOmitConfig = {
   stockBalance?: Prisma.StockBalanceOmit
   stockReservation?: Prisma.StockReservationOmit
   stockReservationLine?: Prisma.StockReservationLineOmit
+  stockStateChange?: Prisma.StockStateChangeOmit
+  cycleCount?: Prisma.CycleCountOmit
+  cycleCountLine?: Prisma.CycleCountLineOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit
 }

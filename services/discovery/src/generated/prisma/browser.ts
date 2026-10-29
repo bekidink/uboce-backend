@@ -28,8 +28,14 @@ export type ProductListing = Prisma.ProductListingModel
  */
 export type OrganizationProfile = Prisma.OrganizationProfileModel
 /**
- * Model IndexState
+ * Model ProductStock
  * Index freshness (PRD 5.6): when we last applied an event, and how old it was.
+ * Running on-hand per product from the stock ledger's movements, for "in stock" filtering.
+ */
+export type ProductStock = Prisma.ProductStockModel
+/**
+ * Model IndexState
+ * 
  */
 export type IndexState = Prisma.IndexStateModel
 /**

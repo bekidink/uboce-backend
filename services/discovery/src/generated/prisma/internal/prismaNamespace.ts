@@ -399,6 +399,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   ProductListing: 'ProductListing',
   OrganizationProfile: 'OrganizationProfile',
+  ProductStock: 'ProductStock',
   IndexState: 'IndexState',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "productListing" | "organizationProfile" | "indexState" | "processedEvent"
+    modelProps: "productListing" | "organizationProfile" | "productStock" | "indexState" | "processedEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -565,6 +566,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OrganizationProfileCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OrganizationProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProductStock: {
+      payload: Prisma.$ProductStockPayload<ExtArgs>
+      fields: Prisma.ProductStockFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductStockFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductStockFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>
+        }
+        findFirst: {
+          args: Prisma.ProductStockFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductStockFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>
+        }
+        findMany: {
+          args: Prisma.ProductStockFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>[]
+        }
+        create: {
+          args: Prisma.ProductStockCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>
+        }
+        createMany: {
+          args: Prisma.ProductStockCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductStockCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>[]
+        }
+        delete: {
+          args: Prisma.ProductStockDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>
+        }
+        update: {
+          args: Prisma.ProductStockUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductStockDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductStockUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductStockUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductStockUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductStockPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductStockAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProductStock>
+        }
+        groupBy: {
+          args: Prisma.ProductStockGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductStockGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductStockCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductStockCountAggregateOutputType> | number
         }
       }
     }
@@ -762,6 +837,7 @@ export const ProductListingScalarFieldEnum = {
   description: 'description',
   categoryId: 'categoryId',
   categorySlug: 'categorySlug',
+  categoryPath: 'categoryPath',
   unitOfMeasure: 'unitOfMeasure',
   attributes: 'attributes',
   variants: 'variants',
@@ -770,7 +846,14 @@ export const ProductListingScalarFieldEnum = {
   currency: 'currency',
   publishedAt: 'publishedAt',
   sourceOccurredAt: 'sourceOccurredAt',
-  indexedAt: 'indexedAt'
+  indexedAt: 'indexedAt',
+  searchText: 'searchText',
+  minOrderQuantity: 'minOrderQuantity',
+  imageDocumentId: 'imageDocumentId',
+  availableFrom: 'availableFrom',
+  availableUntil: 'availableUntil',
+  allowPreorder: 'allowPreorder',
+  madeToOrder: 'madeToOrder'
 } as const
 
 export type ProductListingScalarFieldEnum = (typeof ProductListingScalarFieldEnum)[keyof typeof ProductListingScalarFieldEnum]
@@ -783,11 +866,25 @@ export const OrganizationProfileScalarFieldEnum = {
   countryCode: 'countryCode',
   status: 'status',
   verificationStatus: 'verificationStatus',
+  ratingSum: 'ratingSum',
+  ratingCount: 'ratingCount',
+  serviceAreas: 'serviceAreas',
+  pickupCities: 'pickupCities',
   sourceOccurredAt: 'sourceOccurredAt',
   indexedAt: 'indexedAt'
 } as const
 
 export type OrganizationProfileScalarFieldEnum = (typeof OrganizationProfileScalarFieldEnum)[keyof typeof OrganizationProfileScalarFieldEnum]
+
+
+export const ProductStockScalarFieldEnum = {
+  organizationId: 'organizationId',
+  itemId: 'itemId',
+  onHand: 'onHand',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductStockScalarFieldEnum = (typeof ProductStockScalarFieldEnum)[keyof typeof ProductStockScalarFieldEnum]
 
 
 export const IndexStateScalarFieldEnum = {
@@ -912,6 +1009,13 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -922,6 +1026,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -1077,6 +1195,7 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   productListing?: Prisma.ProductListingOmit
   organizationProfile?: Prisma.OrganizationProfileOmit
+  productStock?: Prisma.ProductStockOmit
   indexState?: Prisma.IndexStateOmit
   processedEvent?: Prisma.ProcessedEventOmit
 }

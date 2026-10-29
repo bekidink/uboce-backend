@@ -54,6 +54,8 @@ export const ModelName = {
   Organization: 'Organization',
   Membership: 'Membership',
   Branch: 'Branch',
+  RoleTemplate: 'RoleTemplate',
+  MembershipLocation: 'MembershipLocation',
   Invitation: 'Invitation',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
@@ -83,6 +85,9 @@ export const OrganizationScalarFieldEnum = {
   countryCode: 'countryCode',
   status: 'status',
   verificationStatus: 'verificationStatus',
+  businessModels: 'businessModels',
+  contactPhone: 'contactPhone',
+  contactEmail: 'contactEmail',
   createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -99,7 +104,9 @@ export const MembershipScalarFieldEnum = {
   status: 'status',
   addedByUserId: 'addedByUserId',
   createdAt: 'createdAt',
-  revokedAt: 'revokedAt'
+  revokedAt: 'revokedAt',
+  suspendedAt: 'suspendedAt',
+  roleTemplateId: 'roleTemplateId'
 } as const
 
 export type MembershipScalarFieldEnum = (typeof MembershipScalarFieldEnum)[keyof typeof MembershipScalarFieldEnum]
@@ -113,11 +120,45 @@ export const BranchScalarFieldEnum = {
   city: 'city',
   addressLine: 'addressLine',
   countryCode: 'countryCode',
+  kind: 'kind',
+  phone: 'phone',
+  email: 'email',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  operatingHours: 'operatingHours',
+  serviceAreas: 'serviceAreas',
+  pickupEnabled: 'pickupEnabled',
+  fulfillment: 'fulfillment',
+  active: 'active',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type BranchScalarFieldEnum = (typeof BranchScalarFieldEnum)[keyof typeof BranchScalarFieldEnum]
+
+
+export const RoleTemplateScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  description: 'description',
+  permissions: 'permissions',
+  approvalLimit: 'approvalLimit',
+  approvalCurrency: 'approvalCurrency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoleTemplateScalarFieldEnum = (typeof RoleTemplateScalarFieldEnum)[keyof typeof RoleTemplateScalarFieldEnum]
+
+
+export const MembershipLocationScalarFieldEnum = {
+  membershipId: 'membershipId',
+  branchId: 'branchId',
+  createdAt: 'createdAt'
+} as const
+
+export type MembershipLocationScalarFieldEnum = (typeof MembershipLocationScalarFieldEnum)[keyof typeof MembershipLocationScalarFieldEnum]
 
 
 export const InvitationScalarFieldEnum = {

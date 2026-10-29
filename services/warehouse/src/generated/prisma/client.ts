@@ -67,6 +67,16 @@ export type ReceiptLine = Prisma.ReceiptLineModel
  */
 export type Transfer = Prisma.TransferModel
 /**
+ * Model TransferRequest
+ * A branch asks another branch for stock (PRD: branch-to-branch transfers). Source approves and dispatches; destination receives.
+ */
+export type TransferRequest = Prisma.TransferRequestModel
+/**
+ * Model TransferRequestLine
+ * 
+ */
+export type TransferRequestLine = Prisma.TransferRequestLineModel
+/**
  * Model OutboxEvent
  * Transactional outbox (PRD 8.3).
  */

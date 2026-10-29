@@ -121,7 +121,7 @@ export class LedgerService {
       const result = applyMovement(balance, 'reversal', quantity);
       if ('error' in result) throw new AppError(HttpStatus.CONFLICT, 'insufficient_stock', result.error);
       await this.saveBalance(tx, organizationId, original.warehouseId, original.itemId, result.next);
-      return tx.stockMovement.create({
+      const movement = await tx.stockMovement.create({
         data: {
           organizationId,
           warehouseId: original.warehouseId,
@@ -138,6 +138,17 @@ export class LedgerService {
           createdBy,
         },
       });
+      await emitEvent(tx, SERVICE_NAME, 'StockMovementPosted', movement.id, {
+        movementId: movement.id,
+        organizationId,
+        warehouseId: movement.warehouseId,
+        itemId: movement.itemId,
+        type: movement.type,
+        quantity: movement.quantity.toString(),
+        sourceType: movement.sourceType,
+        sourceId: movement.sourceId,
+      });
+      return movement;
     });
   }
 
@@ -166,13 +177,13 @@ export class LedgerService {
       const shortages: ReserveStockResult['shortages'] = [];
       for (const [key, want] of [...wanted.entries()].sort(([a], [b]) => a.localeCompare(b))) {
         const itemId = key.split('|')[0]!;
-        const rows = await tx.$queryRaw<{ warehouse_id: string; on_hand: Prisma.Decimal; reserved: Prisma.Decimal }[]>`
-          SELECT warehouse_id, on_hand, reserved FROM ${Prisma.raw(qualified('stock_balances'))}
+        const rows = await tx.$queryRaw<{ warehouse_id: string; on_hand: Prisma.Decimal; reserved: Prisma.Decimal; held: Prisma.Decimal }[]>`
+          SELECT warehouse_id, on_hand, reserved, damaged + quarantined AS held FROM ${Prisma.raw(qualified('stock_balances'))}
           WHERE organization_id = ${request.organizationId}::uuid AND item_id = ${itemId}::uuid
             ${want.warehouseId ? Prisma.sql`AND warehouse_id = ${want.warehouseId}::uuid` : Prisma.empty}
           ORDER BY warehouse_id
           FOR UPDATE`;
-        const candidates = rows.map((r) => ({ warehouseId: r.warehouse_id, available: new Decimal(r.on_hand).minus(r.reserved) }));
+        const candidates = rows.map((r) => ({ warehouseId: r.warehouse_id, available: new Decimal(r.on_hand).minus(r.reserved).minus(r.held) }));
         const allocation = allocate(want.quantity, candidates);
         if (!allocation) {
           const available = candidates.reduce((s, c) => s.plus(Decimal.max(c.available, 0)), new Decimal(0));
@@ -223,6 +234,37 @@ export class LedgerService {
     });
   }
 
+  /**
+   * A pickup order was handed over: issue whatever its reservation still holds
+   * (each line once, by idempotency key), from the reserved warehouses.
+   */
+  async consumeForHandover(orderId: string) {
+    const reservation = await this.prisma.stockReservation.findUnique({
+      where: { referenceType_referenceId: { referenceType: 'order', referenceId: orderId } },
+      include: { lines: true },
+    });
+    if (!reservation || reservation.status !== 'active') return { issued: 0 };
+    let issued = 0;
+    for (const line of reservation.lines) {
+      const remaining = line.quantity.minus(line.consumedQuantity);
+      if (!remaining.greaterThan(0)) continue;
+      await this.post({
+        idempotencyKey: `pickup:${orderId}:${line.id}`,
+        organizationId: reservation.organizationId,
+        warehouseId: line.warehouseId,
+        itemId: line.itemId,
+        type: 'issue',
+        quantity: remaining.negated().toString(),
+        sourceType: 'pickup',
+        sourceId: orderId,
+        reservation: { referenceType: 'order', referenceId: orderId },
+        createdBy: 'service:commerce',
+      });
+      issued++;
+    }
+    return { issued };
+  }
+
   /** Frees whatever is still held. Safe to call repeatedly. */
   async release(referenceType: string, referenceId: string) {
     return this.prisma.$transaction(async (tx) => {
@@ -257,7 +299,7 @@ export class LedgerService {
       this.prisma.stockBalance.count({ where }),
     ]);
     return toPage(
-      items.map((b) => ({ ...b, available: b.onHand.minus(b.reserved) })),
+      items.map((b) => ({ ...b, available: b.onHand.minus(b.reserved).minus(b.damaged).minus(b.quarantined) })),
       total,
       query,
     );
@@ -288,14 +330,16 @@ export class LedgerService {
 
   // ---- Locking -----------------------------------------------------------------------
 
-  private async lockBalance(tx: Tx, organizationId: string, warehouseId: string, itemId: string): Promise<BalanceState> {
+  async lockBalance(tx: Tx, organizationId: string, warehouseId: string, itemId: string): Promise<BalanceState & { damaged: Prisma.Decimal; quarantined: Prisma.Decimal }> {
     await tx.$executeRaw`INSERT INTO ${Prisma.raw(qualified('stock_balances'))} (organization_id, warehouse_id, item_id, updated_at)
       VALUES (${organizationId}::uuid, ${warehouseId}::uuid, ${itemId}::uuid, now()) ON CONFLICT DO NOTHING`;
-    const [row] = await tx.$queryRaw<{ on_hand: Prisma.Decimal; reserved: Prisma.Decimal }[]>`
-      SELECT on_hand, reserved FROM ${Prisma.raw(qualified('stock_balances'))}
+    const [row] = await tx.$queryRaw<{ on_hand: Prisma.Decimal; reserved: Prisma.Decimal; damaged: Prisma.Decimal; quarantined: Prisma.Decimal }[]>`
+      SELECT on_hand, reserved, damaged, quarantined FROM ${Prisma.raw(qualified('stock_balances'))}
       WHERE organization_id = ${organizationId}::uuid AND warehouse_id = ${warehouseId}::uuid AND item_id = ${itemId}::uuid
       FOR UPDATE`;
-    return { onHand: new Decimal(row!.on_hand), reserved: new Decimal(row!.reserved) };
+    const damaged = new Decimal(row!.damaged);
+    const quarantined = new Decimal(row!.quarantined);
+    return { onHand: new Decimal(row!.on_hand), reserved: new Decimal(row!.reserved), damaged, quarantined, held: damaged.plus(quarantined) };
   }
 
   private saveBalance(tx: Tx, organizationId: string, warehouseId: string, itemId: string, next: BalanceState) {

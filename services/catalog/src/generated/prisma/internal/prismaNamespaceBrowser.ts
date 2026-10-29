@@ -54,6 +54,12 @@ export const ModelName = {
   Category: 'Category',
   Product: 'Product',
   ProductVariant: 'ProductVariant',
+  ProductMedia: 'ProductMedia',
+  VariantPriceTier: 'VariantPriceTier',
+  ProductOptionGroup: 'ProductOptionGroup',
+  ProductOption: 'ProductOption',
+  PriceList: 'PriceList',
+  PriceListEntry: 'PriceListEntry',
   OutboxEvent: 'OutboxEvent'
 } as const
 
@@ -79,6 +85,10 @@ export const CategoryScalarFieldEnum = {
   name: 'name',
   parentId: 'parentId',
   requiredAttributes: 'requiredAttributes',
+  attributeDefinitions: 'attributeDefinitions',
+  organizationId: 'organizationId',
+  description: 'description',
+  sortOrder: 'sortOrder',
   createdAt: 'createdAt'
 } as const
 
@@ -94,6 +104,11 @@ export const ProductScalarFieldEnum = {
   unitOfMeasure: 'unitOfMeasure',
   attributes: 'attributes',
   status: 'status',
+  availableFrom: 'availableFrom',
+  availableUntil: 'availableUntil',
+  allowPreorder: 'allowPreorder',
+  madeToOrder: 'madeToOrder',
+  leadTimeDays: 'leadTimeDays',
   publishedAt: 'publishedAt',
   createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
@@ -114,11 +129,90 @@ export const ProductVariantScalarFieldEnum = {
   minOrderQuantity: 'minOrderQuantity',
   attributes: 'attributes',
   isActive: 'isActive',
+  barcode: 'barcode',
+  packSize: 'packSize',
+  tracksBatches: 'tracksBatches',
+  tracksExpiry: 'tracksExpiry',
+  shelfLifeDays: 'shelfLifeDays',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProductVariantScalarFieldEnum = (typeof ProductVariantScalarFieldEnum)[keyof typeof ProductVariantScalarFieldEnum]
+
+
+export const ProductMediaScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  documentId: 'documentId',
+  position: 'position',
+  altText: 'altText',
+  createdAt: 'createdAt'
+} as const
+
+export type ProductMediaScalarFieldEnum = (typeof ProductMediaScalarFieldEnum)[keyof typeof ProductMediaScalarFieldEnum]
+
+
+export const VariantPriceTierScalarFieldEnum = {
+  id: 'id',
+  variantId: 'variantId',
+  minQuantity: 'minQuantity',
+  unitPrice: 'unitPrice'
+} as const
+
+export type VariantPriceTierScalarFieldEnum = (typeof VariantPriceTierScalarFieldEnum)[keyof typeof VariantPriceTierScalarFieldEnum]
+
+
+export const ProductOptionGroupScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  name: 'name',
+  required: 'required',
+  multiple: 'multiple',
+  position: 'position'
+} as const
+
+export type ProductOptionGroupScalarFieldEnum = (typeof ProductOptionGroupScalarFieldEnum)[keyof typeof ProductOptionGroupScalarFieldEnum]
+
+
+export const ProductOptionScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  name: 'name',
+  priceDelta: 'priceDelta',
+  isActive: 'isActive',
+  position: 'position'
+} as const
+
+export type ProductOptionScalarFieldEnum = (typeof ProductOptionScalarFieldEnum)[keyof typeof ProductOptionScalarFieldEnum]
+
+
+export const PriceListScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  currency: 'currency',
+  buyerOrganizationIds: 'buyerOrganizationIds',
+  branchId: 'branchId',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  active: 'active',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PriceListScalarFieldEnum = (typeof PriceListScalarFieldEnum)[keyof typeof PriceListScalarFieldEnum]
+
+
+export const PriceListEntryScalarFieldEnum = {
+  id: 'id',
+  priceListId: 'priceListId',
+  variantId: 'variantId',
+  minQuantity: 'minQuantity',
+  unitPrice: 'unitPrice'
+} as const
+
+export type PriceListEntryScalarFieldEnum = (typeof PriceListEntryScalarFieldEnum)[keyof typeof PriceListEntryScalarFieldEnum]
 
 
 export const OutboxEventScalarFieldEnum = {
@@ -157,14 +251,6 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -172,4 +258,12 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

@@ -46,10 +46,10 @@ model DeviceToken {
 }
 
 model UserPreference {
-  userId    String   @id @map("user_id") @db.Uuid
-  locale    String   @default("en")
-  pushEnabled Boolean @default(true) @map("push_enabled")
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  userId      String   @id @map("user_id") @db.Uuid
+  locale      String   @default("en")
+  pushEnabled Boolean  @default(true) @map("push_enabled")
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("user_preferences")
 }
@@ -99,6 +99,56 @@ model DeliveryAttempt {
 }
 
 /// Inbox: events already handled by this service, for idempotent consumption.
+/// B2B chat between organizations (PRD addendum 2.9), optionally about a record (RFQ, order…).
+model Conversation {
+  id                      String    @id @default(uuid()) @db.Uuid
+  subject                 String
+  /// rfq, quotation, order, shipment, dispute or general
+  contextType             String    @map("context_type")
+  contextId               String?   @map("context_id") @db.Uuid
+  createdByUserId         String    @map("created_by_user_id") @db.Uuid
+  createdByOrganizationId String    @map("created_by_organization_id") @db.Uuid
+  lastMessageAt           DateTime  @default(now()) @map("last_message_at") @db.Timestamptz(3)
+  closedAt                DateTime? @map("closed_at") @db.Timestamptz(3)
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  participants ConversationParticipant[]
+  messages     ChatMessage[]
+
+  @@index([contextType, contextId])
+  @@map("conversations")
+}
+
+/// Organizations in a conversation; every member who can act for one may read and write.
+model ConversationParticipant {
+  conversationId String    @map("conversation_id") @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  lastReadAt     DateTime? @map("last_read_at") @db.Timestamptz(3)
+  joinedAt       DateTime  @default(now()) @map("joined_at") @db.Timestamptz(3)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, organizationId])
+  @@index([organizationId])
+  @@map("conversation_participants")
+}
+
+model ChatMessage {
+  id                    String    @id @default(uuid()) @db.Uuid
+  conversationId        String    @map("conversation_id") @db.Uuid
+  senderUserId          String    @map("sender_user_id") @db.Uuid
+  senderOrganizationId  String    @map("sender_organization_id") @db.Uuid
+  body                  String
+  attachmentDocumentIds String[]  @default([]) @map("attachment_document_ids") @db.Uuid
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt             DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("chat_messages")
+}
+
 model ProcessedEvent {
   eventId     String   @id @map("event_id") @db.Uuid
   eventType   String   @map("event_type")

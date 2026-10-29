@@ -29,3 +29,33 @@ export const PaymentStatus = {
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const IntentStatus = {
+  pending: 'pending',
+  succeeded: 'succeeded',
+  failed: 'failed',
+  cancelled: 'cancelled'
+} as const
+
+export type IntentStatus = (typeof IntentStatus)[keyof typeof IntentStatus]
+
+
+export const RefundStatus = {
+  requested: 'requested',
+  approved: 'approved',
+  processing: 'processing',
+  succeeded: 'succeeded',
+  failed: 'failed',
+  rejected: 'rejected'
+} as const
+
+export type RefundStatus = (typeof RefundStatus)[keyof typeof RefundStatus]
+
+
+export const SettlementStatus = {
+  pending: 'pending',
+  paid: 'paid'
+} as const
+
+export type SettlementStatus = (typeof SettlementStatus)[keyof typeof SettlementStatus]

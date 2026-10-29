@@ -7,6 +7,8 @@ import {
   conflict,
   notFound,
   OrganizationsClient,
+  requireApprovalLimit,
+  requirePermission,
   requireRole,
   skipTake,
   toOutboxRow,
@@ -315,6 +317,7 @@ export class ProcurementService {
    */
   async acceptQuotation(org: ActingOrganization, userId: string, rfqId: string, quotationId: string) {
     requireRole(org, BUYER_ROLES, 'accept quotations');
+    requirePermission(org, 'purchase_orders:approve', 'accept quotations');
     const rfq = await this.ownRfq(org, rfqId);
     const quotation = await this.prisma.quotation.findFirst({ where: { id: quotationId, rfqId }, include: quotationInclude });
     if (!quotation) throw notFound('Quotation');
@@ -322,6 +325,7 @@ export class ProcurementService {
     if (rfq.status !== 'published') throw conflict('invalid_transition', `Cannot award an RFQ that is ${rfq.status}`);
     if (quotation.status !== 'submitted') throw conflict('quotation_not_acceptable', `This quotation is ${quotation.status}`);
     if (quotation.validUntil <= new Date()) throw conflict('quotation_expired', 'This quotation has expired');
+    requireApprovalLimit(org, quotation.total.toString(), quotation.currency, 'accept quotations');
 
     return this.prisma.$transaction(async (tx) => {
       const { count } = await tx.rfq.updateMany({

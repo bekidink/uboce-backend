@@ -24,3 +24,12 @@ export function verifySignature(
   if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return { ok: false, reason: 'mismatch' };
   return { ok: true };
 }
+
+/** Chapa signs its webhooks as hex HMAC-SHA256 of the raw body with the webhook secret (x-chapa-signature). */
+export function verifyChapaSignature(secret: string, signature: string | undefined, rawBody: Buffer): SignatureCheck {
+  if (!signature) return { ok: false, reason: 'missing' };
+  const expected = Buffer.from(createHmac('sha256', secret).update(rawBody).digest('hex'));
+  const actual = Buffer.from(signature);
+  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return { ok: false, reason: 'mismatch' };
+  return { ok: true };
+}

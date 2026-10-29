@@ -400,6 +400,8 @@ export const ModelName = {
   Organization: 'Organization',
   Membership: 'Membership',
   Branch: 'Branch',
+  RoleTemplate: 'RoleTemplate',
+  MembershipLocation: 'MembershipLocation',
   Invitation: 'Invitation',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
@@ -418,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "membership" | "branch" | "invitation" | "outboxEvent" | "processedEvent"
+    modelProps: "organization" | "membership" | "branch" | "roleTemplate" | "membershipLocation" | "invitation" | "outboxEvent" | "processedEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -641,6 +643,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BranchCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BranchCountAggregateOutputType> | number
+        }
+      }
+    }
+    RoleTemplate: {
+      payload: Prisma.$RoleTemplatePayload<ExtArgs>
+      fields: Prisma.RoleTemplateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RoleTemplateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RoleTemplateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>
+        }
+        findFirst: {
+          args: Prisma.RoleTemplateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RoleTemplateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>
+        }
+        findMany: {
+          args: Prisma.RoleTemplateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>[]
+        }
+        create: {
+          args: Prisma.RoleTemplateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>
+        }
+        createMany: {
+          args: Prisma.RoleTemplateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RoleTemplateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>[]
+        }
+        delete: {
+          args: Prisma.RoleTemplateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>
+        }
+        update: {
+          args: Prisma.RoleTemplateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>
+        }
+        deleteMany: {
+          args: Prisma.RoleTemplateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RoleTemplateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RoleTemplateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>[]
+        }
+        upsert: {
+          args: Prisma.RoleTemplateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleTemplatePayload>
+        }
+        aggregate: {
+          args: Prisma.RoleTemplateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRoleTemplate>
+        }
+        groupBy: {
+          args: Prisma.RoleTemplateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoleTemplateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RoleTemplateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoleTemplateCountAggregateOutputType> | number
+        }
+      }
+    }
+    MembershipLocation: {
+      payload: Prisma.$MembershipLocationPayload<ExtArgs>
+      fields: Prisma.MembershipLocationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MembershipLocationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MembershipLocationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>
+        }
+        findFirst: {
+          args: Prisma.MembershipLocationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MembershipLocationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>
+        }
+        findMany: {
+          args: Prisma.MembershipLocationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>[]
+        }
+        create: {
+          args: Prisma.MembershipLocationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>
+        }
+        createMany: {
+          args: Prisma.MembershipLocationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MembershipLocationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>[]
+        }
+        delete: {
+          args: Prisma.MembershipLocationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>
+        }
+        update: {
+          args: Prisma.MembershipLocationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>
+        }
+        deleteMany: {
+          args: Prisma.MembershipLocationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MembershipLocationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MembershipLocationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>[]
+        }
+        upsert: {
+          args: Prisma.MembershipLocationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MembershipLocationPayload>
+        }
+        aggregate: {
+          args: Prisma.MembershipLocationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMembershipLocation>
+        }
+        groupBy: {
+          args: Prisma.MembershipLocationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MembershipLocationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MembershipLocationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MembershipLocationCountAggregateOutputType> | number
         }
       }
     }
@@ -913,6 +1063,9 @@ export const OrganizationScalarFieldEnum = {
   countryCode: 'countryCode',
   status: 'status',
   verificationStatus: 'verificationStatus',
+  businessModels: 'businessModels',
+  contactPhone: 'contactPhone',
+  contactEmail: 'contactEmail',
   createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -929,7 +1082,9 @@ export const MembershipScalarFieldEnum = {
   status: 'status',
   addedByUserId: 'addedByUserId',
   createdAt: 'createdAt',
-  revokedAt: 'revokedAt'
+  revokedAt: 'revokedAt',
+  suspendedAt: 'suspendedAt',
+  roleTemplateId: 'roleTemplateId'
 } as const
 
 export type MembershipScalarFieldEnum = (typeof MembershipScalarFieldEnum)[keyof typeof MembershipScalarFieldEnum]
@@ -943,11 +1098,45 @@ export const BranchScalarFieldEnum = {
   city: 'city',
   addressLine: 'addressLine',
   countryCode: 'countryCode',
+  kind: 'kind',
+  phone: 'phone',
+  email: 'email',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  operatingHours: 'operatingHours',
+  serviceAreas: 'serviceAreas',
+  pickupEnabled: 'pickupEnabled',
+  fulfillment: 'fulfillment',
+  active: 'active',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type BranchScalarFieldEnum = (typeof BranchScalarFieldEnum)[keyof typeof BranchScalarFieldEnum]
+
+
+export const RoleTemplateScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  description: 'description',
+  permissions: 'permissions',
+  approvalLimit: 'approvalLimit',
+  approvalCurrency: 'approvalCurrency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoleTemplateScalarFieldEnum = (typeof RoleTemplateScalarFieldEnum)[keyof typeof RoleTemplateScalarFieldEnum]
+
+
+export const MembershipLocationScalarFieldEnum = {
+  membershipId: 'membershipId',
+  branchId: 'branchId',
+  createdAt: 'createdAt'
+} as const
+
+export type MembershipLocationScalarFieldEnum = (typeof MembershipLocationScalarFieldEnum)[keyof typeof MembershipLocationScalarFieldEnum]
 
 
 export const InvitationScalarFieldEnum = {
@@ -1093,6 +1282,20 @@ export type ListEnumVerificationStatusFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'BusinessModel[]'
+ */
+export type ListEnumBusinessModelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BusinessModel[]'>
+    
+
+
+/**
+ * Reference to a field of type 'BusinessModel'
+ */
+export type EnumBusinessModelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BusinessModel'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -1135,16 +1338,30 @@ export type ListEnumMembershipStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
- * Reference to a field of type 'InvitationStatus'
+ * Reference to a field of type 'LocationKind'
  */
-export type EnumInvitationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvitationStatus'>
+export type EnumLocationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocationKind'>
     
 
 
 /**
- * Reference to a field of type 'InvitationStatus[]'
+ * Reference to a field of type 'LocationKind[]'
  */
-export type ListEnumInvitationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvitationStatus[]'>
+export type ListEnumLocationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocationKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 
@@ -1159,6 +1376,27 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'InvitationStatus'
+ */
+export type EnumInvitationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvitationStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'InvitationStatus[]'
+ */
+export type ListEnumInvitationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvitationStatus[]'>
     
 
 
@@ -1343,6 +1581,8 @@ export type GlobalOmitConfig = {
   organization?: Prisma.OrganizationOmit
   membership?: Prisma.MembershipOmit
   branch?: Prisma.BranchOmit
+  roleTemplate?: Prisma.RoleTemplateOmit
+  membershipLocation?: Prisma.MembershipLocationOmit
   invitation?: Prisma.InvitationOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit

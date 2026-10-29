@@ -83,6 +83,8 @@ export interface PurchaseOrderFulfillmentUpdatedV1 {
   buyerOrganizationId: string;
   supplierOrganizationId: string;
   status: string;
+  /** A pickup order was handed over: Inventory issues the reserved stock. */
+  handover?: boolean;
 }
 
 // ---- Agriculture (S11) -------------------------------------------------------------

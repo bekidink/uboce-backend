@@ -3,6 +3,7 @@ import { type DynamicModule, Global, Module } from '@nestjs/common';
 import { ActingOrganizationGuard } from './acting-organization.js';
 import {
   AdministrationClient,
+  CatalogClient,
   CommerceClient,
   DocumentsClient,
   FinanceClient,
@@ -14,6 +15,7 @@ import {
   WarehousesClient,
 } from './clients.js';
 import { InternalClient } from './internal-client.js';
+import { ModuleGuard } from './modules.js';
 import { PlatformRoleGuard } from './platform-roles.js';
 
 export interface InternalModuleOptions {
@@ -29,9 +31,12 @@ export interface InternalModuleOptions {
   logisticsUrl?: string;
   warehouseUrl?: string;
   commerceUrl?: string;
+  catalogUrl?: string;
+  qualityUrl?: string;
+  analyticsUrl?: string;
 }
 
-const CLIENTS = [IdentityClient, OrganizationsClient, MessagesClient, AdministrationClient, InventoryClient, DocumentsClient, FinanceClient, LogisticsClient, WarehousesClient, CommerceClient];
+const CLIENTS = [IdentityClient, OrganizationsClient, MessagesClient, AdministrationClient, InventoryClient, DocumentsClient, FinanceClient, LogisticsClient, WarehousesClient, CommerceClient, CatalogClient];
 
 /** Service-to-service clients, authenticated with this service's own credentials. */
 @Global()
@@ -54,10 +59,12 @@ export class InternalModule {
         { provide: LogisticsClient, useValue: new LogisticsClient(http, options.logisticsUrl) },
         { provide: WarehousesClient, useValue: new WarehousesClient(http, options.warehouseUrl) },
         { provide: CommerceClient, useValue: new CommerceClient(http, options.commerceUrl) },
+        { provide: CatalogClient, useValue: new CatalogClient(http, options.catalogUrl) },
         ActingOrganizationGuard,
         PlatformRoleGuard,
+        ModuleGuard,
       ],
-      exports: [InternalClient, ...CLIENTS, ActingOrganizationGuard, PlatformRoleGuard],
+      exports: [InternalClient, ...CLIENTS, ActingOrganizationGuard, PlatformRoleGuard, ModuleGuard],
     };
   }
 }

@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model ProcessedEvent
- * Inbox: events already handled by this service, for idempotent consumption.
+ * 
  */
 export type ProcessedEventModel = runtime.Types.Result.DefaultSelection<Prisma.$ProcessedEventPayload>
 

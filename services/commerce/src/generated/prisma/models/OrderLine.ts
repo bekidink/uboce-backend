@@ -33,6 +33,8 @@ export type OrderLineAvgAggregateOutputType = {
   lineTotal: runtime.Decimal | null
   leadTimeDays: number | null
   fulfilledQuantity: runtime.Decimal | null
+  listPrice: runtime.Decimal | null
+  returnedQuantity: runtime.Decimal | null
 }
 
 export type OrderLineSumAggregateOutputType = {
@@ -42,6 +44,8 @@ export type OrderLineSumAggregateOutputType = {
   lineTotal: runtime.Decimal | null
   leadTimeDays: number | null
   fulfilledQuantity: runtime.Decimal | null
+  listPrice: runtime.Decimal | null
+  returnedQuantity: runtime.Decimal | null
 }
 
 export type OrderLineMinAggregateOutputType = {
@@ -56,6 +60,11 @@ export type OrderLineMinAggregateOutputType = {
   lineTotal: runtime.Decimal | null
   leadTimeDays: number | null
   fulfilledQuantity: runtime.Decimal | null
+  variantId: string | null
+  sku: string | null
+  priceSource: string | null
+  listPrice: runtime.Decimal | null
+  returnedQuantity: runtime.Decimal | null
 }
 
 export type OrderLineMaxAggregateOutputType = {
@@ -70,6 +79,11 @@ export type OrderLineMaxAggregateOutputType = {
   lineTotal: runtime.Decimal | null
   leadTimeDays: number | null
   fulfilledQuantity: runtime.Decimal | null
+  variantId: string | null
+  sku: string | null
+  priceSource: string | null
+  listPrice: runtime.Decimal | null
+  returnedQuantity: runtime.Decimal | null
 }
 
 export type OrderLineCountAggregateOutputType = {
@@ -84,6 +98,12 @@ export type OrderLineCountAggregateOutputType = {
   lineTotal: number
   leadTimeDays: number
   fulfilledQuantity: number
+  variantId: number
+  sku: number
+  priceSource: number
+  listPrice: number
+  snapshot: number
+  returnedQuantity: number
   _all: number
 }
 
@@ -95,6 +115,8 @@ export type OrderLineAvgAggregateInputType = {
   lineTotal?: true
   leadTimeDays?: true
   fulfilledQuantity?: true
+  listPrice?: true
+  returnedQuantity?: true
 }
 
 export type OrderLineSumAggregateInputType = {
@@ -104,6 +126,8 @@ export type OrderLineSumAggregateInputType = {
   lineTotal?: true
   leadTimeDays?: true
   fulfilledQuantity?: true
+  listPrice?: true
+  returnedQuantity?: true
 }
 
 export type OrderLineMinAggregateInputType = {
@@ -118,6 +142,11 @@ export type OrderLineMinAggregateInputType = {
   lineTotal?: true
   leadTimeDays?: true
   fulfilledQuantity?: true
+  variantId?: true
+  sku?: true
+  priceSource?: true
+  listPrice?: true
+  returnedQuantity?: true
 }
 
 export type OrderLineMaxAggregateInputType = {
@@ -132,6 +161,11 @@ export type OrderLineMaxAggregateInputType = {
   lineTotal?: true
   leadTimeDays?: true
   fulfilledQuantity?: true
+  variantId?: true
+  sku?: true
+  priceSource?: true
+  listPrice?: true
+  returnedQuantity?: true
 }
 
 export type OrderLineCountAggregateInputType = {
@@ -146,6 +180,12 @@ export type OrderLineCountAggregateInputType = {
   lineTotal?: true
   leadTimeDays?: true
   fulfilledQuantity?: true
+  variantId?: true
+  sku?: true
+  priceSource?: true
+  listPrice?: true
+  snapshot?: true
+  returnedQuantity?: true
   _all?: true
 }
 
@@ -247,6 +287,12 @@ export type OrderLineGroupByOutputType = {
   lineTotal: runtime.Decimal
   leadTimeDays: number | null
   fulfilledQuantity: runtime.Decimal
+  variantId: string | null
+  sku: string | null
+  priceSource: string | null
+  listPrice: runtime.Decimal | null
+  snapshot: runtime.JsonValue | null
+  returnedQuantity: runtime.Decimal
   _count: OrderLineCountAggregateOutputType | null
   _avg: OrderLineAvgAggregateOutputType | null
   _sum: OrderLineSumAggregateOutputType | null
@@ -284,6 +330,12 @@ export type OrderLineWhereInput = {
   lineTotal?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.IntNullableFilter<"OrderLine"> | number | null
   fulfilledQuantity?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.UuidNullableFilter<"OrderLine"> | string | null
+  sku?: Prisma.StringNullableFilter<"OrderLine"> | string | null
+  priceSource?: Prisma.StringNullableFilter<"OrderLine"> | string | null
+  listPrice?: Prisma.DecimalNullableFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.JsonNullableFilter<"OrderLine">
+  returnedQuantity?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
 }
 
@@ -299,6 +351,12 @@ export type OrderLineOrderByWithRelationInput = {
   lineTotal?: Prisma.SortOrder
   leadTimeDays?: Prisma.SortOrderInput | Prisma.SortOrder
   fulfilledQuantity?: Prisma.SortOrder
+  variantId?: Prisma.SortOrderInput | Prisma.SortOrder
+  sku?: Prisma.SortOrderInput | Prisma.SortOrder
+  priceSource?: Prisma.SortOrderInput | Prisma.SortOrder
+  listPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  returnedQuantity?: Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
 }
 
@@ -318,6 +376,12 @@ export type OrderLineWhereUniqueInput = Prisma.AtLeast<{
   lineTotal?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.IntNullableFilter<"OrderLine"> | number | null
   fulfilledQuantity?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.UuidNullableFilter<"OrderLine"> | string | null
+  sku?: Prisma.StringNullableFilter<"OrderLine"> | string | null
+  priceSource?: Prisma.StringNullableFilter<"OrderLine"> | string | null
+  listPrice?: Prisma.DecimalNullableFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.JsonNullableFilter<"OrderLine">
+  returnedQuantity?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
 }, "id" | "orderId_lineNumber">
 
@@ -333,6 +397,12 @@ export type OrderLineOrderByWithAggregationInput = {
   lineTotal?: Prisma.SortOrder
   leadTimeDays?: Prisma.SortOrderInput | Prisma.SortOrder
   fulfilledQuantity?: Prisma.SortOrder
+  variantId?: Prisma.SortOrderInput | Prisma.SortOrder
+  sku?: Prisma.SortOrderInput | Prisma.SortOrder
+  priceSource?: Prisma.SortOrderInput | Prisma.SortOrder
+  listPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  returnedQuantity?: Prisma.SortOrder
   _count?: Prisma.OrderLineCountOrderByAggregateInput
   _avg?: Prisma.OrderLineAvgOrderByAggregateInput
   _max?: Prisma.OrderLineMaxOrderByAggregateInput
@@ -355,6 +425,12 @@ export type OrderLineScalarWhereWithAggregatesInput = {
   lineTotal?: Prisma.DecimalWithAggregatesFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.IntNullableWithAggregatesFilter<"OrderLine"> | number | null
   fulfilledQuantity?: Prisma.DecimalWithAggregatesFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.UuidNullableWithAggregatesFilter<"OrderLine"> | string | null
+  sku?: Prisma.StringNullableWithAggregatesFilter<"OrderLine"> | string | null
+  priceSource?: Prisma.StringNullableWithAggregatesFilter<"OrderLine"> | string | null
+  listPrice?: Prisma.DecimalNullableWithAggregatesFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.JsonNullableWithAggregatesFilter<"OrderLine">
+  returnedQuantity?: Prisma.DecimalWithAggregatesFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineCreateInput = {
@@ -368,6 +444,12 @@ export type OrderLineCreateInput = {
   lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: number | null
   fulfilledQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: string | null
+  sku?: string | null
+  priceSource?: string | null
+  listPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   order: Prisma.OrderCreateNestedOneWithoutLinesInput
 }
 
@@ -383,6 +465,12 @@ export type OrderLineUncheckedCreateInput = {
   lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: number | null
   fulfilledQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: string | null
+  sku?: string | null
+  priceSource?: string | null
+  listPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineUpdateInput = {
@@ -396,6 +484,12 @@ export type OrderLineUpdateInput = {
   lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fulfilledQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   order?: Prisma.OrderUpdateOneRequiredWithoutLinesNestedInput
 }
 
@@ -411,6 +505,12 @@ export type OrderLineUncheckedUpdateInput = {
   lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fulfilledQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineCreateManyInput = {
@@ -425,6 +525,12 @@ export type OrderLineCreateManyInput = {
   lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: number | null
   fulfilledQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: string | null
+  sku?: string | null
+  priceSource?: string | null
+  listPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineUpdateManyMutationInput = {
@@ -438,6 +544,12 @@ export type OrderLineUpdateManyMutationInput = {
   lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fulfilledQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineUncheckedUpdateManyInput = {
@@ -452,6 +564,12 @@ export type OrderLineUncheckedUpdateManyInput = {
   lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fulfilledQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineListRelationFilter = {
@@ -481,6 +599,12 @@ export type OrderLineCountOrderByAggregateInput = {
   lineTotal?: Prisma.SortOrder
   leadTimeDays?: Prisma.SortOrder
   fulfilledQuantity?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
+  sku?: Prisma.SortOrder
+  priceSource?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  snapshot?: Prisma.SortOrder
+  returnedQuantity?: Prisma.SortOrder
 }
 
 export type OrderLineAvgOrderByAggregateInput = {
@@ -490,6 +614,8 @@ export type OrderLineAvgOrderByAggregateInput = {
   lineTotal?: Prisma.SortOrder
   leadTimeDays?: Prisma.SortOrder
   fulfilledQuantity?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  returnedQuantity?: Prisma.SortOrder
 }
 
 export type OrderLineMaxOrderByAggregateInput = {
@@ -504,6 +630,11 @@ export type OrderLineMaxOrderByAggregateInput = {
   lineTotal?: Prisma.SortOrder
   leadTimeDays?: Prisma.SortOrder
   fulfilledQuantity?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
+  sku?: Prisma.SortOrder
+  priceSource?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  returnedQuantity?: Prisma.SortOrder
 }
 
 export type OrderLineMinOrderByAggregateInput = {
@@ -518,6 +649,11 @@ export type OrderLineMinOrderByAggregateInput = {
   lineTotal?: Prisma.SortOrder
   leadTimeDays?: Prisma.SortOrder
   fulfilledQuantity?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
+  sku?: Prisma.SortOrder
+  priceSource?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  returnedQuantity?: Prisma.SortOrder
 }
 
 export type OrderLineSumOrderByAggregateInput = {
@@ -527,6 +663,8 @@ export type OrderLineSumOrderByAggregateInput = {
   lineTotal?: Prisma.SortOrder
   leadTimeDays?: Prisma.SortOrder
   fulfilledQuantity?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  returnedQuantity?: Prisma.SortOrder
 }
 
 export type OrderLineCreateNestedManyWithoutOrderInput = {
@@ -598,6 +736,12 @@ export type OrderLineCreateWithoutOrderInput = {
   lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: number | null
   fulfilledQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: string | null
+  sku?: string | null
+  priceSource?: string | null
+  listPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineUncheckedCreateWithoutOrderInput = {
@@ -611,6 +755,12 @@ export type OrderLineUncheckedCreateWithoutOrderInput = {
   lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: number | null
   fulfilledQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: string | null
+  sku?: string | null
+  priceSource?: string | null
+  listPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineCreateOrConnectWithoutOrderInput = {
@@ -654,6 +804,12 @@ export type OrderLineScalarWhereInput = {
   lineTotal?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.IntNullableFilter<"OrderLine"> | number | null
   fulfilledQuantity?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.UuidNullableFilter<"OrderLine"> | string | null
+  sku?: Prisma.StringNullableFilter<"OrderLine"> | string | null
+  priceSource?: Prisma.StringNullableFilter<"OrderLine"> | string | null
+  listPrice?: Prisma.DecimalNullableFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.JsonNullableFilter<"OrderLine">
+  returnedQuantity?: Prisma.DecimalFilter<"OrderLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineCreateManyOrderInput = {
@@ -667,6 +823,12 @@ export type OrderLineCreateManyOrderInput = {
   lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: number | null
   fulfilledQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: string | null
+  sku?: string | null
+  priceSource?: string | null
+  listPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineUpdateWithoutOrderInput = {
@@ -680,6 +842,12 @@ export type OrderLineUpdateWithoutOrderInput = {
   lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fulfilledQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineUncheckedUpdateWithoutOrderInput = {
@@ -693,6 +861,12 @@ export type OrderLineUncheckedUpdateWithoutOrderInput = {
   lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fulfilledQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type OrderLineUncheckedUpdateManyWithoutOrderInput = {
@@ -706,6 +880,12 @@ export type OrderLineUncheckedUpdateManyWithoutOrderInput = {
   lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fulfilledQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  returnedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -722,6 +902,12 @@ export type OrderLineSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   lineTotal?: boolean
   leadTimeDays?: boolean
   fulfilledQuantity?: boolean
+  variantId?: boolean
+  sku?: boolean
+  priceSource?: boolean
+  listPrice?: boolean
+  snapshot?: boolean
+  returnedQuantity?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderLine"]>
 
@@ -737,6 +923,12 @@ export type OrderLineSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   lineTotal?: boolean
   leadTimeDays?: boolean
   fulfilledQuantity?: boolean
+  variantId?: boolean
+  sku?: boolean
+  priceSource?: boolean
+  listPrice?: boolean
+  snapshot?: boolean
+  returnedQuantity?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderLine"]>
 
@@ -752,6 +944,12 @@ export type OrderLineSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   lineTotal?: boolean
   leadTimeDays?: boolean
   fulfilledQuantity?: boolean
+  variantId?: boolean
+  sku?: boolean
+  priceSource?: boolean
+  listPrice?: boolean
+  snapshot?: boolean
+  returnedQuantity?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderLine"]>
 
@@ -767,9 +965,15 @@ export type OrderLineSelectScalar = {
   lineTotal?: boolean
   leadTimeDays?: boolean
   fulfilledQuantity?: boolean
+  variantId?: boolean
+  sku?: boolean
+  priceSource?: boolean
+  listPrice?: boolean
+  snapshot?: boolean
+  returnedQuantity?: boolean
 }
 
-export type OrderLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "lineNumber" | "productId" | "description" | "quantity" | "unitOfMeasure" | "unitPrice" | "lineTotal" | "leadTimeDays" | "fulfilledQuantity", ExtArgs["result"]["orderLine"]>
+export type OrderLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "lineNumber" | "productId" | "description" | "quantity" | "unitOfMeasure" | "unitPrice" | "lineTotal" | "leadTimeDays" | "fulfilledQuantity" | "variantId" | "sku" | "priceSource" | "listPrice" | "snapshot" | "returnedQuantity", ExtArgs["result"]["orderLine"]>
 export type OrderLineInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }
@@ -797,6 +1001,18 @@ export type $OrderLinePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     lineTotal: runtime.Decimal
     leadTimeDays: number | null
     fulfilledQuantity: runtime.Decimal
+    variantId: string | null
+    sku: string | null
+    /**
+     * list | tier | price_list (from Catalog), agreed (quotation) or buyer_entered (free-text line).
+     */
+    priceSource: string | null
+    listPrice: runtime.Decimal | null
+    /**
+     * The product as it was when ordered: name, attributes, options, image, SKU (PRD addendum 2.3).
+     */
+    snapshot: runtime.JsonValue | null
+    returnedQuantity: runtime.Decimal
   }, ExtArgs["result"]["orderLine"]>
   composites: {}
 }
@@ -1232,6 +1448,12 @@ export interface OrderLineFieldRefs {
   readonly lineTotal: Prisma.FieldRef<"OrderLine", 'Decimal'>
   readonly leadTimeDays: Prisma.FieldRef<"OrderLine", 'Int'>
   readonly fulfilledQuantity: Prisma.FieldRef<"OrderLine", 'Decimal'>
+  readonly variantId: Prisma.FieldRef<"OrderLine", 'String'>
+  readonly sku: Prisma.FieldRef<"OrderLine", 'String'>
+  readonly priceSource: Prisma.FieldRef<"OrderLine", 'String'>
+  readonly listPrice: Prisma.FieldRef<"OrderLine", 'Decimal'>
+  readonly snapshot: Prisma.FieldRef<"OrderLine", 'Json'>
+  readonly returnedQuantity: Prisma.FieldRef<"OrderLine", 'Decimal'>
 }
     
 

@@ -58,6 +58,33 @@ model FeatureFlag {
   @@map("feature_flags")
 }
 
+/// Which optional modules an organization may use (PRD addendum 2.10). No row = the module's default.
+model Entitlement {
+  organizationId  String    @map("organization_id") @db.Uuid
+  moduleKey       String    @map("module_key")
+  enabled         Boolean
+  /// Trial or subscription end; after it the module falls back to its default.
+  validUntil      DateTime? @map("valid_until") @db.Timestamptz(3)
+  note            String?
+  updatedByUserId String?   @map("updated_by_user_id") @db.Uuid
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@id([organizationId, moduleKey])
+  @@map("entitlements")
+}
+
+/// Which modules a business (organization) type gets by default; drives every such organization's sidebar.
+model BusinessTypeModule {
+  organizationType String   @map("organization_type")
+  moduleKey        String   @map("module_key")
+  enabled          Boolean
+  updatedByUserId  String?  @map("updated_by_user_id") @db.Uuid
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@id([organizationType, moduleKey])
+  @@map("business_type_modules")
+}
+
 /// Append-only record of every administrative action (PRD 5.21, 9).
 model AuditEntry {
   id          String   @id @default(uuid()) @db.Uuid

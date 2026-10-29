@@ -21,6 +21,13 @@ export function priceRange(variants: ProductPublishedV1['variants']) {
   };
 }
 
+/** The smallest minimum order across variants; null when any variant has none. */
+export function minMoq(variants: ProductPublishedV1['variants']) {
+  const moqs = variants.map((v) => v.minOrderQuantity);
+  if (!moqs.length || moqs.some((m) => !m)) return null;
+  return moqs.map((m) => new Prisma.Decimal(m!)).reduce((a, b) => (b.lessThan(a) ? b : a));
+}
+
 /** Keeps the search read models in step with Catalog and Organization events. */
 @Injectable()
 export class SearchIndexer implements OnApplicationBootstrap, BeforeApplicationShutdown {
@@ -50,6 +57,25 @@ export class SearchIndexer implements OnApplicationBootstrap, BeforeApplicationS
           }),
         ),
         OrganizationUpdated: this.on('OrganizationUpdated', (e, tx) => this.upsertOrganization(tx, e.occurredAt, e.data)),
+        // PRD addendum 2.11: delivery areas, ratings and stock for search filters.
+        OrganizationLocationsChanged: this.on('OrganizationLocationsChanged', async (e, tx) => {
+          await tx.organizationProfile.updateMany({
+            where: { organizationId: e.data.organizationId },
+            data: { serviceAreas: e.data.serviceAreas, pickupCities: e.data.pickupCities },
+          });
+        }),
+        ReviewPublished: this.on('ReviewPublished', async (e, tx) => {
+          if (e.data.productId) return; // business ratings only
+          await tx.organizationProfile.updateMany({
+            where: { organizationId: e.data.subjectOrganizationId },
+            data: { ratingSum: { increment: e.data.rating }, ratingCount: { increment: 1 } },
+          });
+        }),
+        StockMovementPosted: this.on('StockMovementPosted', async (e, tx) => {
+          await tx.$executeRaw`INSERT INTO ${Prisma.raw(qualified('product_stock'))} (organization_id, item_id, on_hand, updated_at)
+            VALUES (${e.data.organizationId}::uuid, ${e.data.itemId}::uuid, ${e.data.quantity}::numeric, now())
+            ON CONFLICT (organization_id, item_id) DO UPDATE SET on_hand = product_stock.on_hand + EXCLUDED.on_hand, updated_at = now()`;
+        }),
       },
     });
   }
@@ -78,6 +104,7 @@ export class SearchIndexer implements OnApplicationBootstrap, BeforeApplicationS
       description: e.data.description,
       categoryId: e.data.categoryId,
       categorySlug: e.data.categorySlug,
+      categoryPath: e.data.categoryPath ?? [e.data.categorySlug],
       unitOfMeasure: e.data.unitOfMeasure,
       attributes: e.data.attributes,
       variants: e.data.variants as unknown as Prisma.InputJsonValue,
@@ -86,11 +113,17 @@ export class SearchIndexer implements OnApplicationBootstrap, BeforeApplicationS
       currency: range.currency,
       publishedAt: new Date(e.data.publishedAt),
       sourceOccurredAt: occurredAt,
+      minOrderQuantity: minMoq(e.data.variants),
+      imageDocumentId: e.data.imageDocumentId ?? null,
+      availableFrom: e.data.availableFrom ? new Date(e.data.availableFrom) : null,
+      availableUntil: e.data.availableUntil ? new Date(e.data.availableUntil) : null,
+      allowPreorder: e.data.allowPreorder ?? false,
+      madeToOrder: e.data.madeToOrder ?? false,
     };
     await tx.productListing.upsert({ where: { productId: e.data.productId }, update: row, create: { productId: e.data.productId, ...row } });
     // Searchable text: name, description, category and attribute values (e.g. "Yirgacheffe").
     const text = [e.data.name, e.data.description ?? '', e.data.categorySlug, ...Object.values(e.data.attributes)].join(' ');
-    await tx.$executeRaw`UPDATE ${Prisma.raw(qualified('product_listings'))} SET search_document = to_tsvector('simple', ${text}) WHERE product_id = ${e.data.productId}::uuid`;
+    await tx.$executeRaw`UPDATE ${Prisma.raw(qualified('product_listings'))} SET search_document = to_tsvector('simple', ${text}), search_text = lower(${text}) WHERE product_id = ${e.data.productId}::uuid`;
   }
 
   private async upsertOrganization(

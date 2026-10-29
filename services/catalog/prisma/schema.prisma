@@ -33,17 +33,24 @@ enum ProductStatus {
 
 /// Platform-managed taxonomy (seeded). `requiredAttributes` must be filled before a product can be published.
 model Category {
-  id                 String   @id @default(uuid()) @db.Uuid
-  slug               String   @unique
-  name               String
-  parentId           String?  @map("parent_id") @db.Uuid
-  requiredAttributes String[] @map("required_attributes")
-  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  id                   String   @id @default(uuid()) @db.Uuid
+  slug                 String   @unique
+  name                 String
+  parentId             String?  @map("parent_id") @db.Uuid
+  requiredAttributes   String[] @map("required_attributes")
+  /// Typed attribute definitions (PRD addendum 2.3): [{ key, label, type, unit?, options?, required?, filterable?, min?, max? }].
+  attributeDefinitions Json     @default("[]") @map("attribute_definitions")
+  /// Set for a business's own categories (always under a platform category); null for platform categories.
+  organizationId       String?  @map("organization_id") @db.Uuid
+  description          String?
+  sortOrder            Int      @default(0) @map("sort_order")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
   children Category[] @relation("CategoryTree")
   products Product[]
 
+  @@index([organizationId])
   @@map("categories")
 }
 
@@ -58,13 +65,22 @@ model Product {
   /// Category specification values, e.g. { "origin": "Yirgacheffe", "grade": "1" }.
   attributes      Json          @default("{}")
   status          ProductStatus @default(draft)
+  /// Seasonal availability; outside the window the product can only be pre-ordered (if allowed).
+  availableFrom   DateTime?     @map("available_from") @db.Timestamptz(3)
+  availableUntil  DateTime?     @map("available_until") @db.Timestamptz(3)
+  allowPreorder   Boolean       @default(false) @map("allow_preorder")
+  /// Produced after the order (made-to-order); leadTimeDays is then the production time.
+  madeToOrder     Boolean       @default(false) @map("made_to_order")
+  leadTimeDays    Int?          @map("lead_time_days")
   publishedAt     DateTime?     @map("published_at") @db.Timestamptz(3)
   createdByUserId String        @map("created_by_user_id") @db.Uuid
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  category Category         @relation(fields: [categoryId], references: [id])
-  variants ProductVariant[]
+  category     Category             @relation(fields: [categoryId], references: [id])
+  variants     ProductVariant[]
+  media        ProductMedia[]
+  optionGroups ProductOptionGroup[]
 
   @@index([organizationId, status])
   @@map("products")
@@ -82,18 +98,121 @@ model ProductVariant {
   minOrderQuantity Decimal? @map("min_order_quantity") @db.Decimal(18, 4)
   attributes       Json     @default("{}")
   isActive         Boolean  @default(true) @map("is_active")
+  /// GTIN/EAN/UPC, 8–14 digits.
+  barcode          String?
+  /// Units of the product's unit of measure in one pack, e.g. 50 (kg per bag).
+  packSize         Decimal? @map("pack_size") @db.Decimal(18, 4)
+  tracksBatches    Boolean  @default(false) @map("tracks_batches")
+  tracksExpiry     Boolean  @default(false) @map("tracks_expiry")
+  shelfLifeDays    Int?     @map("shelf_life_days")
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product          Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  priceTiers       VariantPriceTier[]
+  priceListEntries PriceListEntry[]
 
-  /// SKUs are unique within an organization.
   @@unique([organizationId, sku])
   @@index([productId])
   @@map("product_variants")
 }
 
 /// Transactional outbox (PRD 8.3).
+/// Product images (Document service, classification product_image). Position 0 is the primary image.
+model ProductMedia {
+  id         String   @id @default(uuid()) @db.Uuid
+  productId  String   @map("product_id") @db.Uuid
+  documentId String   @map("document_id") @db.Uuid
+  position   Int
+  altText    String?  @map("alt_text")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, documentId])
+  @@index([productId, position])
+  @@map("product_media")
+}
+
+/// Bulk pricing: from minQuantity up, the unit price is unitPrice.
+model VariantPriceTier {
+  id          String  @id @default(uuid()) @db.Uuid
+  variantId   String  @map("variant_id") @db.Uuid
+  minQuantity Decimal @map("min_quantity") @db.Decimal(18, 4)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(18, 4)
+
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([variantId, minQuantity])
+  @@map("variant_price_tiers")
+}
+
+/// Add-ons and choices, e.g. "Packaging: jute bag (+0) / GrainPro bag (+35)".
+model ProductOptionGroup {
+  id        String  @id @default(uuid()) @db.Uuid
+  productId String  @map("product_id") @db.Uuid
+  name      String
+  required  Boolean @default(false)
+  /// Several options may be picked.
+  multiple  Boolean @default(false)
+  position  Int
+
+  product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  options ProductOption[]
+
+  @@index([productId])
+  @@map("product_option_groups")
+}
+
+model ProductOption {
+  id         String  @id @default(uuid()) @db.Uuid
+  groupId    String  @map("group_id") @db.Uuid
+  name       String
+  /// Added to the unit price.
+  priceDelta Decimal @default(0) @map("price_delta") @db.Decimal(18, 4)
+  isActive   Boolean @default(true) @map("is_active")
+  position   Int
+
+  group ProductOptionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@map("product_options")
+}
+
+/// Negotiated or location prices (PRD addendum 2.4): for some buyers (none = everyone), optionally one location.
+model PriceList {
+  id                   String    @id @default(uuid()) @db.Uuid
+  organizationId       String    @map("organization_id") @db.Uuid
+  name                 String
+  currency             String    @db.Char(3)
+  buyerOrganizationIds String[]  @default([]) @map("buyer_organization_ids") @db.Uuid
+  branchId             String?   @map("branch_id") @db.Uuid
+  startsAt             DateTime? @map("starts_at") @db.Timestamptz(3)
+  endsAt               DateTime? @map("ends_at") @db.Timestamptz(3)
+  active               Boolean   @default(true)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  entries PriceListEntry[]
+
+  @@index([organizationId, active])
+  @@map("price_lists")
+}
+
+model PriceListEntry {
+  id          String  @id @default(uuid()) @db.Uuid
+  priceListId String  @map("price_list_id") @db.Uuid
+  variantId   String  @map("variant_id") @db.Uuid
+  minQuantity Decimal @default(0) @map("min_quantity") @db.Decimal(18, 4)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(18, 4)
+
+  priceList PriceList      @relation(fields: [priceListId], references: [id], onDelete: Cascade)
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([priceListId, variantId, minQuantity])
+  @@index([variantId])
+  @@map("price_list_entries")
+}
+
 model OutboxEvent {
   id          String    @id @db.Uuid
   eventType   String    @map("event_type")

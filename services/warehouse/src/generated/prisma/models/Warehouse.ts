@@ -33,6 +33,7 @@ export type WarehouseMinAggregateOutputType = {
   region: string | null
   city: string | null
   addressLine: string | null
+  branchId: string | null
   status: $Enums.WarehouseStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -47,6 +48,7 @@ export type WarehouseMaxAggregateOutputType = {
   region: string | null
   city: string | null
   addressLine: string | null
+  branchId: string | null
   status: $Enums.WarehouseStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -61,6 +63,7 @@ export type WarehouseCountAggregateOutputType = {
   region: number
   city: number
   addressLine: number
+  branchId: number
   status: number
   createdAt: number
   updatedAt: number
@@ -77,6 +80,7 @@ export type WarehouseMinAggregateInputType = {
   region?: true
   city?: true
   addressLine?: true
+  branchId?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -91,6 +95,7 @@ export type WarehouseMaxAggregateInputType = {
   region?: true
   city?: true
   addressLine?: true
+  branchId?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -105,6 +110,7 @@ export type WarehouseCountAggregateInputType = {
   region?: true
   city?: true
   addressLine?: true
+  branchId?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -192,6 +198,7 @@ export type WarehouseGroupByOutputType = {
   region: string | null
   city: string | null
   addressLine: string | null
+  branchId: string | null
   status: $Enums.WarehouseStatus
   createdAt: Date
   updatedAt: Date
@@ -227,6 +234,7 @@ export type WarehouseWhereInput = {
   region?: Prisma.StringNullableFilter<"Warehouse"> | string | null
   city?: Prisma.StringNullableFilter<"Warehouse"> | string | null
   addressLine?: Prisma.StringNullableFilter<"Warehouse"> | string | null
+  branchId?: Prisma.UuidNullableFilter<"Warehouse"> | string | null
   status?: Prisma.EnumWarehouseStatusFilter<"Warehouse"> | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
@@ -243,6 +251,7 @@ export type WarehouseOrderByWithRelationInput = {
   region?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine?: Prisma.SortOrderInput | Prisma.SortOrder
+  branchId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -263,6 +272,7 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
   region?: Prisma.StringNullableFilter<"Warehouse"> | string | null
   city?: Prisma.StringNullableFilter<"Warehouse"> | string | null
   addressLine?: Prisma.StringNullableFilter<"Warehouse"> | string | null
+  branchId?: Prisma.UuidNullableFilter<"Warehouse"> | string | null
   status?: Prisma.EnumWarehouseStatusFilter<"Warehouse"> | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
@@ -279,6 +289,7 @@ export type WarehouseOrderByWithAggregationInput = {
   region?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine?: Prisma.SortOrderInput | Prisma.SortOrder
+  branchId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -299,6 +310,7 @@ export type WarehouseScalarWhereWithAggregatesInput = {
   region?: Prisma.StringNullableWithAggregatesFilter<"Warehouse"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"Warehouse"> | string | null
   addressLine?: Prisma.StringNullableWithAggregatesFilter<"Warehouse"> | string | null
+  branchId?: Prisma.UuidNullableWithAggregatesFilter<"Warehouse"> | string | null
   status?: Prisma.EnumWarehouseStatusWithAggregatesFilter<"Warehouse"> | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Warehouse"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Warehouse"> | Date | string
@@ -313,6 +325,7 @@ export type WarehouseCreateInput = {
   region?: string | null
   city?: string | null
   addressLine?: string | null
+  branchId?: string | null
   status?: $Enums.WarehouseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -329,6 +342,7 @@ export type WarehouseUncheckedCreateInput = {
   region?: string | null
   city?: string | null
   addressLine?: string | null
+  branchId?: string | null
   status?: $Enums.WarehouseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -345,6 +359,7 @@ export type WarehouseUpdateInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -361,6 +376,7 @@ export type WarehouseUncheckedUpdateInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -377,6 +393,7 @@ export type WarehouseCreateManyInput = {
   region?: string | null
   city?: string | null
   addressLine?: string | null
+  branchId?: string | null
   status?: $Enums.WarehouseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -391,6 +408,7 @@ export type WarehouseUpdateManyMutationInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -405,6 +423,7 @@ export type WarehouseUncheckedUpdateManyInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -424,6 +443,7 @@ export type WarehouseCountOrderByAggregateInput = {
   region?: Prisma.SortOrder
   city?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -438,6 +458,7 @@ export type WarehouseMaxOrderByAggregateInput = {
   region?: Prisma.SortOrder
   city?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -452,6 +473,7 @@ export type WarehouseMinOrderByAggregateInput = {
   region?: Prisma.SortOrder
   city?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -515,6 +537,7 @@ export type WarehouseCreateWithoutLocationsInput = {
   region?: string | null
   city?: string | null
   addressLine?: string | null
+  branchId?: string | null
   status?: $Enums.WarehouseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -530,6 +553,7 @@ export type WarehouseUncheckedCreateWithoutLocationsInput = {
   region?: string | null
   city?: string | null
   addressLine?: string | null
+  branchId?: string | null
   status?: $Enums.WarehouseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -561,6 +585,7 @@ export type WarehouseUpdateWithoutLocationsInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -576,6 +601,7 @@ export type WarehouseUncheckedUpdateWithoutLocationsInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -591,6 +617,7 @@ export type WarehouseCreateWithoutReceiptsInput = {
   region?: string | null
   city?: string | null
   addressLine?: string | null
+  branchId?: string | null
   status?: $Enums.WarehouseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -606,6 +633,7 @@ export type WarehouseUncheckedCreateWithoutReceiptsInput = {
   region?: string | null
   city?: string | null
   addressLine?: string | null
+  branchId?: string | null
   status?: $Enums.WarehouseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -637,6 +665,7 @@ export type WarehouseUpdateWithoutReceiptsInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -652,6 +681,7 @@ export type WarehouseUncheckedUpdateWithoutReceiptsInput = {
   region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumWarehouseStatusFieldUpdateOperationsInput | $Enums.WarehouseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -707,6 +737,7 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   region?: boolean
   city?: boolean
   addressLine?: boolean
+  branchId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -724,6 +755,7 @@ export type WarehouseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   region?: boolean
   city?: boolean
   addressLine?: boolean
+  branchId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -738,6 +770,7 @@ export type WarehouseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   region?: boolean
   city?: boolean
   addressLine?: boolean
+  branchId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -752,12 +785,13 @@ export type WarehouseSelectScalar = {
   region?: boolean
   city?: boolean
   addressLine?: boolean
+  branchId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type WarehouseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "code" | "name" | "countryCode" | "region" | "city" | "addressLine" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["warehouse"]>
+export type WarehouseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "code" | "name" | "countryCode" | "region" | "city" | "addressLine" | "branchId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["warehouse"]>
 export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   locations?: boolean | Prisma.Warehouse$locationsArgs<ExtArgs>
   receipts?: boolean | Prisma.Warehouse$receiptsArgs<ExtArgs>
@@ -781,6 +815,10 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     region: string | null
     city: string | null
     addressLine: string | null
+    /**
+     * Organization location (branch) this warehouse belongs to; staff limited to locations only see their own.
+     */
+    branchId: string | null
     status: $Enums.WarehouseStatus
     createdAt: Date
     updatedAt: Date
@@ -1217,6 +1255,7 @@ export interface WarehouseFieldRefs {
   readonly region: Prisma.FieldRef<"Warehouse", 'String'>
   readonly city: Prisma.FieldRef<"Warehouse", 'String'>
   readonly addressLine: Prisma.FieldRef<"Warehouse", 'String'>
+  readonly branchId: Prisma.FieldRef<"Warehouse", 'String'>
   readonly status: Prisma.FieldRef<"Warehouse", 'WarehouseStatus'>
   readonly createdAt: Prisma.FieldRef<"Warehouse", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Warehouse", 'DateTime'>

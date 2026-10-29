@@ -402,6 +402,9 @@ export const ModelName = {
   PaymentReference: 'PaymentReference',
   Reconciliation: 'Reconciliation',
   CreditNote: 'CreditNote',
+  PaymentIntent: 'PaymentIntent',
+  Refund: 'Refund',
+  Settlement: 'Settlement',
   DocumentCounter: 'DocumentCounter',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
@@ -420,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "invoice" | "invoiceLine" | "paymentReference" | "reconciliation" | "creditNote" | "documentCounter" | "outboxEvent" | "processedEvent"
+    modelProps: "invoice" | "invoiceLine" | "paymentReference" | "reconciliation" | "creditNote" | "paymentIntent" | "refund" | "settlement" | "documentCounter" | "outboxEvent" | "processedEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -794,6 +797,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PaymentIntent: {
+      payload: Prisma.$PaymentIntentPayload<ExtArgs>
+      fields: Prisma.PaymentIntentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentIntentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentIntentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentIntentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentIntentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentIntentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentIntentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentIntentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentIntentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentIntentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>
+        }
+        update: {
+          args: Prisma.PaymentIntentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentIntentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentIntentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentIntentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentIntentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentIntentPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentIntentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentIntent>
+        }
+        groupBy: {
+          args: Prisma.PaymentIntentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentIntentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentIntentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentIntentCountAggregateOutputType> | number
+        }
+      }
+    }
+    Refund: {
+      payload: Prisma.$RefundPayload<ExtArgs>
+      fields: Prisma.RefundFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RefundFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RefundFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        findFirst: {
+          args: Prisma.RefundFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RefundFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        findMany: {
+          args: Prisma.RefundFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>[]
+        }
+        create: {
+          args: Prisma.RefundCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        createMany: {
+          args: Prisma.RefundCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RefundCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>[]
+        }
+        delete: {
+          args: Prisma.RefundDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        update: {
+          args: Prisma.RefundUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        deleteMany: {
+          args: Prisma.RefundDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RefundUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RefundUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>[]
+        }
+        upsert: {
+          args: Prisma.RefundUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        aggregate: {
+          args: Prisma.RefundAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRefund>
+        }
+        groupBy: {
+          args: Prisma.RefundGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RefundGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RefundCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RefundCountAggregateOutputType> | number
+        }
+      }
+    }
+    Settlement: {
+      payload: Prisma.$SettlementPayload<ExtArgs>
+      fields: Prisma.SettlementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        update: {
+          args: Prisma.SettlementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlement>
+        }
+        groupBy: {
+          args: Prisma.SettlementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementCountAggregateOutputType> | number
+        }
+      }
+    }
     DocumentCounter: {
       payload: Prisma.$DocumentCounterPayload<ExtArgs>
       fields: Prisma.DocumentCounterFieldRefs
@@ -1142,6 +1367,72 @@ export const CreditNoteScalarFieldEnum = {
 export type CreditNoteScalarFieldEnum = (typeof CreditNoteScalarFieldEnum)[keyof typeof CreditNoteScalarFieldEnum]
 
 
+export const PaymentIntentScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  provider: 'provider',
+  providerRef: 'providerRef',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  checkoutUrl: 'checkoutUrl',
+  fee: 'fee',
+  failureReason: 'failureReason',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentIntentScalarFieldEnum = (typeof PaymentIntentScalarFieldEnum)[keyof typeof PaymentIntentScalarFieldEnum]
+
+
+export const RefundScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  sellerOrganizationId: 'sellerOrganizationId',
+  buyerOrganizationId: 'buyerOrganizationId',
+  invoiceId: 'invoiceId',
+  orderId: 'orderId',
+  returnId: 'returnId',
+  amount: 'amount',
+  currency: 'currency',
+  reason: 'reason',
+  status: 'status',
+  method: 'method',
+  provider: 'provider',
+  providerRef: 'providerRef',
+  failureReason: 'failureReason',
+  requestedByUserId: 'requestedByUserId',
+  approvedByUserId: 'approvedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RefundScalarFieldEnum = (typeof RefundScalarFieldEnum)[keyof typeof RefundScalarFieldEnum]
+
+
+export const SettlementScalarFieldEnum = {
+  id: 'id',
+  sellerOrganizationId: 'sellerOrganizationId',
+  provider: 'provider',
+  currency: 'currency',
+  periodStart: 'periodStart',
+  periodEnd: 'periodEnd',
+  paymentCount: 'paymentCount',
+  grossAmount: 'grossAmount',
+  feeTotal: 'feeTotal',
+  refundTotal: 'refundTotal',
+  netAmount: 'netAmount',
+  status: 'status',
+  payoutRef: 'payoutRef',
+  paidAt: 'paidAt',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
 export const DocumentCounterScalarFieldEnum = {
   key: 'key',
   last: 'last'
@@ -1299,6 +1590,48 @@ export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'PaymentStatus[]'
  */
 export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'IntentStatus'
+ */
+export type EnumIntentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IntentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'IntentStatus[]'
+ */
+export type ListEnumIntentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IntentStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'RefundStatus'
+ */
+export type EnumRefundStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RefundStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RefundStatus[]'
+ */
+export type ListEnumRefundStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RefundStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementStatus'
+ */
+export type EnumSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementStatus[]'
+ */
+export type ListEnumSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementStatus[]'>
     
 
 
@@ -1485,6 +1818,9 @@ export type GlobalOmitConfig = {
   paymentReference?: Prisma.PaymentReferenceOmit
   reconciliation?: Prisma.ReconciliationOmit
   creditNote?: Prisma.CreditNoteOmit
+  paymentIntent?: Prisma.PaymentIntentOmit
+  refund?: Prisma.RefundOmit
+  settlement?: Prisma.SettlementOmit
   documentCounter?: Prisma.DocumentCounterOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit

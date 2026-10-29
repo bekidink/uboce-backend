@@ -56,7 +56,8 @@ export const MembershipRole = {
   manufacturer: 'manufacturer',
   logistics_operator: 'logistics_operator',
   finance_officer: 'finance_officer',
-  auditor: 'auditor'
+  auditor: 'auditor',
+  driver: 'driver'
 } as const
 
 export type MembershipRole = (typeof MembershipRole)[keyof typeof MembershipRole]
@@ -64,10 +65,31 @@ export type MembershipRole = (typeof MembershipRole)[keyof typeof MembershipRole
 
 export const MembershipStatus = {
   active: 'active',
+  suspended: 'suspended',
   revoked: 'revoked'
 } as const
 
 export type MembershipStatus = (typeof MembershipStatus)[keyof typeof MembershipStatus]
+
+
+export const BusinessModel = {
+  wholesale: 'wholesale',
+  retail: 'retail',
+  made_to_order: 'made_to_order'
+} as const
+
+export type BusinessModel = (typeof BusinessModel)[keyof typeof BusinessModel]
+
+
+export const LocationKind = {
+  head_office: 'head_office',
+  store: 'store',
+  warehouse: 'warehouse',
+  collection_point: 'collection_point',
+  production_site: 'production_site'
+} as const
+
+export type LocationKind = (typeof LocationKind)[keyof typeof LocationKind]
 
 
 export const InvitationStatus = {

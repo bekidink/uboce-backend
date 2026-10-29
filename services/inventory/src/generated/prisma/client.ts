@@ -62,6 +62,21 @@ export type StockReservation = Prisma.StockReservationModel
  */
 export type StockReservationLine = Prisma.StockReservationLineModel
 /**
+ * Model StockStateChange
+ * Moving stock between available, damaged and quarantined (on hand doesn't change). Append-only.
+ */
+export type StockStateChange = Prisma.StockStateChangeModel
+/**
+ * Model CycleCount
+ * A physical count of one warehouse; approval posts the variances as adjustments.
+ */
+export type CycleCount = Prisma.CycleCountModel
+/**
+ * Model CycleCountLine
+ * 
+ */
+export type CycleCountLine = Prisma.CycleCountLineModel
+/**
  * Model OutboxEvent
  * Transactional outbox (PRD 8.3).
  */

@@ -21,7 +21,7 @@ import { AppError, type AuthUser, CurrentUser, Internal, PaginationQueryDto } fr
 import type { InternalPlatformRoles } from '@uboce/contracts';
 
 import type { Prisma } from '../generated/prisma/client.js';
-import { AuditQueryDto, GrantRoleDto, KEY_PATTERN, OrganizationStatusDto, PutFlagDto, PutSettingDto, ReasonDto } from './admin.dto.js';
+import { AuditQueryDto, BusinessTypeModuleDto, EntitlementDto, GrantRoleDto, KEY_PATTERN, OrganizationStatusDto, PutFlagDto, PutSettingDto, ReasonDto } from './admin.dto.js';
 import { AdminService } from './admin.service.js';
 
 const why = (dto: ReasonDto) => ({ reasonCode: dto.reasonCode, reason: dto.reason.trim() });
@@ -62,6 +62,60 @@ export class AdminController {
   @Get('feature-flags/evaluate')
   evaluate(@Headers('x-organization-id') organizationId?: string) {
     return this.admin.evaluateFlags(organizationId && /^[0-9a-f-]{36}$/i.test(organizationId) ? organizationId : null);
+  }
+
+  /** Every module, with whether it is core and on by default. */
+  @Get('modules')
+  modules() {
+    return this.admin.modules();
+  }
+
+  /** The modules your organization may use (drives the app's navigation). */
+  @Get('entitlements/me')
+  myEntitlements(@Headers('x-organization-id') organizationId?: string) {
+    if (!organizationId || !/^[0-9a-f-]{36}$/i.test(organizationId)) throw new BadRequestException('Send x-organization-id');
+    return this.admin.entitlements(organizationId);
+  }
+
+  /** Which modules each business type gets (drives sidebars). */
+  @UseGuards(PlatformAdminGuard)
+  @Get('business-types')
+  businessTypes() {
+    return this.admin.businessTypes();
+  }
+
+  @UseGuards(PlatformAdminGuard)
+  @Put('business-types/:type/modules/:moduleKey')
+  setBusinessType(@CurrentUser() user: AuthUser, @Param('type') type: string, @Param('moduleKey') moduleKey: string, @Body() dto: BusinessTypeModuleDto) {
+    return this.admin.setBusinessTypeModule(user.userId, type, moduleKey, dto.enabled ?? null, why(dto));
+  }
+
+  @UseGuards(PlatformAdminGuard)
+  @Get('organizations/:organizationId/entitlements')
+  entitlements(@Param('organizationId', new ParseUUIDPipe()) organizationId: string) {
+    return this.admin.entitlements(organizationId);
+  }
+
+  @UseGuards(PlatformAdminGuard)
+  @Put('organizations/:organizationId/entitlements/:moduleKey')
+  setEntitlement(
+    @CurrentUser() user: AuthUser,
+    @Param('organizationId', new ParseUUIDPipe()) organizationId: string,
+    @Param('moduleKey') moduleKey: string,
+    @Body() dto: EntitlementDto,
+  ) {
+    return this.admin.setEntitlement(user.userId, organizationId, moduleKey, dto.enabled, dto.validUntil ?? null, why(dto));
+  }
+
+  @UseGuards(PlatformAdminGuard)
+  @Delete('organizations/:organizationId/entitlements/:moduleKey')
+  clearEntitlement(
+    @CurrentUser() user: AuthUser,
+    @Param('organizationId', new ParseUUIDPipe()) organizationId: string,
+    @Param('moduleKey') moduleKey: string,
+    @Body() dto: ReasonDto,
+  ) {
+    return this.admin.clearEntitlement(user.userId, organizationId, moduleKey, why(dto));
   }
 
   @UseGuards(PlatformAdminGuard)
@@ -118,6 +172,12 @@ export class AdminController {
   }
 
   @UseGuards(PlatformAdminGuard)
+  @Get('audit/facets')
+  auditFacets() {
+    return this.admin.auditFacets();
+  }
+
+  @UseGuards(PlatformAdminGuard)
   @Get('audit')
   audit(@Query() query: AuditQueryDto) {
     return this.admin.listAudit(query);
@@ -134,5 +194,18 @@ export class InternalPlatformRolesController {
   @Get(':userId')
   async roles(@Param('userId', new ParseUUIDPipe()) userId: string): Promise<InternalPlatformRoles> {
     return { userId, roles: (await this.admin.effectiveRoles(userId)).roles };
+  }
+}
+
+@Controller('internal/entitlements')
+export class InternalEntitlementsController {
+  constructor(private readonly admin: AdminService) {}
+
+  @ApiExcludeEndpoint()
+  @Internal()
+  @Get(':organizationId')
+  async entitlements(@Param('organizationId', new ParseUUIDPipe()) organizationId: string) {
+    const { modules } = await this.admin.entitlements(organizationId);
+    return { organizationId, modules };
   }
 }

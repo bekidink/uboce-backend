@@ -51,6 +51,8 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         'connect-src': ["'self'", ...words(env.WEB_CONNECT_SRC)],
+        // Product images redirect to signed object-storage links.
+        'img-src': ["'self'", 'data:', 'blob:', ...words(env.WEB_CONNECT_SRC)],
         'frame-ancestors': ["'self'", ...frameAncestors],
       },
     },

@@ -19,6 +19,7 @@ export const ROLE_PERMISSIONS: Record<MembershipRole, readonly Permission[]> = {
   logistics_operator: READ,
   finance_officer: READ,
   auditor: READ,
+  driver: ['organization:read'],
 };
 
 export const hasPermission = (role: MembershipRole, permission: Permission) =>

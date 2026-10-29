@@ -54,6 +54,8 @@ model Document {
   rejectionReason     String?                @map("rejection_reason")
   retentionUntil      DateTime?              @map("retention_until") @db.Timestamptz(3)
   legalHold           Boolean                @default(false) @map("legal_hold")
+  /// Product images published by Catalog: anyone may view them (PRD addendum 2.3).
+  isPublic            Boolean                @default(false) @map("is_public")
   createdAt           DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
   uploadedAt          DateTime?              @map("uploaded_at") @db.Timestamptz(3)
   deletedAt           DateTime?              @map("deleted_at") @db.Timestamptz(3)
@@ -85,14 +87,14 @@ model DocumentGrant {
 
 /// Every upload and download link issued, and every grant (PRD 5.17: audit sensitive access).
 model DocumentAccessLog {
-  id          String   @id @default(uuid()) @db.Uuid
-  documentId  String   @map("document_id") @db.Uuid
-  action      String
-  actorUserId String?  @map("actor_user_id") @db.Uuid
-  actorService String? @map("actor_service")
-  organizationId String? @map("organization_id") @db.Uuid
-  ipAddress   String?  @map("ip_address")
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  id             String   @id @default(uuid()) @db.Uuid
+  documentId     String   @map("document_id") @db.Uuid
+  action         String
+  actorUserId    String?  @map("actor_user_id") @db.Uuid
+  actorService   String?  @map("actor_service")
+  organizationId String?  @map("organization_id") @db.Uuid
+  ipAddress      String?  @map("ip_address")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 

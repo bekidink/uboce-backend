@@ -52,6 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   DailyMetric: 'DailyMetric',
+  ActivityEvent: 'ActivityEvent',
+  ReportTemplate: 'ReportTemplate',
   IndexState: 'IndexState',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
@@ -82,6 +84,41 @@ export const DailyMetricScalarFieldEnum = {
 } as const
 
 export type DailyMetricScalarFieldEnum = (typeof DailyMetricScalarFieldEnum)[keyof typeof DailyMetricScalarFieldEnum]
+
+
+export const ActivityEventScalarFieldEnum = {
+  eventId: 'eventId',
+  organizationId: 'organizationId',
+  eventType: 'eventType',
+  area: 'area',
+  summary: 'summary',
+  reference: 'reference',
+  aggregateId: 'aggregateId',
+  branchId: 'branchId',
+  actorUserId: 'actorUserId',
+  own: 'own',
+  occurredAt: 'occurredAt',
+  data: 'data'
+} as const
+
+export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
+
+
+export const ReportTemplateScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  description: 'description',
+  dataset: 'dataset',
+  columns: 'columns',
+  filters: 'filters',
+  format: 'format',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReportTemplateScalarFieldEnum = (typeof ReportTemplateScalarFieldEnum)[keyof typeof ReportTemplateScalarFieldEnum]
 
 
 export const IndexStateScalarFieldEnum = {

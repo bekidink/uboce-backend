@@ -13,8 +13,16 @@ datasource db {
 }
 
 enum ShipmentStatus {
+  /// Planned: created, nothing assigned yet.
   created
+  /// A driver/vehicle (or carrier) is assigned.
+  assigned
+  /// Packed and waiting at the origin for collection.
+  ready_for_pickup
   dispatched
+  /// The carrier or driver has collected it.
+  picked_up
+  delayed
   in_transit
   delivered
   partially_delivered
@@ -36,6 +44,20 @@ model Shipment {
   carrierName             String?        @map("carrier_name")
   trackingNumber          String?        @unique @map("tracking_number")
   status                  ShipmentStatus @default(created)
+  /// When the goods can be collected at the origin.
+  pickupWindowStart       DateTime?      @map("pickup_window_start") @db.Timestamptz(3)
+  pickupWindowEnd         DateTime?      @map("pickup_window_end") @db.Timestamptz(3)
+  /// Who pays for freight (PRD addendum 2.8).
+  freightPayer            FreightPayer   @default(shipper) @map("freight_payer")
+  /// e.g. EXW, FCA, DAP, DDP.
+  incoterm                String?
+  freightCost             Decimal?       @map("freight_cost") @db.Decimal(18, 4)
+  freightCurrency         String?        @map("freight_currency") @db.Char(3)
+  carrierId               String?        @map("carrier_id") @db.Uuid
+  /// A logistics provider organization on UBOCE carrying this shipment (PRD addendum 2.8).
+  carrierOrganizationId   String?        @map("carrier_organization_id") @db.Uuid
+  carrierStatus           CarrierStatus  @default(none) @map("carrier_status")
+  carrierNote             String?        @map("carrier_note")
   expectedDeliveryAt      DateTime?      @map("expected_delivery_at") @db.Timestamptz(3)
   dispatchedAt            DateTime?      @map("dispatched_at") @db.Timestamptz(3)
   deliveredAt             DateTime?      @map("delivered_at") @db.Timestamptz(3)
@@ -43,14 +65,19 @@ model Shipment {
   createdAt               DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt               DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  items      ShipmentItem[]
-  tracking   TrackingEvent[]
-  evidence   DeliveryEvidence?
-  exceptions DeliveryException[]
+  items       ShipmentItem[]
+  orders      ShipmentOrder[]
+  packages    ShipmentPackage[]
+  assignments DriverAssignment[]
+  carrier     Carrier?            @relation(fields: [carrierId], references: [id])
+  tracking    TrackingEvent[]
+  evidence    DeliveryEvidence?
+  exceptions  DeliveryException[]
 
   @@index([orderId])
   @@index([shipperOrganizationId, status])
   @@index([consigneeOrganizationId, status])
+  @@index([carrierOrganizationId, carrierStatus])
   @@map("shipments")
 }
 
@@ -59,6 +86,8 @@ model ShipmentItem {
   shipmentId        String   @map("shipment_id") @db.Uuid
   lineNumber        Int      @map("line_number")
   orderLineId       String   @map("order_line_id") @db.Uuid
+  /// Consolidated shipments carry lines from several orders.
+  orderId           String?  @map("order_id") @db.Uuid
   /// Inventory item (the order line's product), when stock is tracked.
   itemId            String?  @map("item_id") @db.Uuid
   description       String
@@ -69,6 +98,130 @@ model ShipmentItem {
 
   @@unique([shipmentId, lineNumber])
   @@map("shipment_items")
+}
+
+enum CarrierStatus {
+  none
+  requested
+  accepted
+  declined
+}
+
+enum FreightPayer {
+  shipper
+  consignee
+  third_party
+}
+
+enum AssignmentStatus {
+  assigned
+  accepted
+  completed
+  cancelled
+}
+
+/// Orders carried by a shipment; several when consolidated (same shipper and consignee).
+model ShipmentOrder {
+  shipmentId  String @map("shipment_id") @db.Uuid
+  orderId     String @map("order_id") @db.Uuid
+  orderNumber String @map("order_number")
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@id([shipmentId, orderId])
+  @@index([orderId])
+  @@map("shipment_orders")
+}
+
+model ShipmentPackage {
+  id         String   @id @default(uuid()) @db.Uuid
+  shipmentId String   @map("shipment_id") @db.Uuid
+  /// Label or barcode on the package.
+  reference  String
+  weightKg   Decimal? @map("weight_kg") @db.Decimal(12, 3)
+  lengthCm   Decimal? @map("length_cm") @db.Decimal(10, 2)
+  widthCm    Decimal? @map("width_cm") @db.Decimal(10, 2)
+  heightCm   Decimal? @map("height_cm") @db.Decimal(10, 2)
+  contents   String?
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentId, reference])
+  @@map("shipment_packages")
+}
+
+/// A carrier an organization works with, or its own fleet.
+model Carrier {
+  id                    String   @id @default(uuid()) @db.Uuid
+  organizationId        String   @map("organization_id") @db.Uuid
+  name                  String
+  /// own_fleet or third_party
+  kind                  String
+  phone                 String?
+  /// Integration provider name, for tracking callbacks.
+  trackingProvider      String?  @map("tracking_provider")
+  /// When the carrier is a logistics provider on UBOCE, its organization (shipments are handed to it).
+  carrierOrganizationId String?  @map("carrier_organization_id") @db.Uuid
+  active                Boolean  @default(true)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  shipments Shipment[]
+
+  @@index([organizationId])
+  @@map("carriers")
+}
+
+model Vehicle {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  plateNumber    String   @map("plate_number")
+  /// truck, van, pickup, motorbike, other
+  type           String
+  capacityKg     Decimal? @map("capacity_kg") @db.Decimal(12, 2)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  assignments DriverAssignment[]
+
+  @@unique([organizationId, plateNumber])
+  @@map("vehicles")
+}
+
+/// A driver of the organization; userId links the UBOCE account they sign in with (role "driver").
+model Driver {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  userId         String?  @map("user_id") @db.Uuid
+  name           String
+  phone          String
+  licenseNumber  String?  @map("license_number")
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  assignments DriverAssignment[]
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@map("drivers")
+}
+
+model DriverAssignment {
+  id               String           @id @default(uuid()) @db.Uuid
+  shipmentId       String           @map("shipment_id") @db.Uuid
+  driverId         String           @map("driver_id") @db.Uuid
+  vehicleId        String?          @map("vehicle_id") @db.Uuid
+  status           AssignmentStatus @default(assigned)
+  assignedByUserId String           @map("assigned_by_user_id") @db.Uuid
+  assignedAt       DateTime         @default(now()) @map("assigned_at") @db.Timestamptz(3)
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  driver   Driver   @relation(fields: [driverId], references: [id])
+  vehicle  Vehicle? @relation(fields: [vehicleId], references: [id])
+
+  @@index([driverId, status])
+  @@index([shipmentId])
+  @@map("driver_assignments")
 }
 
 model TrackingEvent {

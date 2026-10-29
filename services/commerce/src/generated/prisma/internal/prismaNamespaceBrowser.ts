@@ -54,6 +54,11 @@ export const ModelName = {
   Order: 'Order',
   OrderLine: 'OrderLine',
   OrderStatusHistory: 'OrderStatusHistory',
+  OrderFulfillmentChange: 'OrderFulfillmentChange',
+  CancellationPolicy: 'CancellationPolicy',
+  ReturnRequest: 'ReturnRequest',
+  Promotion: 'Promotion',
+  PromotionRedemption: 'PromotionRedemption',
   OrderNumberCounter: 'OrderNumberCounter',
   ProcessedEvent: 'ProcessedEvent',
   OutboxEvent: 'OutboxEvent'
@@ -91,6 +96,17 @@ export const OrderScalarFieldEnum = {
   deliveryTerms: 'deliveryTerms',
   deliveryLocation: 'deliveryLocation',
   status: 'status',
+  fulfillmentMethod: 'fulfillmentMethod',
+  fulfillmentBranchId: 'fulfillmentBranchId',
+  subtotal: 'subtotal',
+  discountTotal: 'discountTotal',
+  promotionId: 'promotionId',
+  promotionCode: 'promotionCode',
+  cancellationPolicy: 'cancellationPolicy',
+  cancellationFee: 'cancellationFee',
+  preorder: 'preorder',
+  confirmedAt: 'confirmedAt',
+  fulfilledAt: 'fulfilledAt',
   createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -110,7 +126,13 @@ export const OrderLineScalarFieldEnum = {
   unitPrice: 'unitPrice',
   lineTotal: 'lineTotal',
   leadTimeDays: 'leadTimeDays',
-  fulfilledQuantity: 'fulfilledQuantity'
+  fulfilledQuantity: 'fulfilledQuantity',
+  variantId: 'variantId',
+  sku: 'sku',
+  priceSource: 'priceSource',
+  listPrice: 'listPrice',
+  snapshot: 'snapshot',
+  returnedQuantity: 'returnedQuantity'
 } as const
 
 export type OrderLineScalarFieldEnum = (typeof OrderLineScalarFieldEnum)[keyof typeof OrderLineScalarFieldEnum]
@@ -127,6 +149,101 @@ export const OrderStatusHistoryScalarFieldEnum = {
 } as const
 
 export type OrderStatusHistoryScalarFieldEnum = (typeof OrderStatusHistoryScalarFieldEnum)[keyof typeof OrderStatusHistoryScalarFieldEnum]
+
+
+export const OrderFulfillmentChangeScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  fromBranchId: 'fromBranchId',
+  toBranchId: 'toBranchId',
+  changedByUserId: 'changedByUserId',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderFulfillmentChangeScalarFieldEnum = (typeof OrderFulfillmentChangeScalarFieldEnum)[keyof typeof OrderFulfillmentChangeScalarFieldEnum]
+
+
+export const CancellationPolicyScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  version: 'version',
+  name: 'name',
+  freeCancellationHours: 'freeCancellationHours',
+  cancellationFeePct: 'cancellationFeePct',
+  noShowFeePct: 'noShowFeePct',
+  returnWindowDays: 'returnWindowDays',
+  restockingFeePct: 'restockingFeePct',
+  pickupHoldHours: 'pickupHoldHours',
+  terms: 'terms',
+  active: 'active',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type CancellationPolicyScalarFieldEnum = (typeof CancellationPolicyScalarFieldEnum)[keyof typeof CancellationPolicyScalarFieldEnum]
+
+
+export const ReturnRequestScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  orderId: 'orderId',
+  buyerOrganizationId: 'buyerOrganizationId',
+  supplierOrganizationId: 'supplierOrganizationId',
+  status: 'status',
+  reason: 'reason',
+  lines: 'lines',
+  currency: 'currency',
+  amount: 'amount',
+  restockingFee: 'restockingFee',
+  evidenceDocumentIds: 'evidenceDocumentIds',
+  requestedByUserId: 'requestedByUserId',
+  decidedByUserId: 'decidedByUserId',
+  decisionNote: 'decisionNote',
+  decidedAt: 'decidedAt',
+  receivedAt: 'receivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReturnRequestScalarFieldEnum = (typeof ReturnRequestScalarFieldEnum)[keyof typeof ReturnRequestScalarFieldEnum]
+
+
+export const PromotionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  code: 'code',
+  kind: 'kind',
+  value: 'value',
+  currency: 'currency',
+  minSubtotal: 'minSubtotal',
+  maxDiscount: 'maxDiscount',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  usageLimit: 'usageLimit',
+  perBuyerLimit: 'perBuyerLimit',
+  usedCount: 'usedCount',
+  active: 'active',
+  description: 'description',
+  advertised: 'advertised',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PromotionScalarFieldEnum = (typeof PromotionScalarFieldEnum)[keyof typeof PromotionScalarFieldEnum]
+
+
+export const PromotionRedemptionScalarFieldEnum = {
+  id: 'id',
+  promotionId: 'promotionId',
+  orderId: 'orderId',
+  buyerOrganizationId: 'buyerOrganizationId',
+  amount: 'amount',
+  createdAt: 'createdAt'
+} as const
+
+export type PromotionRedemptionScalarFieldEnum = (typeof PromotionRedemptionScalarFieldEnum)[keyof typeof PromotionRedemptionScalarFieldEnum]
 
 
 export const OrderNumberCounterScalarFieldEnum = {
@@ -167,6 +284,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const JsonNullValueInput = {
   JsonNull: JsonNull
 } as const
@@ -182,14 +307,6 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -197,4 +314,12 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

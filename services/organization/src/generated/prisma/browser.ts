@@ -33,6 +33,16 @@ export type Membership = Prisma.MembershipModel
  */
 export type Branch = Prisma.BranchModel
 /**
+ * Model RoleTemplate
+ * A named set of permissions with an optional approval limit, e.g. "Junior buyer — up to 50,000 ETB".
+ */
+export type RoleTemplate = Prisma.RoleTemplateModel
+/**
+ * Model MembershipLocation
+ * Staff-to-location assignment (PRD addendum 2.2: location-scoped access).
+ */
+export type MembershipLocation = Prisma.MembershipLocationModel
+/**
  * Model Invitation
  * An invitation to join, sent by email or SMS. Only the token's SHA-256 is stored.
  */

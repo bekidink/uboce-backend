@@ -8,6 +8,7 @@ import {
   type EventHandler,
   EventConsumer,
   REDIS,
+  RequiresModule,
   requireRole,
 } from '@uboce/common';
 import type { DomainEvent, EventEnvelope, EventType } from '@uboce/contracts';
@@ -17,6 +18,7 @@ import type { Redis } from 'ioredis';
 import { SERVICE_NAME } from '../config.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
+import { ACTIVITY_TYPES, activityRows } from './activity.js';
 import { derivedRates, PROJECTIONS } from './projections.js';
 
 type Tx = Prisma.TransactionClient;
@@ -32,16 +34,20 @@ export class AnalyticsProjector extends EventConsumer<Tx> {
 
   protected subscriptions() {
     const handlers: Record<string, EventHandler> = {};
-    for (const [type, project] of Object.entries(PROJECTIONS) as [EventType, (e: DomainEvent) => ReturnType<NonNullable<(typeof PROJECTIONS)['RFQPublished']>>][]) {
+    const types = new Set<EventType>([...(Object.keys(PROJECTIONS) as EventType[]), ...ACTIVITY_TYPES]);
+    for (const type of types) {
+      const project = PROJECTIONS[type as keyof typeof PROJECTIONS] as ((e: DomainEvent) => ReturnType<NonNullable<(typeof PROJECTIONS)['RFQPublished']>>) | undefined;
       handlers[type] = this.once(type, async (e, tx) => {
         const day = new Date(e.occurredAt.slice(0, 10));
-        for (const inc of project(e as unknown as DomainEvent)) {
+        for (const inc of project?.(e as unknown as DomainEvent) ?? []) {
           await tx.dailyMetric.upsert({
             where: { organizationId_day_metric_currency: { organizationId: inc.organizationId, day, metric: inc.metric, currency: inc.currency ?? '' } },
             update: { value: { increment: inc.amount } },
             create: { organizationId: inc.organizationId, day, metric: inc.metric, currency: inc.currency ?? '', value: inc.amount },
           });
         }
+        const activity = activityRows(e as EventEnvelope);
+        if (activity.length) await tx.activityEvent.createMany({ data: activity, skipDuplicates: true });
         const state = { lastEventOccurredAt: new Date((e as EventEnvelope).occurredAt), lastIndexedAt: new Date() };
         await tx.indexState.upsert({ where: { id: 'metrics' }, update: state, create: { id: 'metrics', ...state } });
       });
@@ -77,6 +83,7 @@ const range = (q: RangeDto) => {
 @ApiTags('analytics')
 @ApiBearerAuth()
 @ActsForOrganization()
+@RequiresModule('analytics')
 @Controller('analytics')
 export class AnalyticsController {
   constructor(private readonly prisma: PrismaService) {}

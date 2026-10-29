@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Injectable, Logger, type BeforeApplicationShutdown, type OnApplicationBootstrap, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
-import { type ActingOrganization, ActingOrg, ActsForOrganization, type AuthUser, CurrentUser, IsDecimalString, PaginationQueryDto } from '@uboce/common';
+import { type ActingOrganization, ActingOrg, ActsForOrganization, type AuthUser, CurrentUser, IsDecimalString, PaginationQueryDto, RequiresModule } from '@uboce/common';
 import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -206,6 +206,7 @@ const Id = (name: string) => Param(name, new ParseUUIDPipe());
 @ApiTags('agriculture')
 @ApiBearerAuth()
 @ActsForOrganization()
+@RequiresModule('agriculture')
 @Controller('agriculture')
 export class AgricultureController {
   constructor(private readonly agriculture: AgricultureService) {}

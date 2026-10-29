@@ -50,6 +50,9 @@ export const internalCallsEnvSchema = z.object({
   LOGISTICS_URL: z.string().optional(),
   WAREHOUSE_URL: z.string().optional(),
   COMMERCE_URL: z.string().optional(),
+  CATALOG_URL: z.string().optional(),
+  QUALITY_URL: z.string().optional(),
+  ANALYTICS_URL: z.string().optional(),
 });
 
 export type InternalCallsEnv = z.infer<typeof internalCallsEnvSchema>;
@@ -67,6 +70,9 @@ export const internalModuleOptions = (env: InternalCallsEnv) => ({
   logisticsUrl: env.LOGISTICS_URL,
   warehouseUrl: env.WAREHOUSE_URL,
   commerceUrl: env.COMMERCE_URL,
+  catalogUrl: env.CATALOG_URL,
+  qualityUrl: env.QUALITY_URL,
+  analyticsUrl: env.ANALYTICS_URL,
 });
 
 export const decodeBase64 = (value: string) => Buffer.from(value, 'base64').toString('utf8');

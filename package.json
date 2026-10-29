@@ -24,6 +24,8 @@
     "compose:generate": "node scripts/generate-compose.mjs",
     "smoke:operations": "node scripts/smoke-operations.mjs",
     "smoke:core": "node scripts/smoke-test.mjs",
+    "smoke:locations": "node scripts/smoke-locations.mjs",
+    "smoke:branch-ops": "node scripts/smoke-branch-ops.mjs",
     "seed": "node scripts/seed.mjs",
     "db:supabase": "node scripts/supabase-setup.mjs",
     "db:local": "node scripts/supabase-setup.mjs local",

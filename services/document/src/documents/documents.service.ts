@@ -208,6 +208,27 @@ export class DocumentsService {
     return { granted: true };
   }
 
+  /** Catalog marks a product image public once it is attached to a product. */
+  async internalPublish(service: string, documentId: string) {
+    const document = await this.prisma.document.findUnique({ where: { id: documentId } });
+    if (!document || document.status !== 'available') throw notFound('Document');
+    if (document.classification !== 'product_image' || !document.contentType.startsWith('image/')) {
+      throw conflict('not_an_image', 'Only uploaded product images can be published');
+    }
+    if (!document.isPublic) {
+      await this.prisma.document.update({ where: { id: documentId }, data: { isPublic: true } });
+      await this.prisma.documentAccessLog.create({ data: { documentId, action: 'grant', actorService: service } });
+    }
+    return { published: true, ownerOrganizationId: document.ownerOrganizationId };
+  }
+
+  /** A signed link to a public image; no sign-in, nothing logged per view. */
+  async publicUrl(documentId: string) {
+    const document = await this.prisma.document.findUnique({ where: { id: documentId } });
+    if (!document || !document.isPublic || document.status !== 'available') throw notFound('Image');
+    return this.storage.downloadUrl(document.storageKey, document.fileName, document.contentType);
+  }
+
   // ---- Access --------------------------------------------------------------------
 
   private async readable(caller: Caller, documentId: string) {

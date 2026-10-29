@@ -139,6 +139,11 @@ class PaymentNotificationDto {
 
   @IsDateString()
   occurredAt: string;
+
+  /** Provider fee, when the provider reports it. */
+  @IsOptional()
+  @IsDecimalString('12.50')
+  fee?: string | null;
 }
 
 const Id = () => Param('invoiceId', new ParseUUIDPipe());

@@ -55,6 +55,9 @@ export const ModelName = {
   UserPreference: 'UserPreference',
   Notification: 'Notification',
   DeliveryAttempt: 'DeliveryAttempt',
+  Conversation: 'Conversation',
+  ConversationParticipant: 'ConversationParticipant',
+  ChatMessage: 'ChatMessage',
   ProcessedEvent: 'ProcessedEvent'
 } as const
 
@@ -127,6 +130,45 @@ export const DeliveryAttemptScalarFieldEnum = {
 } as const
 
 export type DeliveryAttemptScalarFieldEnum = (typeof DeliveryAttemptScalarFieldEnum)[keyof typeof DeliveryAttemptScalarFieldEnum]
+
+
+export const ConversationScalarFieldEnum = {
+  id: 'id',
+  subject: 'subject',
+  contextType: 'contextType',
+  contextId: 'contextId',
+  createdByUserId: 'createdByUserId',
+  createdByOrganizationId: 'createdByOrganizationId',
+  lastMessageAt: 'lastMessageAt',
+  closedAt: 'closedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ConversationScalarFieldEnum = (typeof ConversationScalarFieldEnum)[keyof typeof ConversationScalarFieldEnum]
+
+
+export const ConversationParticipantScalarFieldEnum = {
+  conversationId: 'conversationId',
+  organizationId: 'organizationId',
+  lastReadAt: 'lastReadAt',
+  joinedAt: 'joinedAt'
+} as const
+
+export type ConversationParticipantScalarFieldEnum = (typeof ConversationParticipantScalarFieldEnum)[keyof typeof ConversationParticipantScalarFieldEnum]
+
+
+export const ChatMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  senderUserId: 'senderUserId',
+  senderOrganizationId: 'senderOrganizationId',
+  body: 'body',
+  attachmentDocumentIds: 'attachmentDocumentIds',
+  createdAt: 'createdAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
 
 
 export const ProcessedEventScalarFieldEnum = {

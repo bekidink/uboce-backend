@@ -14,28 +14,40 @@ datasource db {
 
 /// One row per published product. Removed when the product is archived.
 model ProductListing {
-  productId      String   @id @map("product_id") @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  name           String
-  description    String?
-  categoryId     String   @map("category_id") @db.Uuid
-  categorySlug   String   @map("category_slug")
-  unitOfMeasure  String   @map("unit_of_measure")
-  attributes     Json
-  variants       Json
+  productId        String                   @id @map("product_id") @db.Uuid
+  organizationId   String                   @map("organization_id") @db.Uuid
+  name             String
+  description      String?
+  categoryId       String                   @map("category_id") @db.Uuid
+  categorySlug     String                   @map("category_slug")
+  /// Slugs from the sector down to the category; a category filter matches anywhere on the path.
+  categoryPath     String[]                 @default([]) @map("category_path")
+  unitOfMeasure    String                   @map("unit_of_measure")
+  attributes       Json
+  variants         Json
   /// Lowest active variant price, for price filters and sorting.
-  minPrice       Decimal  @map("min_price") @db.Decimal(18, 4)
-  maxPrice       Decimal  @map("max_price") @db.Decimal(18, 4)
-  currency       String   @db.Char(3)
-  publishedAt    DateTime @map("published_at") @db.Timestamptz(3)
+  minPrice         Decimal                  @map("min_price") @db.Decimal(18, 4)
+  maxPrice         Decimal                  @map("max_price") @db.Decimal(18, 4)
+  currency         String                   @db.Char(3)
+  publishedAt      DateTime                 @map("published_at") @db.Timestamptz(3)
   /// occurredAt of the event that produced this row; older events are ignored (out-of-order safety).
-  sourceOccurredAt DateTime @map("source_occurred_at") @db.Timestamptz(3)
-  indexedAt      DateTime @default(now()) @updatedAt @map("indexed_at") @db.Timestamptz(3)
+  sourceOccurredAt DateTime                 @map("source_occurred_at") @db.Timestamptz(3)
+  indexedAt        DateTime                 @default(now()) @updatedAt @map("indexed_at") @db.Timestamptz(3)
   /// to_tsvector('simple', name, description, category), maintained by the indexer.
-  searchDocument Unsupported("tsvector")? @map("search_document")
+  searchDocument   Unsupported("tsvector")? @map("search_document")
+  /// Lower-cased name, category and attribute values, for typo-tolerant (trigram) matching.
+  searchText       String?                  @map("search_text")
+  /// Smallest minimum order across variants (null: no minimum).
+  minOrderQuantity Decimal?                 @map("min_order_quantity") @db.Decimal(18, 4)
+  imageDocumentId  String?                  @map("image_document_id") @db.Uuid
+  availableFrom    DateTime?                @map("available_from") @db.Timestamptz(3)
+  availableUntil   DateTime?                @map("available_until") @db.Timestamptz(3)
+  allowPreorder    Boolean                  @default(false) @map("allow_preorder")
+  madeToOrder      Boolean                  @default(false) @map("made_to_order")
 
   @@index([searchDocument], type: Gin)
   @@index([categorySlug])
+  @@index([categoryPath], type: Gin)
   @@index([organizationId])
   @@index([minPrice])
   @@map("product_listings")
@@ -49,6 +61,12 @@ model OrganizationProfile {
   countryCode        String   @map("country_code") @db.Char(2)
   status             String
   verificationStatus String   @map("verification_status")
+  /// From published business reviews (Quality).
+  ratingSum          Int      @default(0) @map("rating_sum")
+  ratingCount        Int      @default(0) @map("rating_count")
+  /// Where the organization delivers / lets buyers collect (Organization locations).
+  serviceAreas       String[] @default([]) @map("service_areas")
+  pickupCities       String[] @default([]) @map("pickup_cities")
   sourceOccurredAt   DateTime @map("source_occurred_at") @db.Timestamptz(3)
   indexedAt          DateTime @default(now()) @updatedAt @map("indexed_at") @db.Timestamptz(3)
 
@@ -56,6 +74,17 @@ model OrganizationProfile {
 }
 
 /// Index freshness (PRD 5.6): when we last applied an event, and how old it was.
+/// Running on-hand per product from the stock ledger's movements, for "in stock" filtering.
+model ProductStock {
+  organizationId String   @map("organization_id") @db.Uuid
+  itemId         String   @map("item_id") @db.Uuid
+  onHand         Decimal  @default(0) @map("on_hand") @db.Decimal(18, 4)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@id([organizationId, itemId])
+  @@map("product_stock")
+}
+
 model IndexState {
   id                  String   @id
   lastEventId         String   @map("last_event_id") @db.Uuid

@@ -50,8 +50,8 @@ model Inspection {
   createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
   completedAt         DateTime?        @map("completed_at") @db.Timestamptz(3)
 
-  lines            InspectionLine[]
-  nonconformances  Nonconformance[]
+  lines           InspectionLine[]
+  nonconformances Nonconformance[]
 
   /// One inspection per subject.
   @@unique([subjectType, subjectId])
@@ -93,6 +93,147 @@ model Nonconformance {
 }
 
 /// Transactional outbox (PRD 8.3).
+enum ClaimStatus {
+  open
+  accepted
+  rejected
+  escalated
+  resolved
+}
+
+enum ReviewStatus {
+  /// Held for moderation (e.g. contains links or contact details).
+  pending
+  published
+  hidden
+  rejected
+}
+
+/// What a product must meet (PRD addendum 2.5), e.g. moisture ≤ 11.5 %. Versions are kept.
+model QualitySpec {
+  id              String   @id @default(uuid()) @db.Uuid
+  organizationId  String   @map("organization_id") @db.Uuid
+  /// Catalog product (external reference).
+  productId       String   @map("product_id") @db.Uuid
+  version         Int
+  name            String
+  /// [{ name, target?, min?, max?, unit?, method? }]
+  parameters      Json
+  active          Boolean  @default(true)
+  createdByUserId String   @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([productId, version])
+  @@index([organizationId, active])
+  @@map("quality_specs")
+}
+
+/// Organic, HACCP, ISO 9001… with the certificate document and expiry.
+model Certification {
+  id                String    @id @default(uuid()) @db.Uuid
+  organizationId    String    @map("organization_id") @db.Uuid
+  /// Null: the whole organization (e.g. ISO 9001); otherwise one product.
+  productId         String?   @map("product_id") @db.Uuid
+  kind              String
+  certificateNumber String    @map("certificate_number")
+  issuer            String
+  issuedAt          DateTime  @map("issued_at") @db.Timestamptz(3)
+  expiresAt         DateTime? @map("expires_at") @db.Timestamptz(3)
+  documentId        String?   @map("document_id") @db.Uuid
+  revokedAt         DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([organizationId])
+  @@index([productId])
+  @@map("certifications")
+}
+
+/// A buyer's complaint about delivered goods (PRD addendum 2.5).
+model QualityClaim {
+  id                     String      @id @default(uuid()) @db.Uuid
+  number                 String      @unique
+  orderId                String      @map("order_id") @db.Uuid
+  orderLineId            String?     @map("order_line_id") @db.Uuid
+  orderNumber            String      @map("order_number")
+  buyerOrganizationId    String      @map("buyer_organization_id") @db.Uuid
+  supplierOrganizationId String      @map("supplier_organization_id") @db.Uuid
+  /// e.g. moisture, contamination, wrong_grade, damaged, short_weight, other
+  reason                 String
+  description            String
+  affectedQuantity       Decimal?    @map("affected_quantity") @db.Decimal(18, 4)
+  evidenceDocumentIds    String[]    @default([]) @map("evidence_document_ids") @db.Uuid
+  status                 ClaimStatus @default(open)
+  /// What the supplier offers: replacement, refund, credit, price_adjustment, none
+  resolution             String?
+  supplierResponse       String?     @map("supplier_response")
+  openedByUserId         String      @map("opened_by_user_id") @db.Uuid
+  respondedByUserId      String?     @map("responded_by_user_id") @db.Uuid
+  respondedAt            DateTime?   @map("responded_at") @db.Timestamptz(3)
+  resolvedAt             DateTime?   @map("resolved_at") @db.Timestamptz(3)
+  createdAt              DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([buyerOrganizationId, status])
+  @@index([supplierOrganizationId, status])
+  @@map("quality_claims")
+}
+
+/// Verified reviews: only a buyer with a delivered order can review that supplier or product.
+model Review {
+  id                     String       @id @default(uuid()) @db.Uuid
+  orderId                String       @map("order_id") @db.Uuid
+  reviewerOrganizationId String       @map("reviewer_organization_id") @db.Uuid
+  reviewerUserId         String       @map("reviewer_user_id") @db.Uuid
+  subjectOrganizationId  String       @map("subject_organization_id") @db.Uuid
+  productId              String?      @map("product_id") @db.Uuid
+  /// "business" or the product ID: one review per order per subject.
+  subjectKey             String       @map("subject_key")
+  rating                 Int
+  title                  String?
+  body                   String?
+  status                 ReviewStatus @default(published)
+  moderationNote         String?      @map("moderation_note")
+  moderatedByUserId      String?      @map("moderated_by_user_id") @db.Uuid
+  supplierReply          String?      @map("supplier_reply")
+  repliedAt              DateTime?    @map("replied_at") @db.Timestamptz(3)
+  createdAt              DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@unique([orderId, reviewerOrganizationId, subjectKey])
+  @@index([subjectOrganizationId, status])
+  @@index([productId, status])
+  @@map("reviews")
+}
+
+/// Monthly quality scorecard per supplier, frozen so history doesn't shift (PRD addendum 2.5).
+model ScorecardSnapshot {
+  id                String   @id @default(uuid()) @db.Uuid
+  organizationId    String   @map("organization_id") @db.Uuid
+  /// YYYY-MM
+  period            String
+  inspections       Int
+  inspectionsPassed Int      @map("inspections_passed")
+  nonconformances   Int
+  claimsOpened      Int      @map("claims_opened")
+  claimsAccepted    Int      @map("claims_accepted")
+  reviewCount       Int      @map("review_count")
+  averageRating     Decimal? @map("average_rating") @db.Decimal(3, 2)
+  /// 0–100, see formulaVersion.
+  score             Decimal  @db.Decimal(5, 2)
+  formulaVersion    Int      @map("formula_version")
+  computedAt        DateTime @default(now()) @map("computed_at") @db.Timestamptz(3)
+
+  @@unique([organizationId, period])
+  @@map("scorecard_snapshots")
+}
+
+model ClaimCounter {
+  key  String @id
+  last Int
+
+  @@map("claim_counters")
+}
+
 model OutboxEvent {
   id          String    @id @db.Uuid
   eventType   String    @map("event_type")

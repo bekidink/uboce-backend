@@ -54,6 +54,12 @@ export const ModelName = {
   Inspection: 'Inspection',
   InspectionLine: 'InspectionLine',
   Nonconformance: 'Nonconformance',
+  QualitySpec: 'QualitySpec',
+  Certification: 'Certification',
+  QualityClaim: 'QualityClaim',
+  Review: 'Review',
+  ScorecardSnapshot: 'ScorecardSnapshot',
+  ClaimCounter: 'ClaimCounter',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -119,6 +125,114 @@ export const NonconformanceScalarFieldEnum = {
 } as const
 
 export type NonconformanceScalarFieldEnum = (typeof NonconformanceScalarFieldEnum)[keyof typeof NonconformanceScalarFieldEnum]
+
+
+export const QualitySpecScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  productId: 'productId',
+  version: 'version',
+  name: 'name',
+  parameters: 'parameters',
+  active: 'active',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type QualitySpecScalarFieldEnum = (typeof QualitySpecScalarFieldEnum)[keyof typeof QualitySpecScalarFieldEnum]
+
+
+export const CertificationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  productId: 'productId',
+  kind: 'kind',
+  certificateNumber: 'certificateNumber',
+  issuer: 'issuer',
+  issuedAt: 'issuedAt',
+  expiresAt: 'expiresAt',
+  documentId: 'documentId',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CertificationScalarFieldEnum = (typeof CertificationScalarFieldEnum)[keyof typeof CertificationScalarFieldEnum]
+
+
+export const QualityClaimScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  orderId: 'orderId',
+  orderLineId: 'orderLineId',
+  orderNumber: 'orderNumber',
+  buyerOrganizationId: 'buyerOrganizationId',
+  supplierOrganizationId: 'supplierOrganizationId',
+  reason: 'reason',
+  description: 'description',
+  affectedQuantity: 'affectedQuantity',
+  evidenceDocumentIds: 'evidenceDocumentIds',
+  status: 'status',
+  resolution: 'resolution',
+  supplierResponse: 'supplierResponse',
+  openedByUserId: 'openedByUserId',
+  respondedByUserId: 'respondedByUserId',
+  respondedAt: 'respondedAt',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QualityClaimScalarFieldEnum = (typeof QualityClaimScalarFieldEnum)[keyof typeof QualityClaimScalarFieldEnum]
+
+
+export const ReviewScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  reviewerOrganizationId: 'reviewerOrganizationId',
+  reviewerUserId: 'reviewerUserId',
+  subjectOrganizationId: 'subjectOrganizationId',
+  productId: 'productId',
+  subjectKey: 'subjectKey',
+  rating: 'rating',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  moderationNote: 'moderationNote',
+  moderatedByUserId: 'moderatedByUserId',
+  supplierReply: 'supplierReply',
+  repliedAt: 'repliedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
+
+
+export const ScorecardSnapshotScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  period: 'period',
+  inspections: 'inspections',
+  inspectionsPassed: 'inspectionsPassed',
+  nonconformances: 'nonconformances',
+  claimsOpened: 'claimsOpened',
+  claimsAccepted: 'claimsAccepted',
+  reviewCount: 'reviewCount',
+  averageRating: 'averageRating',
+  score: 'score',
+  formulaVersion: 'formulaVersion',
+  computedAt: 'computedAt'
+} as const
+
+export type ScorecardSnapshotScalarFieldEnum = (typeof ScorecardSnapshotScalarFieldEnum)[keyof typeof ScorecardSnapshotScalarFieldEnum]
+
+
+export const ClaimCounterScalarFieldEnum = {
+  key: 'key',
+  last: 'last'
+} as const
+
+export type ClaimCounterScalarFieldEnum = (typeof ClaimCounterScalarFieldEnum)[keyof typeof ClaimCounterScalarFieldEnum]
 
 
 export const OutboxEventScalarFieldEnum = {

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { emitEvent, Internal, notFound } from '@uboce/common';
-import type { InternalMembership, InternalOrganization, InternalOrganizationMember } from '@uboce/contracts';
+import type { InternalBranch, InternalMembership, InternalOrganization, InternalOrganizationMember } from '@uboce/contracts';
 import { IsEnum } from 'class-validator';
 
 import { SERVICE_NAME } from '../config.js';
@@ -66,6 +66,25 @@ export class InternalController {
   }
 
   @Internal()
+  @Get('branches/:branchId')
+  async branch(
+    @Param('organizationId', new ParseUUIDPipe()) organizationId: string,
+    @Param('branchId', new ParseUUIDPipe()) branchId: string,
+  ): Promise<InternalBranch> {
+    const branch = await this.prisma.branch.findFirst({ where: { id: branchId, organizationId } });
+    if (!branch) throw notFound('Location');
+    return {
+      id: branch.id,
+      organizationId: branch.organizationId,
+      name: branch.name,
+      kind: branch.kind,
+      active: branch.active,
+      pickupEnabled: branch.pickupEnabled,
+      fulfillment: branch.fulfillment,
+    };
+  }
+
+  @Internal()
   @Get('members/:userId')
   async membership(
     @Param('organizationId', new ParseUUIDPipe()) organizationId: string,
@@ -73,13 +92,20 @@ export class InternalController {
   ): Promise<InternalMembership> {
     const membership = await this.prisma.membership.findUnique({
       where: { organizationId_userId: { organizationId, userId } },
-      include: { organization: true },
+      include: { organization: true, locations: { select: { branchId: true } }, roleTemplate: true },
     });
+    // Suspended members are treated like non-members by every other service.
     if (!membership || membership.status !== 'active') throw notFound('Membership');
     return {
       membershipId: membership.id,
       userId: membership.userId,
       role: membership.role,
+      locationIds: membership.locations.map((l) => l.branchId),
+      permissions: membership.roleTemplate?.permissions ?? null,
+      approvalLimit:
+        membership.roleTemplate?.approvalLimit && membership.roleTemplate.approvalCurrency
+          ? { amount: membership.roleTemplate.approvalLimit.toString(), currency: membership.roleTemplate.approvalCurrency }
+          : null,
       organization: toInternal(membership.organization),
     };
   }

@@ -1,6 +1,8 @@
 import type { EventEnvelope } from './envelope.js';
+import type * as Add from './events-addendum.js';
 import type * as Ops from './events-operations.js';
 
+export type * from './events-addendum.js';
 export type * from './events-operations.js';
 
 // Versioned event contracts. A breaking change to a payload means a new
@@ -52,6 +54,18 @@ export interface MembershipRevokedV1 {
   revokedByUserId: string;
 }
 
+/** Suspension, reactivation, role or location-scope change (PRD addendum 2.2). */
+export interface MembershipUpdatedV1 {
+  organizationId: string;
+  membershipId: string;
+  userId: string;
+  role: string;
+  status: string;
+  /** Empty: the whole organization. */
+  locationIds: string[];
+  changedByUserId: string;
+}
+
 // ---- Catalog ------------------------------------------------------------------
 
 export interface ProductVariantSnapshot {
@@ -61,6 +75,9 @@ export interface ProductVariantSnapshot {
   price: string;
   currency: string;
   attributes: Record<string, string>;
+  minOrderQuantity?: string | null;
+  /** Lowest tier price, for "from" prices in search. */
+  lowestTierPrice?: string | null;
 }
 
 export interface ProductPublishedV1 {
@@ -70,10 +87,18 @@ export interface ProductPublishedV1 {
   description: string | null;
   categoryId: string;
   categorySlug: string;
+  /** Category slugs from the sector down (e.g. ["agriculture", "coffee"]), for sector-wide search. */
+  categoryPath?: string[];
   unitOfMeasure: string;
   attributes: Record<string, string>;
   variants: ProductVariantSnapshot[];
   publishedAt: string;
+  imageDocumentId?: string | null;
+  /** Seasonal availability (PRD addendum 2.4). */
+  availableFrom?: string | null;
+  availableUntil?: string | null;
+  allowPreorder?: boolean;
+  madeToOrder?: boolean;
 }
 
 export interface ProductArchivedV1 {
@@ -152,6 +177,8 @@ export interface PurchaseOrderStatusChangedV1 {
   status: string;
   changedByUserId: string;
   reason: string | null;
+  /** Fee charged under the order's cancellation policy, if any. */
+  cancellationFee?: string | null;
 }
 
 /** Confirmation carries the lines so Inventory can reserve stock without calling back. */
@@ -165,6 +192,7 @@ export interface EventCatalog {
   OrganizationUpdated: OrganizationUpdatedV1;
   MembershipAdded: MembershipAddedV1;
   MembershipRevoked: MembershipRevokedV1;
+  MembershipUpdated: MembershipUpdatedV1;
   ProductPublished: ProductPublishedV1;
   ProductArchived: ProductArchivedV1;
   RFQPublished: RfqPublishedV1;
@@ -189,6 +217,17 @@ export interface EventCatalog {
   ReconciliationUpdated: Ops.ReconciliationUpdatedV1;
   DisputeOpened: Ops.DisputeOpenedV1;
   DisputeResolved: Ops.DisputeResolvedV1;
+  ReturnRequested: Add.ReturnRequestedV1;
+  ReturnStatusChanged: Add.ReturnStatusChangedV1;
+  OrderChargeAssessed: Add.OrderChargeAssessedV1;
+  RefundStatusChanged: Add.RefundStatusChangedV1;
+  ShipmentStatusChanged: Add.ShipmentStatusChangedV1;
+  ReviewPublished: Add.ReviewPublishedV1;
+  QualityClaimOpened: Add.QualityClaimOpenedV1;
+  ChatMessageSent: Add.ChatMessageSentV1;
+  EntitlementChanged: Add.EntitlementChangedV1;
+  OrganizationLocationsChanged: Add.OrganizationLocationsChangedV1;
+  ShipmentCarrierChanged: Add.ShipmentCarrierChangedV1;
 }
 
 export type EventType = keyof EventCatalog;
@@ -199,6 +238,7 @@ export const EVENT_SCHEMA_VERSIONS: Record<EventType, number> = {
   OrganizationUpdated: 1,
   MembershipAdded: 1,
   MembershipRevoked: 1,
+  MembershipUpdated: 1,
   ProductPublished: 1,
   ProductArchived: 1,
   RFQPublished: 1,
@@ -223,6 +263,17 @@ export const EVENT_SCHEMA_VERSIONS: Record<EventType, number> = {
   ReconciliationUpdated: 1,
   DisputeOpened: 1,
   DisputeResolved: 1,
+  ReturnRequested: 1,
+  ReturnStatusChanged: 1,
+  OrderChargeAssessed: 1,
+  RefundStatusChanged: 1,
+  ShipmentStatusChanged: 1,
+  ReviewPublished: 1,
+  QualityClaimOpened: 1,
+  ChatMessageSent: 1,
+  EntitlementChanged: 1,
+  OrganizationLocationsChanged: 1,
+  ShipmentCarrierChanged: 1,
 };
 
 export type DomainEvent<T extends EventType = EventType> = EventEnvelope<T, EventCatalog[T]>;

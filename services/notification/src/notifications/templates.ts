@@ -30,6 +30,23 @@ const VERIFICATION_TEXT: Record<Locale, Record<string, string>> = {
   },
 };
 
+const ORDER_TEXT: Record<Locale, Record<string, string>> = {
+  en: {
+    ready_for_pickup: 'Your order is ready to collect.',
+    uncollected: 'The order was not collected in time.',
+    delivery_failed: 'Delivery failed; the supplier will retry or contact you.',
+    fulfilled: 'The order is complete.',
+    exception: 'The order needs attention.',
+  },
+  am: {
+    ready_for_pickup: 'ትዕዛዝዎ ለመውሰድ ዝግጁ ነው።',
+    uncollected: 'ትዕዛዙ በጊዜው አልተወሰደም።',
+    delivery_failed: 'ማድረሱ አልተሳካም፤ አቅራቢው እንደገና ይሞክራል ወይም ያነጋግርዎታል።',
+    fulfilled: 'ትዕዛዙ ተጠናቋል።',
+    exception: 'ትዕዛዙ ትኩረት ይፈልጋል።',
+  },
+};
+
 // English + Amharic (PRD 10). Amharic copy needs review by a native speaker before launch.
 // Push previews show on lock screens, so pushes never carry identity or payment details (PRD 5.16).
 export const TEMPLATES = {
@@ -192,6 +209,95 @@ export const TEMPLATES = {
     text: {
       en: { title: () => 'Verification update', body: (v) => VERIFICATION_TEXT.en[v.decision ?? ''] ?? 'Your verification status changed.' },
       am: { title: () => 'የማረጋገጫ ዝማኔ', body: (v) => VERIFICATION_TEXT.am[v.decision ?? ''] ?? 'የማረጋገጫ ሁኔታዎ ተቀይሯል።' },
+    },
+  },
+  // ---- PRD addendum v1.1 ---------------------------------------------------------
+  chat_message: {
+    push: true,
+    route: (v) => `/messages/${v.conversationId}`,
+    text: {
+      en: { title: (v) => `${v.organizationName}: ${v.subject}`, body: (v) => v.preview || 'Sent an attachment.' },
+      am: { title: (v) => `${v.organizationName}፦ ${v.subject}`, body: (v) => v.preview || 'ፋይል ልኳል።' },
+    },
+  },
+  order_update: {
+    push: true,
+    route: (v) => `/${v.side === 'supplier' ? 'sales-orders' : 'purchase-orders'}/${v.orderId}`,
+    text: {
+      en: { title: (v) => `Order ${v.orderNumber}`, body: (v) => ORDER_TEXT.en[v.status ?? ''] ?? `The order is now ${v.status}.` },
+      am: { title: (v) => `ትዕዛዝ ${v.orderNumber}`, body: (v) => ORDER_TEXT.am[v.status ?? ''] ?? `ትዕዛዙ አሁን ${v.status} ነው።` },
+    },
+  },
+  shipment_update: {
+    push: true,
+    route: (v) => `/shipments/${v.shipmentId}`,
+    text: {
+      en: { title: () => 'Shipment update', body: (v) => (v.status === 'delayed' ? 'A shipment is delayed.' : v.status === 'failed' ? 'A delivery attempt failed.' : `A shipment is now ${v.status}.`) },
+      am: { title: () => 'የጭነት ዝማኔ', body: (v) => (v.status === 'delayed' ? 'ጭነት ዘግይቷል።' : v.status === 'failed' ? 'የማድረስ ሙከራ አልተሳካም።' : `ጭነቱ አሁን ${v.status} ነው።`) },
+    },
+  },
+  return_requested: {
+    push: true,
+    route: (v) => `/returns/${v.returnId}`,
+    text: {
+      en: { title: () => 'Return requested', body: (v) => `The buyer asked to return goods from order ${v.orderNumber}.` },
+      am: { title: () => 'የመመለስ ጥያቄ', body: (v) => `ገዢው ከትዕዛዝ ${v.orderNumber} እቃ ለመመለስ ጠይቋል።` },
+    },
+  },
+  return_update: {
+    push: true,
+    route: (v) => `/returns/${v.returnId}`,
+    text: {
+      en: { title: () => 'Return update', body: (v) => `Your return for order ${v.orderNumber} was ${v.status}.` },
+      am: { title: () => 'የመመለስ ዝማኔ', body: (v) => `ለትዕዛዝ ${v.orderNumber} ያቀረቡት የመመለስ ጥያቄ ${v.status} ሆኗል።` },
+    },
+  },
+  refund_update: {
+    push: true,
+    route: (v) => `/refunds/${v.refundId}`,
+    text: {
+      en: { title: () => 'Refund update', body: (v) => `A refund of ${v.amount} ${v.currency} is ${v.status}.` },
+      am: { title: () => 'የገንዘብ ተመላሽ ዝማኔ', body: (v) => `${v.amount} ${v.currency} ተመላሽ ${v.status} ነው።` },
+    },
+  },
+  fee_charged: {
+    push: true,
+    route: (v) => `/purchase-orders/${v.orderId}`,
+    text: {
+      en: { title: () => 'Fee charged', body: (v) => `A ${v.kind} of ${v.amount} ${v.currency} applies to order ${v.orderNumber} under the supplier's policy.` },
+      am: { title: () => 'ክፍያ ተጥሏል', body: (v) => `በአቅራቢው መመሪያ መሠረት ለትዕዛዝ ${v.orderNumber} ${v.amount} ${v.currency} ክፍያ ተጥሏል።` },
+    },
+  },
+  claim_opened: {
+    push: true,
+    route: (v) => `/quality/claims/${v.claimId}`,
+    text: {
+      en: { title: () => 'Quality claim', body: (v) => `A buyer opened a quality claim (${v.reason}). Please respond.` },
+      am: { title: () => 'የጥራት ቅሬታ', body: (v) => `ገዢ የጥራት ቅሬታ (${v.reason}) አቅርቧል። እባክዎ ምላሽ ይስጡ።` },
+    },
+  },
+  carrier_request: {
+    push: true,
+    route: (v) => `/shipments/${v.shipmentId}`,
+    text: {
+      en: { title: () => 'Shipment to carry', body: (v) => `${v.organizationName} asked you to carry shipment ${v.orderNumber}. Accept or decline.` },
+      am: { title: () => 'የሚጓጓዝ ጭነት', body: (v) => `${v.organizationName} ጭነት ${v.orderNumber} እንዲያጓጉዙ ጠይቋል። ይቀበሉ ወይም አይቀበሉ።` },
+    },
+  },
+  carrier_answer: {
+    push: true,
+    route: (v) => `/shipments/${v.shipmentId}`,
+    text: {
+      en: { title: () => 'Carrier answered', body: (v) => `The logistics provider ${v.status} shipment ${v.orderNumber}.${v.note ? ` "${v.note}"` : ''}` },
+      am: { title: () => 'አጓጓዡ ምላሽ ሰጥቷል', body: (v) => `አጓጓዡ ጭነት ${v.orderNumber} ${v.status === 'accepted' ? 'ተቀብሏል' : 'አልተቀበለም'}።` },
+    },
+  },
+  review_published: {
+    push: false,
+    route: () => '/reviews',
+    text: {
+      en: { title: () => 'New review', body: (v) => `A buyer rated you ${v.rating}/5.` },
+      am: { title: () => 'አዲስ ግምገማ', body: (v) => `ገዢ ${v.rating}/5 ሰጥቶዎታል።` },
     },
   },
 } satisfies Record<string, Template>;

@@ -400,6 +400,8 @@ export const ModelName = {
   PlatformRoleGrant: 'PlatformRoleGrant',
   Setting: 'Setting',
   FeatureFlag: 'FeatureFlag',
+  Entitlement: 'Entitlement',
+  BusinessTypeModule: 'BusinessTypeModule',
   AuditEntry: 'AuditEntry',
   OutboxEvent: 'OutboxEvent'
 } as const
@@ -417,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "platformRoleGrant" | "setting" | "featureFlag" | "auditEntry" | "outboxEvent"
+    modelProps: "platformRoleGrant" | "setting" | "featureFlag" | "entitlement" | "businessTypeModule" | "auditEntry" | "outboxEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -640,6 +642,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.FeatureFlagCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.FeatureFlagCountAggregateOutputType> | number
+        }
+      }
+    }
+    Entitlement: {
+      payload: Prisma.$EntitlementPayload<ExtArgs>
+      fields: Prisma.EntitlementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EntitlementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EntitlementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>
+        }
+        findFirst: {
+          args: Prisma.EntitlementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EntitlementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>
+        }
+        findMany: {
+          args: Prisma.EntitlementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>[]
+        }
+        create: {
+          args: Prisma.EntitlementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>
+        }
+        createMany: {
+          args: Prisma.EntitlementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EntitlementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>[]
+        }
+        delete: {
+          args: Prisma.EntitlementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>
+        }
+        update: {
+          args: Prisma.EntitlementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>
+        }
+        deleteMany: {
+          args: Prisma.EntitlementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EntitlementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EntitlementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>[]
+        }
+        upsert: {
+          args: Prisma.EntitlementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntitlementPayload>
+        }
+        aggregate: {
+          args: Prisma.EntitlementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEntitlement>
+        }
+        groupBy: {
+          args: Prisma.EntitlementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EntitlementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EntitlementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EntitlementCountAggregateOutputType> | number
+        }
+      }
+    }
+    BusinessTypeModule: {
+      payload: Prisma.$BusinessTypeModulePayload<ExtArgs>
+      fields: Prisma.BusinessTypeModuleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BusinessTypeModuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BusinessTypeModuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>
+        }
+        findFirst: {
+          args: Prisma.BusinessTypeModuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BusinessTypeModuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>
+        }
+        findMany: {
+          args: Prisma.BusinessTypeModuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>[]
+        }
+        create: {
+          args: Prisma.BusinessTypeModuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>
+        }
+        createMany: {
+          args: Prisma.BusinessTypeModuleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BusinessTypeModuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>[]
+        }
+        delete: {
+          args: Prisma.BusinessTypeModuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>
+        }
+        update: {
+          args: Prisma.BusinessTypeModuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>
+        }
+        deleteMany: {
+          args: Prisma.BusinessTypeModuleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BusinessTypeModuleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BusinessTypeModuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>[]
+        }
+        upsert: {
+          args: Prisma.BusinessTypeModuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BusinessTypeModulePayload>
+        }
+        aggregate: {
+          args: Prisma.BusinessTypeModuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBusinessTypeModule>
+        }
+        groupBy: {
+          args: Prisma.BusinessTypeModuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BusinessTypeModuleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BusinessTypeModuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BusinessTypeModuleCountAggregateOutputType> | number
         }
       }
     }
@@ -866,6 +1016,30 @@ export const FeatureFlagScalarFieldEnum = {
 } as const
 
 export type FeatureFlagScalarFieldEnum = (typeof FeatureFlagScalarFieldEnum)[keyof typeof FeatureFlagScalarFieldEnum]
+
+
+export const EntitlementScalarFieldEnum = {
+  organizationId: 'organizationId',
+  moduleKey: 'moduleKey',
+  enabled: 'enabled',
+  validUntil: 'validUntil',
+  note: 'note',
+  updatedByUserId: 'updatedByUserId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EntitlementScalarFieldEnum = (typeof EntitlementScalarFieldEnum)[keyof typeof EntitlementScalarFieldEnum]
+
+
+export const BusinessTypeModuleScalarFieldEnum = {
+  organizationType: 'organizationType',
+  moduleKey: 'moduleKey',
+  enabled: 'enabled',
+  updatedByUserId: 'updatedByUserId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BusinessTypeModuleScalarFieldEnum = (typeof BusinessTypeModuleScalarFieldEnum)[keyof typeof BusinessTypeModuleScalarFieldEnum]
 
 
 export const AuditEntryScalarFieldEnum = {
@@ -1194,6 +1368,8 @@ export type GlobalOmitConfig = {
   platformRoleGrant?: Prisma.PlatformRoleGrantOmit
   setting?: Prisma.SettingOmit
   featureFlag?: Prisma.FeatureFlagOmit
+  entitlement?: Prisma.EntitlementOmit
+  businessTypeModule?: Prisma.BusinessTypeModuleOmit
   auditEntry?: Prisma.AuditEntryOmit
   outboxEvent?: Prisma.OutboxEventOmit
 }

@@ -9,6 +9,8 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/DailyMetric.js'
+export type * from './models/ActivityEvent.js'
+export type * from './models/ReportTemplate.js'
 export type * from './models/IndexState.js'
 export type * from './models/OutboxEvent.js'
 export type * from './models/ProcessedEvent.js'

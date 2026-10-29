@@ -4,6 +4,8 @@ import { coreModules } from '@uboce/common';
 import { EMAIL_PROVIDER, LogEmailProvider, SmtpEmailProvider } from './channels/email.provider.js';
 import { LogSmsProvider, SMS_PROVIDER } from './channels/sms.provider.js';
 import { env, SERVICE_NAME } from './config.js';
+import { ChatController } from './chat/chat.controller.js';
+import { ChatService } from './chat/chat.service.js';
 import { NotificationEventHandlers } from './notifications/event-handlers.js';
 import { InternalMessagesController } from './notifications/internal.controller.js';
 import { NotificationsController } from './notifications/notifications.controller.js';
@@ -17,9 +19,10 @@ const logger = new Logger('Channels');
 
 @Module({
   imports: coreModules({ serviceName: SERVICE_NAME, env, prismaService: PrismaService, prismaModule: PrismaModule }),
-  controllers: [NotificationsController, InternalMessagesController],
+  controllers: [NotificationsController, InternalMessagesController, ChatController],
   providers: [
     NotificationsService,
+    ChatService,
     NotificationEventHandlers,
     PushRetryJob,
     {

@@ -57,6 +57,7 @@ model Invoice {
   lines       InvoiceLine[]
   payments    PaymentReference[]
   creditNotes CreditNote[]
+  intents     PaymentIntent[]
 
   @@index([sellerOrganizationId, status])
   @@index([buyerOrganizationId, status])
@@ -137,6 +138,105 @@ model CreditNote {
   invoice Invoice @relation(fields: [invoiceId], references: [id])
 
   @@map("credit_notes")
+}
+
+enum IntentStatus {
+  pending
+  succeeded
+  failed
+  cancelled
+}
+
+enum RefundStatus {
+  requested
+  approved
+  processing
+  succeeded
+  failed
+  rejected
+}
+
+enum SettlementStatus {
+  pending
+  paid
+}
+
+/// One attempt to collect an invoice through a payment provider (PRD addendum 2.7).
+model PaymentIntent {
+  id              String       @id @default(uuid()) @db.Uuid
+  invoiceId       String       @map("invoice_id") @db.Uuid
+  provider        String
+  /// The provider's transaction reference; their callbacks quote it.
+  providerRef     String       @map("provider_ref")
+  amount          Decimal      @db.Decimal(18, 4)
+  currency        String       @db.Char(3)
+  status          IntentStatus @default(pending)
+  checkoutUrl     String?      @map("checkout_url")
+  /// Provider fee, known once the payment succeeds.
+  fee             Decimal?     @db.Decimal(18, 4)
+  failureReason   String?      @map("failure_reason")
+  createdByUserId String       @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@unique([provider, providerRef])
+  @@index([invoiceId, createdAt])
+  @@map("payment_intents")
+}
+
+/// Money going back to a buyer: after a return, an overpayment or a goodwill gesture.
+model Refund {
+  id                   String       @id @default(uuid()) @db.Uuid
+  number               String       @unique
+  sellerOrganizationId String       @map("seller_organization_id") @db.Uuid
+  buyerOrganizationId  String       @map("buyer_organization_id") @db.Uuid
+  invoiceId            String?      @map("invoice_id") @db.Uuid
+  orderId              String?      @map("order_id") @db.Uuid
+  /// The Commerce return it settles; one refund per return.
+  returnId             String?      @unique @map("return_id") @db.Uuid
+  amount               Decimal      @db.Decimal(18, 4)
+  currency             String       @db.Char(3)
+  reason               String
+  status               RefundStatus @default(requested)
+  /// provider (back through the original payment) or manual (e.g. bank transfer by the seller).
+  method               String?
+  provider             String?
+  providerRef          String?      @map("provider_ref")
+  failureReason        String?      @map("failure_reason")
+  requestedByUserId    String?      @map("requested_by_user_id") @db.Uuid
+  approvedByUserId     String?      @map("approved_by_user_id") @db.Uuid
+  createdAt            DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([sellerOrganizationId, status])
+  @@index([buyerOrganizationId, status])
+  @@map("refunds")
+}
+
+/// A provider payout to a seller for a period: what came in, fees, refunds and the net (PRD addendum 2.7).
+model Settlement {
+  id                   String           @id @default(uuid()) @db.Uuid
+  sellerOrganizationId String           @map("seller_organization_id") @db.Uuid
+  provider             String
+  currency             String           @db.Char(3)
+  periodStart          DateTime         @map("period_start") @db.Timestamptz(3)
+  periodEnd            DateTime         @map("period_end") @db.Timestamptz(3)
+  paymentCount         Int              @map("payment_count")
+  grossAmount          Decimal          @map("gross_amount") @db.Decimal(18, 4)
+  feeTotal             Decimal          @map("fee_total") @db.Decimal(18, 4)
+  refundTotal          Decimal          @map("refund_total") @db.Decimal(18, 4)
+  netAmount            Decimal          @map("net_amount") @db.Decimal(18, 4)
+  status               SettlementStatus @default(pending)
+  /// The provider's payout reference once the money arrived.
+  payoutRef            String?          @map("payout_ref")
+  paidAt               DateTime?        @map("paid_at") @db.Timestamptz(3)
+  createdByUserId      String           @map("created_by_user_id") @db.Uuid
+  createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([sellerOrganizationId, provider, currency, periodStart, periodEnd])
+  @@map("settlements")
 }
 
 model DocumentCounter {

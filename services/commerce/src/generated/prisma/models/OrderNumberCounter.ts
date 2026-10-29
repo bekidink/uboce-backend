@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model OrderNumberCounter
- * Per-year counter behind order numbers.
+ * 
  */
 export type OrderNumberCounterModel = runtime.Types.Result.DefaultSelection<Prisma.$OrderNumberCounterPayload>
 

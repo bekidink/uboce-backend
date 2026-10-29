@@ -155,9 +155,11 @@ async function seed() {
   const categories = await ok('categories', call('GET', '/catalog/categories'));
   const cat = (slug) => categories.find((c) => c.slug === slug).id;
   const sku = (prefix) => `${prefix}-${randomUUID().slice(0, 6).toUpperCase()}`;
+  const variantsOf = {};
   const publish = async (user, orgId, body) => {
     const p = await ok(`product ${body.name}`, call('POST', '/catalog/products', { token: user.token, org: orgId, body }));
     await ok('publish', call('POST', `/catalog/products/${p.id}/publish`, { token: user.token, org: orgId }));
+    variantsOf[p.id] = p.variants;
     return p.id;
   };
   const sidamaG1 = await publish(selam, sidama, {
@@ -165,7 +167,7 @@ async function seed() {
     description: 'Bensa and Aroresa smallholders, 1,900–2,300 m. Floral, citrus, black tea.',
     categoryId: cat('coffee'),
     unitOfMeasure: 'kg',
-    attributes: { origin: 'Sidama', grade: '1', process: 'washed', altitude_m: '1900-2300', crop_year: '2026' },
+    attributes: { origin: 'Sidama', grade: '1', process: 'washed', altitude_m: '2100', crop_year: '2026' },
     variants: [
       { sku: sku('SID-G1-60'), name: '60 kg jute bag (per kg)', price: '465.00', currency: 'ETB', minOrderQuantity: '600' },
       { sku: sku('SID-G1-S'), name: 'Sample', price: '520.00', currency: 'ETB' },
@@ -191,7 +193,7 @@ async function seed() {
     description: 'Stone-milled Magna teff, 25 kg bags.',
     categoryId: cat('teff'),
     unitOfMeasure: 'kg',
-    attributes: { variety: 'Magna (white)' },
+    attributes: { variety: 'white', cultivar: 'Magna' },
     variants: [{ sku: sku('TEF-W25'), name: '25 kg bag (per kg)', price: '145.00', currency: 'ETB', minOrderQuantity: '250' }],
   });
   await publish(meron, agro, {
@@ -216,6 +218,35 @@ async function seed() {
     attributes: {},
     variants: [{ sku: sku('PKG-1KG'), name: 'Per bag', price: '18.50', currency: 'ETB' }],
   });
+
+  // ---- PRD addendum: bulk tiers, a policy, a promotion, a location --------------------------
+  section('Addendum: price tiers, cancellation policy, promotion, pickup location');
+  await ok('price tiers', call('PUT', `/catalog/products/${sidamaG1}/variants/${variantsOf[sidamaG1][0].id}/price-tiers`, {
+    token: selam.token,
+    org: sidama,
+    body: { tiers: [{ minQuantity: '1200', unitPrice: '455.00' }, { minQuantity: '6000', unitPrice: '440.00' }] },
+  }));
+  await ok('cancellation policy', call('POST', '/cancellation-policies', {
+    token: meron.token,
+    org: agro,
+    body: { name: 'Standard terms', freeCancellationHours: 24, cancellationFeePct: '10', noShowFeePct: '5', returnWindowDays: 7, restockingFeePct: '10', pickupHoldHours: 72 },
+  }));
+  await ok('promotion', call('POST', '/promotions', {
+    token: meron.token,
+    org: agro,
+    body: { name: 'Harvest 5% off', code: 'HARVEST5', kind: 'percent', value: '5', currency: 'ETB', minSubtotal: '10000' },
+  }));
+  await ok('pickup location', call('POST', `/organizations/${agro}/branches`, {
+    token: meron.token,
+    body: {
+      name: 'Merkato pickup point',
+      kind: 'collection_point',
+      city: 'Addis Ababa',
+      pickupEnabled: true,
+      serviceAreas: ['Addis Ababa', 'Adama'],
+      operatingHours: [1, 2, 3, 4, 5].map((day) => ({ day, opens: '08:00', closes: '18:00' })).concat([{ day: 6, opens: '09:00', closes: '13:00' }]),
+    },
+  }));
 
   // ---- Warehouse, Inventory, Quality --------------------------------------------------------
 
@@ -367,14 +398,14 @@ async function seed() {
     token: hana.token,
     org: roasters,
     headers: { 'idempotency-key': `seed-teff-${randomUUID()}` },
-    body: { supplierOrganizationId: agro, currency: 'ETB', title: 'Teff flour for staff canteen', deliveryLocation: 'Bole roastery', lines: [{ productId: teffFlour, description: 'White teff flour', quantity: '500', unitOfMeasure: 'kg', unitPrice: '145.00' }] },
+    body: { supplierOrganizationId: agro, currency: 'ETB', title: 'Teff flour for staff canteen', deliveryLocation: 'Bole roastery', lines: [{ variantId: variantsOf[teffFlour][0].id, quantity: '500' }] },
   }));
   await ok('confirm', call('POST', `/sales-orders/${teffOrder.id}/confirm`, { token: meron.token, org: agro }));
   await ok('pending order', call('POST', '/purchase-orders', {
     token: hana.token,
     org: roasters,
     headers: { 'idempotency-key': `seed-roast-${randomUUID()}` },
-    body: { supplierOrganizationId: agro, currency: 'ETB', title: 'Roasted coffee for café', lines: [{ productId: roastedCoffee, description: 'Medium roast', quantity: '120', unitOfMeasure: 'kg', unitPrice: '980.00' }] },
+    body: { supplierOrganizationId: agro, currency: 'ETB', title: 'Roasted coffee for café', lines: [{ variantId: variantsOf[roastedCoffee][0].id, quantity: '120' }] },
   }));
 
   // ---- Logistics + Integration (carrier) -----------------------------------------------------

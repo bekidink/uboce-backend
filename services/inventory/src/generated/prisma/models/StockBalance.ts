@@ -29,11 +29,15 @@ export type AggregateStockBalance = {
 export type StockBalanceAvgAggregateOutputType = {
   onHand: runtime.Decimal | null
   reserved: runtime.Decimal | null
+  damaged: runtime.Decimal | null
+  quarantined: runtime.Decimal | null
 }
 
 export type StockBalanceSumAggregateOutputType = {
   onHand: runtime.Decimal | null
   reserved: runtime.Decimal | null
+  damaged: runtime.Decimal | null
+  quarantined: runtime.Decimal | null
 }
 
 export type StockBalanceMinAggregateOutputType = {
@@ -42,6 +46,8 @@ export type StockBalanceMinAggregateOutputType = {
   itemId: string | null
   onHand: runtime.Decimal | null
   reserved: runtime.Decimal | null
+  damaged: runtime.Decimal | null
+  quarantined: runtime.Decimal | null
   updatedAt: Date | null
 }
 
@@ -51,6 +57,8 @@ export type StockBalanceMaxAggregateOutputType = {
   itemId: string | null
   onHand: runtime.Decimal | null
   reserved: runtime.Decimal | null
+  damaged: runtime.Decimal | null
+  quarantined: runtime.Decimal | null
   updatedAt: Date | null
 }
 
@@ -60,6 +68,8 @@ export type StockBalanceCountAggregateOutputType = {
   itemId: number
   onHand: number
   reserved: number
+  damaged: number
+  quarantined: number
   updatedAt: number
   _all: number
 }
@@ -68,11 +78,15 @@ export type StockBalanceCountAggregateOutputType = {
 export type StockBalanceAvgAggregateInputType = {
   onHand?: true
   reserved?: true
+  damaged?: true
+  quarantined?: true
 }
 
 export type StockBalanceSumAggregateInputType = {
   onHand?: true
   reserved?: true
+  damaged?: true
+  quarantined?: true
 }
 
 export type StockBalanceMinAggregateInputType = {
@@ -81,6 +95,8 @@ export type StockBalanceMinAggregateInputType = {
   itemId?: true
   onHand?: true
   reserved?: true
+  damaged?: true
+  quarantined?: true
   updatedAt?: true
 }
 
@@ -90,6 +106,8 @@ export type StockBalanceMaxAggregateInputType = {
   itemId?: true
   onHand?: true
   reserved?: true
+  damaged?: true
+  quarantined?: true
   updatedAt?: true
 }
 
@@ -99,6 +117,8 @@ export type StockBalanceCountAggregateInputType = {
   itemId?: true
   onHand?: true
   reserved?: true
+  damaged?: true
+  quarantined?: true
   updatedAt?: true
   _all?: true
 }
@@ -195,6 +215,8 @@ export type StockBalanceGroupByOutputType = {
   itemId: string
   onHand: runtime.Decimal
   reserved: runtime.Decimal
+  damaged: runtime.Decimal
+  quarantined: runtime.Decimal
   updatedAt: Date
   _count: StockBalanceCountAggregateOutputType | null
   _avg: StockBalanceAvgAggregateOutputType | null
@@ -227,6 +249,8 @@ export type StockBalanceWhereInput = {
   itemId?: Prisma.UuidFilter<"StockBalance"> | string
   onHand?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFilter<"StockBalance"> | Date | string
 }
 
@@ -236,6 +260,8 @@ export type StockBalanceOrderByWithRelationInput = {
   itemId?: Prisma.SortOrder
   onHand?: Prisma.SortOrder
   reserved?: Prisma.SortOrder
+  damaged?: Prisma.SortOrder
+  quarantined?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -249,6 +275,8 @@ export type StockBalanceWhereUniqueInput = Prisma.AtLeast<{
   itemId?: Prisma.UuidFilter<"StockBalance"> | string
   onHand?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: Prisma.DecimalFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFilter<"StockBalance"> | Date | string
 }, "organizationId_warehouseId_itemId">
 
@@ -258,6 +286,8 @@ export type StockBalanceOrderByWithAggregationInput = {
   itemId?: Prisma.SortOrder
   onHand?: Prisma.SortOrder
   reserved?: Prisma.SortOrder
+  damaged?: Prisma.SortOrder
+  quarantined?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.StockBalanceCountOrderByAggregateInput
   _avg?: Prisma.StockBalanceAvgOrderByAggregateInput
@@ -275,6 +305,8 @@ export type StockBalanceScalarWhereWithAggregatesInput = {
   itemId?: Prisma.UuidWithAggregatesFilter<"StockBalance"> | string
   onHand?: Prisma.DecimalWithAggregatesFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: Prisma.DecimalWithAggregatesFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: Prisma.DecimalWithAggregatesFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: Prisma.DecimalWithAggregatesFilter<"StockBalance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"StockBalance"> | Date | string
 }
 
@@ -284,6 +316,8 @@ export type StockBalanceCreateInput = {
   itemId: string
   onHand?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
 }
 
@@ -293,6 +327,8 @@ export type StockBalanceUncheckedCreateInput = {
   itemId: string
   onHand?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
 }
 
@@ -302,6 +338,8 @@ export type StockBalanceUpdateInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   onHand?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -311,6 +349,8 @@ export type StockBalanceUncheckedUpdateInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   onHand?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -320,6 +360,8 @@ export type StockBalanceCreateManyInput = {
   itemId: string
   onHand?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
 }
 
@@ -329,6 +371,8 @@ export type StockBalanceUpdateManyMutationInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   onHand?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -338,6 +382,8 @@ export type StockBalanceUncheckedUpdateManyInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   onHand?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reserved?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  damaged?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quarantined?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -353,12 +399,16 @@ export type StockBalanceCountOrderByAggregateInput = {
   itemId?: Prisma.SortOrder
   onHand?: Prisma.SortOrder
   reserved?: Prisma.SortOrder
+  damaged?: Prisma.SortOrder
+  quarantined?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type StockBalanceAvgOrderByAggregateInput = {
   onHand?: Prisma.SortOrder
   reserved?: Prisma.SortOrder
+  damaged?: Prisma.SortOrder
+  quarantined?: Prisma.SortOrder
 }
 
 export type StockBalanceMaxOrderByAggregateInput = {
@@ -367,6 +417,8 @@ export type StockBalanceMaxOrderByAggregateInput = {
   itemId?: Prisma.SortOrder
   onHand?: Prisma.SortOrder
   reserved?: Prisma.SortOrder
+  damaged?: Prisma.SortOrder
+  quarantined?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -376,12 +428,16 @@ export type StockBalanceMinOrderByAggregateInput = {
   itemId?: Prisma.SortOrder
   onHand?: Prisma.SortOrder
   reserved?: Prisma.SortOrder
+  damaged?: Prisma.SortOrder
+  quarantined?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type StockBalanceSumOrderByAggregateInput = {
   onHand?: Prisma.SortOrder
   reserved?: Prisma.SortOrder
+  damaged?: Prisma.SortOrder
+  quarantined?: Prisma.SortOrder
 }
 
 
@@ -392,6 +448,8 @@ export type StockBalanceSelect<ExtArgs extends runtime.Types.Extensions.Internal
   itemId?: boolean
   onHand?: boolean
   reserved?: boolean
+  damaged?: boolean
+  quarantined?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["stockBalance"]>
 
@@ -401,6 +459,8 @@ export type StockBalanceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   itemId?: boolean
   onHand?: boolean
   reserved?: boolean
+  damaged?: boolean
+  quarantined?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["stockBalance"]>
 
@@ -410,6 +470,8 @@ export type StockBalanceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   itemId?: boolean
   onHand?: boolean
   reserved?: boolean
+  damaged?: boolean
+  quarantined?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["stockBalance"]>
 
@@ -419,10 +481,12 @@ export type StockBalanceSelectScalar = {
   itemId?: boolean
   onHand?: boolean
   reserved?: boolean
+  damaged?: boolean
+  quarantined?: boolean
   updatedAt?: boolean
 }
 
-export type StockBalanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"organizationId" | "warehouseId" | "itemId" | "onHand" | "reserved" | "updatedAt", ExtArgs["result"]["stockBalance"]>
+export type StockBalanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"organizationId" | "warehouseId" | "itemId" | "onHand" | "reserved" | "damaged" | "quarantined" | "updatedAt", ExtArgs["result"]["stockBalance"]>
 
 export type $StockBalancePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StockBalance"
@@ -433,6 +497,14 @@ export type $StockBalancePayload<ExtArgs extends runtime.Types.Extensions.Intern
     itemId: string
     onHand: runtime.Decimal
     reserved: runtime.Decimal
+    /**
+     * Part of onHand that is damaged (not sellable until written off or repaired). PRD addendum 2.1.
+     */
+    damaged: runtime.Decimal
+    /**
+     * Part of onHand held for quality (inspection hold, recall).
+     */
+    quarantined: runtime.Decimal
     updatedAt: Date
   }, ExtArgs["result"]["stockBalance"]>
   composites: {}
@@ -862,6 +934,8 @@ export interface StockBalanceFieldRefs {
   readonly itemId: Prisma.FieldRef<"StockBalance", 'String'>
   readonly onHand: Prisma.FieldRef<"StockBalance", 'Decimal'>
   readonly reserved: Prisma.FieldRef<"StockBalance", 'Decimal'>
+  readonly damaged: Prisma.FieldRef<"StockBalance", 'Decimal'>
+  readonly quarantined: Prisma.FieldRef<"StockBalance", 'Decimal'>
   readonly updatedAt: Prisma.FieldRef<"StockBalance", 'DateTime'>
 }
     

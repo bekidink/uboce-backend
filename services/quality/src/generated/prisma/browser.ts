@@ -33,8 +33,38 @@ export type InspectionLine = Prisma.InspectionLineModel
  */
 export type Nonconformance = Prisma.NonconformanceModel
 /**
+ * Model QualitySpec
+ * What a product must meet (PRD addendum 2.5), e.g. moisture ≤ 11.5 %. Versions are kept.
+ */
+export type QualitySpec = Prisma.QualitySpecModel
+/**
+ * Model Certification
+ * Organic, HACCP, ISO 9001… with the certificate document and expiry.
+ */
+export type Certification = Prisma.CertificationModel
+/**
+ * Model QualityClaim
+ * A buyer's complaint about delivered goods (PRD addendum 2.5).
+ */
+export type QualityClaim = Prisma.QualityClaimModel
+/**
+ * Model Review
+ * Verified reviews: only a buyer with a delivered order can review that supplier or product.
+ */
+export type Review = Prisma.ReviewModel
+/**
+ * Model ScorecardSnapshot
+ * Monthly quality scorecard per supplier, frozen so history doesn't shift (PRD addendum 2.5).
+ */
+export type ScorecardSnapshot = Prisma.ScorecardSnapshotModel
+/**
+ * Model ClaimCounter
+ * 
+ */
+export type ClaimCounter = Prisma.ClaimCounterModel
+/**
  * Model OutboxEvent
- * Transactional outbox (PRD 8.3).
+ * 
  */
 export type OutboxEvent = Prisma.OutboxEventModel
 /**

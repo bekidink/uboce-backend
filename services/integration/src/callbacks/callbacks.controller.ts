@@ -24,8 +24,9 @@ export class CallbacksController {
     @Headers('x-uboce-timestamp') timestamp: string | undefined,
     @Headers('x-uboce-signature') signature: string | undefined,
     @Req() req: RawBodyRequest<Request>,
+    @Headers('x-chapa-signature') chapaSignature?: string,
   ) {
-    return this.callbacks.handle(provider, { timestamp, signature }, req.rawBody);
+    return this.callbacks.handle(provider, { timestamp, signature, chapaSignature }, req.rawBody);
   }
 
   @ApiBearerAuth()

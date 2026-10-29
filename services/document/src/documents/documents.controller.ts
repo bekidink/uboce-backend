@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Headers, HttpCode, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, HttpCode, Param, ParseUUIDPipe, Post, Query, Req, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiHeader, ApiProperty, ApiTags } from '@nestjs/swagger';
-import { type AuthUser, CallingService, CurrentUser, Internal, PaginationQueryDto, type ServiceCaller } from '@uboce/common';
+import { type AuthUser, CallingService, CurrentUser, Internal, PaginationQueryDto, Public, type ServiceCaller } from '@uboce/common';
 import { IsEnum, IsIn, IsInt, IsString, IsUUID, Length, Max, Min } from 'class-validator';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 
 import { DocumentClassification, GranteeType } from '../generated/prisma/enums.js';
 import { ALLOWED_CONTENT_TYPES } from './content-rules.js';
@@ -63,6 +63,22 @@ const DocumentId = () => Param('documentId', new ParseUUIDPipe());
  * Send x-organization-id to file a document under an organization (and to read
  * documents shared with it); without it, documents are personal.
  */
+/** Product images, viewable by anyone (e.g. in an <img> tag). Redirects to a short-lived signed link. */
+@ApiTags('documents')
+@Controller('documents/public')
+export class PublicImagesController {
+  constructor(private readonly documents: DocumentsService) {}
+
+  @Public()
+  @Get(':documentId')
+  async image(@Param('documentId', new ParseUUIDPipe()) id: string, @Res() res: Response) {
+    const url = await this.documents.publicUrl(id);
+    // Shorter than the link's lifetime, so a cached redirect never points at an expired link.
+    res.setHeader('cache-control', 'public, max-age=300');
+    res.redirect(302, url);
+  }
+}
+
 @ApiTags('documents')
 @ApiBearerAuth()
 @ApiHeader({ name: 'x-organization-id', required: false })
@@ -120,9 +136,17 @@ export class InternalDocumentsController {
     return this.documents.internalGet(id);
   }
 
+  @ApiExcludeEndpoint()
+  @Internal('catalog')
+  @Post(':documentId/publish')
+  @HttpCode(200)
+  publish(@CallingService() service: ServiceCaller, @DocumentId() id: string) {
+    return this.documents.internalPublish(service.service, id);
+  }
+
   /** Review cases and disputes attach evidence this way. */
   @ApiExcludeEndpoint()
-  @Internal('kyc', 'kyb', 'dispute', 'logistics', 'quality')
+  @Internal('kyc', 'kyb', 'dispute', 'logistics', 'quality', 'notification', 'commerce')
   @Post(':documentId/grants')
   grant(@CallingService() service: ServiceCaller, @DocumentId() id: string, @Body() dto: InternalGrantDto) {
     return this.documents.internalGrant(service.service, id, dto.type, dto.id, dto.reason);

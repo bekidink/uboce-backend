@@ -402,6 +402,8 @@ export const ModelName = {
   Receipt: 'Receipt',
   ReceiptLine: 'ReceiptLine',
   Transfer: 'Transfer',
+  TransferRequest: 'TransferRequest',
+  TransferRequestLine: 'TransferRequestLine',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -419,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "warehouse" | "storageLocation" | "receipt" | "receiptLine" | "transfer" | "outboxEvent" | "processedEvent"
+    modelProps: "warehouse" | "storageLocation" | "receipt" | "receiptLine" | "transfer" | "transferRequest" | "transferRequestLine" | "outboxEvent" | "processedEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -793,6 +795,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TransferRequest: {
+      payload: Prisma.$TransferRequestPayload<ExtArgs>
+      fields: Prisma.TransferRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TransferRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TransferRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.TransferRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TransferRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>
+        }
+        findMany: {
+          args: Prisma.TransferRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>[]
+        }
+        create: {
+          args: Prisma.TransferRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>
+        }
+        createMany: {
+          args: Prisma.TransferRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TransferRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.TransferRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>
+        }
+        update: {
+          args: Prisma.TransferRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.TransferRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TransferRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TransferRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.TransferRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.TransferRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTransferRequest>
+        }
+        groupBy: {
+          args: Prisma.TransferRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TransferRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    TransferRequestLine: {
+      payload: Prisma.$TransferRequestLinePayload<ExtArgs>
+      fields: Prisma.TransferRequestLineFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TransferRequestLineFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TransferRequestLineFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>
+        }
+        findFirst: {
+          args: Prisma.TransferRequestLineFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TransferRequestLineFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>
+        }
+        findMany: {
+          args: Prisma.TransferRequestLineFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>[]
+        }
+        create: {
+          args: Prisma.TransferRequestLineCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>
+        }
+        createMany: {
+          args: Prisma.TransferRequestLineCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TransferRequestLineCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>[]
+        }
+        delete: {
+          args: Prisma.TransferRequestLineDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>
+        }
+        update: {
+          args: Prisma.TransferRequestLineUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>
+        }
+        deleteMany: {
+          args: Prisma.TransferRequestLineDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TransferRequestLineUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TransferRequestLineUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>[]
+        }
+        upsert: {
+          args: Prisma.TransferRequestLineUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferRequestLinePayload>
+        }
+        aggregate: {
+          args: Prisma.TransferRequestLineAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTransferRequestLine>
+        }
+        groupBy: {
+          args: Prisma.TransferRequestLineGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferRequestLineGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TransferRequestLineCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferRequestLineCountAggregateOutputType> | number
+        }
+      }
+    }
     OutboxEvent: {
       payload: Prisma.$OutboxEventPayload<ExtArgs>
       fields: Prisma.OutboxEventFieldRefs
@@ -989,6 +1139,7 @@ export const WarehouseScalarFieldEnum = {
   region: 'region',
   city: 'city',
   addressLine: 'addressLine',
+  branchId: 'branchId',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1056,6 +1207,45 @@ export const TransferScalarFieldEnum = {
 } as const
 
 export type TransferScalarFieldEnum = (typeof TransferScalarFieldEnum)[keyof typeof TransferScalarFieldEnum]
+
+
+export const TransferRequestScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  number: 'number',
+  fromWarehouseId: 'fromWarehouseId',
+  toWarehouseId: 'toWarehouseId',
+  fromBranchId: 'fromBranchId',
+  toBranchId: 'toBranchId',
+  status: 'status',
+  note: 'note',
+  responseNote: 'responseNote',
+  neededBy: 'neededBy',
+  requestedByUserId: 'requestedByUserId',
+  respondedByUserId: 'respondedByUserId',
+  dispatchedByUserId: 'dispatchedByUserId',
+  receivedByUserId: 'receivedByUserId',
+  respondedAt: 'respondedAt',
+  dispatchedAt: 'dispatchedAt',
+  receivedAt: 'receivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TransferRequestScalarFieldEnum = (typeof TransferRequestScalarFieldEnum)[keyof typeof TransferRequestScalarFieldEnum]
+
+
+export const TransferRequestLineScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  itemId: 'itemId',
+  description: 'description',
+  requestedQuantity: 'requestedQuantity',
+  approvedQuantity: 'approvedQuantity',
+  receivedQuantity: 'receivedQuantity'
+} as const
+
+export type TransferRequestLineScalarFieldEnum = (typeof TransferRequestLineScalarFieldEnum)[keyof typeof TransferRequestLineScalarFieldEnum]
 
 
 export const OutboxEventScalarFieldEnum = {
@@ -1400,6 +1590,8 @@ export type GlobalOmitConfig = {
   receipt?: Prisma.ReceiptOmit
   receiptLine?: Prisma.ReceiptLineOmit
   transfer?: Prisma.TransferOmit
+  transferRequest?: Prisma.TransferRequestOmit
+  transferRequestLine?: Prisma.TransferRequestLineOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit
 }

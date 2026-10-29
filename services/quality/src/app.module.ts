@@ -6,10 +6,12 @@ import { PrismaModule, PrismaService } from './prisma.service.js';
 import { QualityController } from './quality/quality.controller.js';
 import { QualityEvents } from './quality/quality-events.js';
 import { QualityService } from './quality/quality.service.js';
+import { ModerationController, PublicTrustController, TrustController } from './quality/trust.controller.js';
+import { TrustService } from './quality/trust.service.js';
 
 @Module({
   imports: coreModules({ serviceName: SERVICE_NAME, env, prismaService: PrismaService, prismaModule: PrismaModule }),
-  controllers: [QualityController],
-  providers: [QualityService, QualityEvents, OutboxRelayHost(PrismaService)],
+  controllers: [PublicTrustController, ModerationController, TrustController, QualityController],
+  providers: [QualityService, TrustService, QualityEvents, OutboxRelayHost(PrismaService)],
 })
 export class AppModule {}

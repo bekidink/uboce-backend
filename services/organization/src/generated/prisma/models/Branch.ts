@@ -20,8 +20,20 @@ export type BranchModel = runtime.Types.Result.DefaultSelection<Prisma.$BranchPa
 
 export type AggregateBranch = {
   _count: BranchCountAggregateOutputType | null
+  _avg: BranchAvgAggregateOutputType | null
+  _sum: BranchSumAggregateOutputType | null
   _min: BranchMinAggregateOutputType | null
   _max: BranchMaxAggregateOutputType | null
+}
+
+export type BranchAvgAggregateOutputType = {
+  latitude: runtime.Decimal | null
+  longitude: runtime.Decimal | null
+}
+
+export type BranchSumAggregateOutputType = {
+  latitude: runtime.Decimal | null
+  longitude: runtime.Decimal | null
 }
 
 export type BranchMinAggregateOutputType = {
@@ -32,6 +44,14 @@ export type BranchMinAggregateOutputType = {
   city: string | null
   addressLine: string | null
   countryCode: string | null
+  kind: $Enums.LocationKind | null
+  phone: string | null
+  email: string | null
+  latitude: runtime.Decimal | null
+  longitude: runtime.Decimal | null
+  pickupEnabled: boolean | null
+  fulfillment: boolean | null
+  active: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +64,14 @@ export type BranchMaxAggregateOutputType = {
   city: string | null
   addressLine: string | null
   countryCode: string | null
+  kind: $Enums.LocationKind | null
+  phone: string | null
+  email: string | null
+  latitude: runtime.Decimal | null
+  longitude: runtime.Decimal | null
+  pickupEnabled: boolean | null
+  fulfillment: boolean | null
+  active: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,11 +84,31 @@ export type BranchCountAggregateOutputType = {
   city: number
   addressLine: number
   countryCode: number
+  kind: number
+  phone: number
+  email: number
+  latitude: number
+  longitude: number
+  operatingHours: number
+  serviceAreas: number
+  pickupEnabled: number
+  fulfillment: number
+  active: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type BranchAvgAggregateInputType = {
+  latitude?: true
+  longitude?: true
+}
+
+export type BranchSumAggregateInputType = {
+  latitude?: true
+  longitude?: true
+}
 
 export type BranchMinAggregateInputType = {
   id?: true
@@ -70,6 +118,14 @@ export type BranchMinAggregateInputType = {
   city?: true
   addressLine?: true
   countryCode?: true
+  kind?: true
+  phone?: true
+  email?: true
+  latitude?: true
+  longitude?: true
+  pickupEnabled?: true
+  fulfillment?: true
+  active?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +138,14 @@ export type BranchMaxAggregateInputType = {
   city?: true
   addressLine?: true
   countryCode?: true
+  kind?: true
+  phone?: true
+  email?: true
+  latitude?: true
+  longitude?: true
+  pickupEnabled?: true
+  fulfillment?: true
+  active?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +158,16 @@ export type BranchCountAggregateInputType = {
   city?: true
   addressLine?: true
   countryCode?: true
+  kind?: true
+  phone?: true
+  email?: true
+  latitude?: true
+  longitude?: true
+  operatingHours?: true
+  serviceAreas?: true
+  pickupEnabled?: true
+  fulfillment?: true
+  active?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -137,6 +211,18 @@ export type BranchAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BranchAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BranchSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BranchMinAggregateInputType
@@ -167,6 +253,8 @@ export type BranchGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: BranchCountAggregateInputType | true
+  _avg?: BranchAvgAggregateInputType
+  _sum?: BranchSumAggregateInputType
   _min?: BranchMinAggregateInputType
   _max?: BranchMaxAggregateInputType
 }
@@ -179,9 +267,21 @@ export type BranchGroupByOutputType = {
   city: string | null
   addressLine: string | null
   countryCode: string
+  kind: $Enums.LocationKind
+  phone: string | null
+  email: string | null
+  latitude: runtime.Decimal | null
+  longitude: runtime.Decimal | null
+  operatingHours: runtime.JsonValue
+  serviceAreas: string[]
+  pickupEnabled: boolean
+  fulfillment: boolean
+  active: boolean
   createdAt: Date
   updatedAt: Date
   _count: BranchCountAggregateOutputType | null
+  _avg: BranchAvgAggregateOutputType | null
+  _sum: BranchSumAggregateOutputType | null
   _min: BranchMinAggregateOutputType | null
   _max: BranchMaxAggregateOutputType | null
 }
@@ -212,9 +312,20 @@ export type BranchWhereInput = {
   city?: Prisma.StringNullableFilter<"Branch"> | string | null
   addressLine?: Prisma.StringNullableFilter<"Branch"> | string | null
   countryCode?: Prisma.StringFilter<"Branch"> | string
+  kind?: Prisma.EnumLocationKindFilter<"Branch"> | $Enums.LocationKind
+  phone?: Prisma.StringNullableFilter<"Branch"> | string | null
+  email?: Prisma.StringNullableFilter<"Branch"> | string | null
+  latitude?: Prisma.DecimalNullableFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.DecimalNullableFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonFilter<"Branch">
+  serviceAreas?: Prisma.StringNullableListFilter<"Branch">
+  pickupEnabled?: Prisma.BoolFilter<"Branch"> | boolean
+  fulfillment?: Prisma.BoolFilter<"Branch"> | boolean
+  active?: Prisma.BoolFilter<"Branch"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  members?: Prisma.MembershipLocationListRelationFilter
 }
 
 export type BranchOrderByWithRelationInput = {
@@ -225,9 +336,20 @@ export type BranchOrderByWithRelationInput = {
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine?: Prisma.SortOrderInput | Prisma.SortOrder
   countryCode?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  operatingHours?: Prisma.SortOrder
+  serviceAreas?: Prisma.SortOrder
+  pickupEnabled?: Prisma.SortOrder
+  fulfillment?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
+  members?: Prisma.MembershipLocationOrderByRelationAggregateInput
 }
 
 export type BranchWhereUniqueInput = Prisma.AtLeast<{
@@ -241,9 +363,20 @@ export type BranchWhereUniqueInput = Prisma.AtLeast<{
   city?: Prisma.StringNullableFilter<"Branch"> | string | null
   addressLine?: Prisma.StringNullableFilter<"Branch"> | string | null
   countryCode?: Prisma.StringFilter<"Branch"> | string
+  kind?: Prisma.EnumLocationKindFilter<"Branch"> | $Enums.LocationKind
+  phone?: Prisma.StringNullableFilter<"Branch"> | string | null
+  email?: Prisma.StringNullableFilter<"Branch"> | string | null
+  latitude?: Prisma.DecimalNullableFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.DecimalNullableFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonFilter<"Branch">
+  serviceAreas?: Prisma.StringNullableListFilter<"Branch">
+  pickupEnabled?: Prisma.BoolFilter<"Branch"> | boolean
+  fulfillment?: Prisma.BoolFilter<"Branch"> | boolean
+  active?: Prisma.BoolFilter<"Branch"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  members?: Prisma.MembershipLocationListRelationFilter
 }, "id">
 
 export type BranchOrderByWithAggregationInput = {
@@ -254,11 +387,23 @@ export type BranchOrderByWithAggregationInput = {
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine?: Prisma.SortOrderInput | Prisma.SortOrder
   countryCode?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  operatingHours?: Prisma.SortOrder
+  serviceAreas?: Prisma.SortOrder
+  pickupEnabled?: Prisma.SortOrder
+  fulfillment?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BranchCountOrderByAggregateInput
+  _avg?: Prisma.BranchAvgOrderByAggregateInput
   _max?: Prisma.BranchMaxOrderByAggregateInput
   _min?: Prisma.BranchMinOrderByAggregateInput
+  _sum?: Prisma.BranchSumOrderByAggregateInput
 }
 
 export type BranchScalarWhereWithAggregatesInput = {
@@ -272,6 +417,16 @@ export type BranchScalarWhereWithAggregatesInput = {
   city?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null
   addressLine?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null
   countryCode?: Prisma.StringWithAggregatesFilter<"Branch"> | string
+  kind?: Prisma.EnumLocationKindWithAggregatesFilter<"Branch"> | $Enums.LocationKind
+  phone?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null
+  email?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null
+  latitude?: Prisma.DecimalNullableWithAggregatesFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.DecimalNullableWithAggregatesFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonWithAggregatesFilter<"Branch">
+  serviceAreas?: Prisma.StringNullableListFilter<"Branch">
+  pickupEnabled?: Prisma.BoolWithAggregatesFilter<"Branch"> | boolean
+  fulfillment?: Prisma.BoolWithAggregatesFilter<"Branch"> | boolean
+  active?: Prisma.BoolWithAggregatesFilter<"Branch"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Branch"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Branch"> | Date | string
 }
@@ -283,9 +438,20 @@ export type BranchCreateInput = {
   city?: string | null
   addressLine?: string | null
   countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutBranchesInput
+  members?: Prisma.MembershipLocationCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateInput = {
@@ -296,8 +462,19 @@ export type BranchUncheckedCreateInput = {
   city?: string | null
   addressLine?: string | null
   countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  members?: Prisma.MembershipLocationUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUpdateInput = {
@@ -307,9 +484,20 @@ export type BranchUpdateInput = {
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutBranchesNestedInput
+  members?: Prisma.MembershipLocationUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateInput = {
@@ -320,8 +508,19 @@ export type BranchUncheckedUpdateInput = {
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MembershipLocationUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateManyInput = {
@@ -332,6 +531,16 @@ export type BranchCreateManyInput = {
   city?: string | null
   addressLine?: string | null
   countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -343,6 +552,16 @@ export type BranchUpdateManyMutationInput = {
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -355,6 +574,16 @@ export type BranchUncheckedUpdateManyInput = {
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -369,6 +598,14 @@ export type BranchOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type BranchCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
@@ -377,8 +614,23 @@ export type BranchCountOrderByAggregateInput = {
   city?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  operatingHours?: Prisma.SortOrder
+  serviceAreas?: Prisma.SortOrder
+  pickupEnabled?: Prisma.SortOrder
+  fulfillment?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type BranchAvgOrderByAggregateInput = {
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
 }
 
 export type BranchMaxOrderByAggregateInput = {
@@ -389,6 +641,14 @@ export type BranchMaxOrderByAggregateInput = {
   city?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  pickupEnabled?: Prisma.SortOrder
+  fulfillment?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -401,8 +661,26 @@ export type BranchMinOrderByAggregateInput = {
   city?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  pickupEnabled?: Prisma.SortOrder
+  fulfillment?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type BranchSumOrderByAggregateInput = {
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+}
+
+export type BranchScalarRelationFilter = {
+  is?: Prisma.BranchWhereInput
+  isNot?: Prisma.BranchWhereInput
 }
 
 export type BranchCreateNestedManyWithoutOrganizationInput = {
@@ -447,6 +725,45 @@ export type BranchUncheckedUpdateManyWithoutOrganizationNestedInput = {
   deleteMany?: Prisma.BranchScalarWhereInput | Prisma.BranchScalarWhereInput[]
 }
 
+export type BranchCreateserviceAreasInput = {
+  set: string[]
+}
+
+export type EnumLocationKindFieldUpdateOperationsInput = {
+  set?: $Enums.LocationKind
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type BranchUpdateserviceAreasInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
+export type BranchCreateNestedOneWithoutMembersInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutMembersInput, Prisma.BranchUncheckedCreateWithoutMembersInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutMembersInput
+  connect?: Prisma.BranchWhereUniqueInput
+}
+
+export type BranchUpdateOneRequiredWithoutMembersNestedInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutMembersInput, Prisma.BranchUncheckedCreateWithoutMembersInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutMembersInput
+  upsert?: Prisma.BranchUpsertWithoutMembersInput
+  connect?: Prisma.BranchWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutMembersInput, Prisma.BranchUpdateWithoutMembersInput>, Prisma.BranchUncheckedUpdateWithoutMembersInput>
+}
+
 export type BranchCreateWithoutOrganizationInput = {
   id?: string
   name: string
@@ -454,8 +771,19 @@ export type BranchCreateWithoutOrganizationInput = {
   city?: string | null
   addressLine?: string | null
   countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  members?: Prisma.MembershipLocationCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutOrganizationInput = {
@@ -465,8 +793,19 @@ export type BranchUncheckedCreateWithoutOrganizationInput = {
   city?: string | null
   addressLine?: string | null
   countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  members?: Prisma.MembershipLocationUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutOrganizationInput = {
@@ -506,8 +845,122 @@ export type BranchScalarWhereInput = {
   city?: Prisma.StringNullableFilter<"Branch"> | string | null
   addressLine?: Prisma.StringNullableFilter<"Branch"> | string | null
   countryCode?: Prisma.StringFilter<"Branch"> | string
+  kind?: Prisma.EnumLocationKindFilter<"Branch"> | $Enums.LocationKind
+  phone?: Prisma.StringNullableFilter<"Branch"> | string | null
+  email?: Prisma.StringNullableFilter<"Branch"> | string | null
+  latitude?: Prisma.DecimalNullableFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.DecimalNullableFilter<"Branch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonFilter<"Branch">
+  serviceAreas?: Prisma.StringNullableListFilter<"Branch">
+  pickupEnabled?: Prisma.BoolFilter<"Branch"> | boolean
+  fulfillment?: Prisma.BoolFilter<"Branch"> | boolean
+  active?: Prisma.BoolFilter<"Branch"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string
+}
+
+export type BranchCreateWithoutMembersInput = {
+  id?: string
+  name: string
+  region?: string | null
+  city?: string | null
+  addressLine?: string | null
+  countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutBranchesInput
+}
+
+export type BranchUncheckedCreateWithoutMembersInput = {
+  id?: string
+  organizationId: string
+  name: string
+  region?: string | null
+  city?: string | null
+  addressLine?: string | null
+  countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type BranchCreateOrConnectWithoutMembersInput = {
+  where: Prisma.BranchWhereUniqueInput
+  create: Prisma.XOR<Prisma.BranchCreateWithoutMembersInput, Prisma.BranchUncheckedCreateWithoutMembersInput>
+}
+
+export type BranchUpsertWithoutMembersInput = {
+  update: Prisma.XOR<Prisma.BranchUpdateWithoutMembersInput, Prisma.BranchUncheckedUpdateWithoutMembersInput>
+  create: Prisma.XOR<Prisma.BranchCreateWithoutMembersInput, Prisma.BranchUncheckedCreateWithoutMembersInput>
+  where?: Prisma.BranchWhereInput
+}
+
+export type BranchUpdateToOneWithWhereWithoutMembersInput = {
+  where?: Prisma.BranchWhereInput
+  data: Prisma.XOR<Prisma.BranchUpdateWithoutMembersInput, Prisma.BranchUncheckedUpdateWithoutMembersInput>
+}
+
+export type BranchUpdateWithoutMembersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutBranchesNestedInput
+}
+
+export type BranchUncheckedUpdateWithoutMembersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type BranchCreateManyOrganizationInput = {
@@ -517,6 +970,16 @@ export type BranchCreateManyOrganizationInput = {
   city?: string | null
   addressLine?: string | null
   countryCode?: string
+  kind?: $Enums.LocationKind
+  phone?: string | null
+  email?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchCreateserviceAreasInput | string[]
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -528,8 +991,19 @@ export type BranchUpdateWithoutOrganizationInput = {
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MembershipLocationUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutOrganizationInput = {
@@ -539,8 +1013,19 @@ export type BranchUncheckedUpdateWithoutOrganizationInput = {
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MembershipLocationUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateManyWithoutOrganizationInput = {
@@ -550,10 +1035,49 @@ export type BranchUncheckedUpdateManyWithoutOrganizationInput = {
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLocationKindFieldUpdateOperationsInput | $Enums.LocationKind
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  operatingHours?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  serviceAreas?: Prisma.BranchUpdateserviceAreasInput | string[]
+  pickupEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fulfillment?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type BranchCountOutputType
+ */
+
+export type BranchCountOutputType = {
+  members: number
+}
+
+export type BranchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  members?: boolean | BranchCountOutputTypeCountMembersArgs
+}
+
+/**
+ * BranchCountOutputType without action
+ */
+export type BranchCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BranchCountOutputType
+   */
+  select?: Prisma.BranchCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * BranchCountOutputType without action
+ */
+export type BranchCountOutputTypeCountMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MembershipLocationWhereInput
+}
 
 
 export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -564,9 +1088,21 @@ export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   city?: boolean
   addressLine?: boolean
   countryCode?: boolean
+  kind?: boolean
+  phone?: boolean
+  email?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  operatingHours?: boolean
+  serviceAreas?: boolean
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  members?: boolean | Prisma.Branch$membersArgs<ExtArgs>
+  _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["branch"]>
 
 export type BranchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -577,6 +1113,16 @@ export type BranchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   city?: boolean
   addressLine?: boolean
   countryCode?: boolean
+  kind?: boolean
+  phone?: boolean
+  email?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  operatingHours?: boolean
+  serviceAreas?: boolean
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -590,6 +1136,16 @@ export type BranchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   city?: boolean
   addressLine?: boolean
   countryCode?: boolean
+  kind?: boolean
+  phone?: boolean
+  email?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  operatingHours?: boolean
+  serviceAreas?: boolean
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -603,13 +1159,25 @@ export type BranchSelectScalar = {
   city?: boolean
   addressLine?: boolean
   countryCode?: boolean
+  kind?: boolean
+  phone?: boolean
+  email?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  operatingHours?: boolean
+  serviceAreas?: boolean
+  pickupEnabled?: boolean
+  fulfillment?: boolean
+  active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BranchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "name" | "region" | "city" | "addressLine" | "countryCode" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>
+export type BranchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "name" | "region" | "city" | "addressLine" | "countryCode" | "kind" | "phone" | "email" | "latitude" | "longitude" | "operatingHours" | "serviceAreas" | "pickupEnabled" | "fulfillment" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>
 export type BranchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  members?: boolean | Prisma.Branch$membersArgs<ExtArgs>
+  _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BranchIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -622,6 +1190,7 @@ export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Branch"
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs>
+    members: Prisma.$MembershipLocationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -631,6 +1200,25 @@ export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     city: string | null
     addressLine: string | null
     countryCode: string
+    kind: $Enums.LocationKind
+    phone: string | null
+    email: string | null
+    latitude: runtime.Decimal | null
+    longitude: runtime.Decimal | null
+    /**
+     * Weekly hours: [{ day: 0-6 (Sunday = 0), opens: "08:00", closes: "18:00" }]. Days not listed are closed.
+     */
+    operatingHours: runtime.JsonValue
+    /**
+     * Regions/cities this location delivers to.
+     */
+    serviceAreas: string[]
+    pickupEnabled: boolean
+    /**
+     * Can fulfil (ship) orders.
+     */
+    fulfillment: boolean
+    active: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["branch"]>
@@ -1028,6 +1616,7 @@ readonly fields: BranchFieldRefs;
 export interface Prisma__BranchClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  members<T extends Prisma.Branch$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MembershipLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1064,6 +1653,16 @@ export interface BranchFieldRefs {
   readonly city: Prisma.FieldRef<"Branch", 'String'>
   readonly addressLine: Prisma.FieldRef<"Branch", 'String'>
   readonly countryCode: Prisma.FieldRef<"Branch", 'String'>
+  readonly kind: Prisma.FieldRef<"Branch", 'LocationKind'>
+  readonly phone: Prisma.FieldRef<"Branch", 'String'>
+  readonly email: Prisma.FieldRef<"Branch", 'String'>
+  readonly latitude: Prisma.FieldRef<"Branch", 'Decimal'>
+  readonly longitude: Prisma.FieldRef<"Branch", 'Decimal'>
+  readonly operatingHours: Prisma.FieldRef<"Branch", 'Json'>
+  readonly serviceAreas: Prisma.FieldRef<"Branch", 'String[]'>
+  readonly pickupEnabled: Prisma.FieldRef<"Branch", 'Boolean'>
+  readonly fulfillment: Prisma.FieldRef<"Branch", 'Boolean'>
+  readonly active: Prisma.FieldRef<"Branch", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Branch", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Branch", 'DateTime'>
 }
@@ -1464,6 +2063,30 @@ export type BranchDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Branches to delete.
    */
   limit?: number
+}
+
+/**
+ * Branch.members
+ */
+export type Branch$membersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MembershipLocation
+   */
+  select?: Prisma.MembershipLocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MembershipLocation
+   */
+  omit?: Prisma.MembershipLocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MembershipLocationInclude<ExtArgs> | null
+  where?: Prisma.MembershipLocationWhereInput
+  orderBy?: Prisma.MembershipLocationOrderByWithRelationInput | Prisma.MembershipLocationOrderByWithRelationInput[]
+  cursor?: Prisma.MembershipLocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MembershipLocationScalarFieldEnum | Prisma.MembershipLocationScalarFieldEnum[]
 }
 
 /**

@@ -1,14 +1,20 @@
 import type {
   InternalMembership,
+  InternalBranch,
   InternalOrganization,
   InternalOrder,
   InternalOrganizationMember,
   InternalUser,
   InternalWarehouse,
   CarrierTrackingEvent,
+  CatalogQuote,
+  CatalogQuoteRequest,
   InternalDocument,
+  InternalEntitlements,
+  InternalShipment,
   InternalPlatformRoles,
   PaymentNotification,
+  RefundNotification,
   PostMovementRequest,
   ReserveStockRequest,
   ReserveStockResult,
@@ -60,6 +66,11 @@ export class OrganizationsClient extends ServiceClient {
     return this.http.get<InternalOrganization>(this.url(`/organizations/${organizationId}`)).catch(notFoundAsNull);
   }
 
+  /** One of the organization's locations, or null when it doesn't belong to it. */
+  getBranch(organizationId: string, branchId: string) {
+    return this.http.get<InternalBranch>(this.url(`/organizations/${organizationId}/branches/${branchId}`)).catch(notFoundAsNull);
+  }
+
   /** The user's active membership, or null when they don't belong to the organization. */
   getMembership(organizationId: string, userId: string) {
     return this.http
@@ -96,6 +107,11 @@ export class AdministrationClient extends ServiceClient {
     const result = await this.http.get<InternalPlatformRoles>(this.url(`/platform-roles/${userId}`)).catch(notFoundAsNull);
     return result?.roles ?? [];
   }
+
+  /** Which modules an organization may use (PRD addendum 2.10). */
+  entitlements(organizationId: string) {
+    return this.http.get<InternalEntitlements>(this.url(`/entitlements/${organizationId}`));
+  }
 }
 
 export class InventoryClient extends ServiceClient {
@@ -127,6 +143,11 @@ export class DocumentsClient extends ServiceClient {
     return this.http.get<InternalDocument>(this.url(`/documents/${documentId}`)).catch(notFoundAsNull);
   }
 
+  /** Makes an uploaded product image publicly viewable (Catalog only). */
+  publish(documentId: string) {
+    return this.http.post<{ published: boolean; ownerOrganizationId: string | null }>(this.url(`/documents/${documentId}/publish`), {});
+  }
+
   /** Lets an organization (e.g. a dispute's other party, or a reviewer case) read a document. */
   grant(documentId: string, grantee: { type: 'organization' | 'case'; id: string }, reason: string) {
     return this.http.post<{ granted: boolean }>(this.url(`/documents/${documentId}/grants`), { ...grantee, reason });
@@ -141,6 +162,10 @@ export class FinanceClient extends ServiceClient {
   paymentNotification(notification: PaymentNotification) {
     return this.http.post<{ applied: boolean }>(this.url('/payment-notifications'), notification);
   }
+
+  refundNotification(notification: RefundNotification) {
+    return this.http.post<{ applied: boolean }>(this.url('/refund-notifications'), notification);
+  }
 }
 
 export class LogisticsClient extends ServiceClient {
@@ -150,6 +175,10 @@ export class LogisticsClient extends ServiceClient {
 
   trackingEvent(event: CarrierTrackingEvent) {
     return this.http.post<{ applied: boolean }>(this.url('/tracking-events'), event);
+  }
+
+  getShipment(shipmentId: string) {
+    return this.http.get<InternalShipment>(this.url(`/shipments/${shipmentId}`)).catch(notFoundAsNull);
   }
 }
 
@@ -170,5 +199,21 @@ export class CommerceClient extends ServiceClient {
 
   getOrder(orderId: string) {
     return this.http.get<InternalOrder>(this.url('/orders/' + orderId)).catch(notFoundAsNull);
+  }
+
+  /** Location report for an organization (Analytics). */
+  locationReport(organizationId: string, from: string, to: string) {
+    return this.http.get<Record<string, unknown>>(this.url(`/orders/reports/locations/${organizationId}?from=${from}&to=${to}`));
+  }
+}
+
+export class CatalogClient extends ServiceClient {
+  constructor(http: InternalClient, baseUrl: string | undefined) {
+    super(http, baseUrl, 'CATALOG_URL');
+  }
+
+  /** Prices order lines from the catalog (tiers, price lists, options) and snapshots the products. */
+  quote(request: CatalogQuoteRequest) {
+    return this.http.post<CatalogQuote>(this.url('/catalog/quote'), request);
   }
 }

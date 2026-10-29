@@ -12,7 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { type ActingOrganization, ActingOrg, ActsForOrganization, type AuthUser, CurrentUser, IsDecimalString, PaginationQueryDto } from '@uboce/common';
+import { type ActingOrganization, ActingOrg, ActsForOrganization, type AuthUser, CurrentUser, IsDecimalString, PaginationQueryDto, RequiresModule } from '@uboce/common';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsOptional, IsString, IsUUID, Length, Matches, ValidateNested } from 'class-validator';
 
@@ -100,6 +100,7 @@ const Id = (name: string) => Param(name, new ParseUUIDPipe());
 @ApiTags('manufacturing')
 @ApiBearerAuth()
 @ActsForOrganization()
+@RequiresModule('manufacturing')
 @Controller('manufacturing')
 export class ProductionController {
   constructor(private readonly production: ProductionService) {}

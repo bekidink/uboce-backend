@@ -19,6 +19,7 @@ import type { PaymentNotification } from '@uboce/contracts';
 import { SERVICE_NAME } from '../config.js';
 import { Prisma } from '../generated/prisma/client.js';
 import type { InvoiceStatus } from '../generated/prisma/enums.js';
+import { PaymentsService } from '../payments/payments.service.js';
 import { PrismaService } from '../prisma.service.js';
 import { type LineInput, outstanding, priceLines, settlementStatus } from './money.js';
 
@@ -39,6 +40,7 @@ export class InvoicesService {
     private readonly prisma: PrismaService,
     private readonly commerce: CommerceClient,
     private readonly organizations: OrganizationsClient,
+    private readonly payments: PaymentsService,
   ) {}
 
   /** Draft from an order's immutable lines (seller side). */
@@ -55,7 +57,13 @@ export class InvoicesService {
       currency: order.currency,
       dueInDays: dto.dueInDays,
       notes: dto.notes,
-      lines: order.lines.map((l) => ({ description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, taxRatePct: dto.taxRatePct, orderLineId: l.id })),
+      lines: [
+        ...order.lines.map((l) => ({ description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, taxRatePct: dto.taxRatePct, orderLineId: l.id })),
+        // Promotions reduce the taxable amount, so the discount is a negative line taxed at the same rate.
+        ...(Number(order.discountTotal ?? 0) > 0
+          ? [{ description: `Discount${order.promotionCode ? ` (${order.promotionCode})` : ''}`, quantity: '1', unitPrice: `-${order.discountTotal}`, taxRatePct: dto.taxRatePct }]
+          : []),
+      ],
     });
   }
 
@@ -179,6 +187,7 @@ export class InvoicesService {
         });
         // A reversal for a payment we never saw confirmed is recorded but moves no money.
         if (n.status === 'confirmed') await this.apply(tx, inv.id, payment.id, payment.amount, 'provider confirmed');
+        await this.payments.onProviderPayment(tx, n.provider, n.externalReference, n.status, payment.amount, n.fee);
         return { applied: n.status === 'confirmed' };
       }
 
@@ -199,6 +208,7 @@ export class InvoicesService {
       } else {
         return { applied: false }; // duplicate or out-of-order callback: no effect
       }
+      await this.payments.onProviderPayment(tx, n.provider, n.externalReference, n.status, existing.amount, n.fee);
       return { applied: true };
     });
   }

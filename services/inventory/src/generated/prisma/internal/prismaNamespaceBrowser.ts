@@ -55,6 +55,9 @@ export const ModelName = {
   StockBalance: 'StockBalance',
   StockReservation: 'StockReservation',
   StockReservationLine: 'StockReservationLine',
+  StockStateChange: 'StockStateChange',
+  CycleCount: 'CycleCount',
+  CycleCountLine: 'CycleCountLine',
   OutboxEvent: 'OutboxEvent',
   ProcessedEvent: 'ProcessedEvent'
 } as const
@@ -103,6 +106,8 @@ export const StockBalanceScalarFieldEnum = {
   itemId: 'itemId',
   onHand: 'onHand',
   reserved: 'reserved',
+  damaged: 'damaged',
+  quarantined: 'quarantined',
   updatedAt: 'updatedAt'
 } as const
 
@@ -133,6 +138,54 @@ export const StockReservationLineScalarFieldEnum = {
 } as const
 
 export type StockReservationLineScalarFieldEnum = (typeof StockReservationLineScalarFieldEnum)[keyof typeof StockReservationLineScalarFieldEnum]
+
+
+export const StockStateChangeScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  warehouseId: 'warehouseId',
+  itemId: 'itemId',
+  fromState: 'fromState',
+  toState: 'toState',
+  quantity: 'quantity',
+  reason: 'reason',
+  sourceType: 'sourceType',
+  sourceId: 'sourceId',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+} as const
+
+export type StockStateChangeScalarFieldEnum = (typeof StockStateChangeScalarFieldEnum)[keyof typeof StockStateChangeScalarFieldEnum]
+
+
+export const CycleCountScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  organizationId: 'organizationId',
+  warehouseId: 'warehouseId',
+  status: 'status',
+  note: 'note',
+  createdByUserId: 'createdByUserId',
+  submittedByUserId: 'submittedByUserId',
+  approvedByUserId: 'approvedByUserId',
+  createdAt: 'createdAt',
+  submittedAt: 'submittedAt',
+  approvedAt: 'approvedAt'
+} as const
+
+export type CycleCountScalarFieldEnum = (typeof CycleCountScalarFieldEnum)[keyof typeof CycleCountScalarFieldEnum]
+
+
+export const CycleCountLineScalarFieldEnum = {
+  id: 'id',
+  cycleCountId: 'cycleCountId',
+  itemId: 'itemId',
+  expectedQuantity: 'expectedQuantity',
+  countedQuantity: 'countedQuantity',
+  note: 'note'
+} as const
+
+export type CycleCountLineScalarFieldEnum = (typeof CycleCountLineScalarFieldEnum)[keyof typeof CycleCountLineScalarFieldEnum]
 
 
 export const OutboxEventScalarFieldEnum = {

@@ -15,6 +15,12 @@ datasource db {
 enum OrderStatus {
   pending_confirmation
   confirmed
+  /// Pickup orders: packed and waiting at the collection point (PRD addendum 2.6).
+  ready_for_pickup
+  /// The buyer didn't collect in time (no-show).
+  uncollected
+  /// The carrier couldn't deliver; retried or cancelled.
+  delivery_failed
   partially_fulfilled
   fulfilled
   closed
@@ -28,32 +34,66 @@ enum OrderSource {
   direct
 }
 
+enum FulfillmentMethod {
+  delivery
+  pickup
+}
+
+enum ReturnStatus {
+  requested
+  approved
+  rejected
+  received
+  cancelled
+}
+
+enum PromotionKind {
+  percent
+  fixed
+}
+
 model Order {
-  id                     String      @id @default(uuid()) @db.Uuid
+  id                     String            @id @default(uuid()) @db.Uuid
   /// Human-facing, e.g. PO-2026-000042.
-  number                 String      @unique
-  buyerOrganizationId    String      @map("buyer_organization_id") @db.Uuid
-  supplierOrganizationId String      @map("supplier_organization_id") @db.Uuid
+  number                 String            @unique
+  buyerOrganizationId    String            @map("buyer_organization_id") @db.Uuid
+  supplierOrganizationId String            @map("supplier_organization_id") @db.Uuid
   source                 OrderSource
   /// One order per accepted quotation, enforced by the database.
-  sourceQuotationId      String?     @unique @map("source_quotation_id") @db.Uuid
-  rfqId                  String?     @map("rfq_id") @db.Uuid
+  sourceQuotationId      String?           @unique @map("source_quotation_id") @db.Uuid
+  rfqId                  String?           @map("rfq_id") @db.Uuid
   /// Client-chosen key for direct orders; unique per buyer.
-  idempotencyKey         String?     @map("idempotency_key")
+  idempotencyKey         String?           @map("idempotency_key")
   /// SHA-256 of the direct-order request, to reject a reused key with a different body.
-  requestHash            String?     @map("request_hash")
+  requestHash            String?           @map("request_hash")
   title                  String?
-  currency               String      @db.Char(3)
-  total                  Decimal     @db.Decimal(18, 4)
-  deliveryTerms          String?     @map("delivery_terms")
-  deliveryLocation       String?     @map("delivery_location")
-  status                 OrderStatus @default(pending_confirmation)
-  createdByUserId        String      @map("created_by_user_id") @db.Uuid
-  createdAt              DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt              DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  currency               String            @db.Char(3)
+  total                  Decimal           @db.Decimal(18, 4)
+  deliveryTerms          String?           @map("delivery_terms")
+  deliveryLocation       String?           @map("delivery_location")
+  status                 OrderStatus       @default(pending_confirmation)
+  fulfillmentMethod      FulfillmentMethod @default(delivery) @map("fulfillment_method")
+  /// The supplier location fulfilling (or hosting the pickup of) the order.
+  fulfillmentBranchId    String?           @map("fulfillment_branch_id") @db.Uuid
+  /// Before discounts.
+  subtotal               Decimal           @default(0) @db.Decimal(18, 4)
+  discountTotal          Decimal           @default(0) @map("discount_total") @db.Decimal(18, 4)
+  promotionId            String?           @map("promotion_id") @db.Uuid
+  promotionCode          String?           @map("promotion_code")
+  /// The supplier's cancellation policy as it was when the order was placed.
+  cancellationPolicy     Json?             @map("cancellation_policy")
+  cancellationFee        Decimal?          @map("cancellation_fee") @db.Decimal(18, 4)
+  preorder               Boolean           @default(false)
+  confirmedAt            DateTime?         @map("confirmed_at") @db.Timestamptz(3)
+  fulfilledAt            DateTime?         @map("fulfilled_at") @db.Timestamptz(3)
+  createdByUserId        String            @map("created_by_user_id") @db.Uuid
+  createdAt              DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  lines   OrderLine[]
-  history OrderStatusHistory[]
+  lines              OrderLine[]
+  history            OrderStatusHistory[]
+  fulfillmentChanges OrderFulfillmentChange[]
+  returns            ReturnRequest[]
 
   @@unique([buyerOrganizationId, idempotencyKey])
   @@index([buyerOrganizationId, status])
@@ -63,17 +103,25 @@ model Order {
 
 /// Immutable commercial snapshot: catalog or quotation changes never alter a placed order (PRD 5.5, 5.8).
 model OrderLine {
-  id                String  @id @default(uuid()) @db.Uuid
-  orderId           String  @map("order_id") @db.Uuid
-  lineNumber        Int     @map("line_number")
-  productId         String? @map("product_id") @db.Uuid
+  id                String   @id @default(uuid()) @db.Uuid
+  orderId           String   @map("order_id") @db.Uuid
+  lineNumber        Int      @map("line_number")
+  productId         String?  @map("product_id") @db.Uuid
   description       String
-  quantity          Decimal @db.Decimal(18, 4)
-  unitOfMeasure     String  @map("unit_of_measure")
-  unitPrice         Decimal @map("unit_price") @db.Decimal(18, 4)
-  lineTotal         Decimal @map("line_total") @db.Decimal(18, 4)
-  leadTimeDays      Int?    @map("lead_time_days")
-  fulfilledQuantity Decimal @default(0) @map("fulfilled_quantity") @db.Decimal(18, 4)
+  quantity          Decimal  @db.Decimal(18, 4)
+  unitOfMeasure     String   @map("unit_of_measure")
+  unitPrice         Decimal  @map("unit_price") @db.Decimal(18, 4)
+  lineTotal         Decimal  @map("line_total") @db.Decimal(18, 4)
+  leadTimeDays      Int?     @map("lead_time_days")
+  fulfilledQuantity Decimal  @default(0) @map("fulfilled_quantity") @db.Decimal(18, 4)
+  variantId         String?  @map("variant_id") @db.Uuid
+  sku               String?
+  /// list | tier | price_list (from Catalog), agreed (quotation) or buyer_entered (free-text line).
+  priceSource       String?  @map("price_source")
+  listPrice         Decimal? @map("list_price") @db.Decimal(18, 4)
+  /// The product as it was when ordered: name, attributes, options, image, SKU (PRD addendum 2.3).
+  snapshot          Json?
+  returnedQuantity  Decimal  @default(0) @map("returned_quantity") @db.Decimal(18, 4)
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -97,6 +145,124 @@ model OrderStatusHistory {
 }
 
 /// Per-year counter behind order numbers.
+/// Which location fulfils an order, and every change to it (PRD addendum 2.1).
+model OrderFulfillmentChange {
+  id              String   @id @default(uuid()) @db.Uuid
+  orderId         String   @map("order_id") @db.Uuid
+  fromBranchId    String?  @map("from_branch_id") @db.Uuid
+  toBranchId      String   @map("to_branch_id") @db.Uuid
+  changedByUserId String   @map("changed_by_user_id") @db.Uuid
+  reason          String?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+  @@map("order_fulfillment_changes")
+}
+
+/// A supplier's cancellation and return terms. Versions are immutable; orders keep a snapshot (PRD addendum 2.6).
+model CancellationPolicy {
+  id                    String   @id @default(uuid()) @db.Uuid
+  organizationId        String   @map("organization_id") @db.Uuid
+  version               Int
+  name                  String
+  /// After confirmation, the buyer may cancel free of charge for this many hours.
+  freeCancellationHours Int      @map("free_cancellation_hours")
+  cancellationFeePct    Decimal  @map("cancellation_fee_pct") @db.Decimal(5, 2)
+  noShowFeePct          Decimal  @map("no_show_fee_pct") @db.Decimal(5, 2)
+  /// Days after fulfilment within which returns may be requested (0 = no returns).
+  returnWindowDays      Int      @map("return_window_days")
+  restockingFeePct      Decimal  @map("restocking_fee_pct") @db.Decimal(5, 2)
+  /// Hours a ready pickup order waits before it may be marked uncollected.
+  pickupHoldHours       Int      @default(72) @map("pickup_hold_hours")
+  terms                 String?
+  active                Boolean  @default(true)
+  createdByUserId       String   @map("created_by_user_id") @db.Uuid
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([organizationId, version])
+  @@index([organizationId, active])
+  @@map("cancellation_policies")
+}
+
+model ReturnRequest {
+  id                     String       @id @default(uuid()) @db.Uuid
+  number                 String       @unique
+  orderId                String       @map("order_id") @db.Uuid
+  buyerOrganizationId    String       @map("buyer_organization_id") @db.Uuid
+  supplierOrganizationId String       @map("supplier_organization_id") @db.Uuid
+  status                 ReturnStatus @default(requested)
+  reason                 String
+  /// [{ orderLineId, quantity }]
+  lines                  Json
+  currency               String       @db.Char(3)
+  /// Value of the returned goods before fees.
+  amount                 Decimal      @db.Decimal(18, 4)
+  restockingFee          Decimal      @default(0) @map("restocking_fee") @db.Decimal(18, 4)
+  evidenceDocumentIds    String[]     @default([]) @map("evidence_document_ids") @db.Uuid
+  requestedByUserId      String       @map("requested_by_user_id") @db.Uuid
+  decidedByUserId        String?      @map("decided_by_user_id") @db.Uuid
+  decisionNote           String?      @map("decision_note")
+  decidedAt              DateTime?    @map("decided_at") @db.Timestamptz(3)
+  receivedAt             DateTime?    @map("received_at") @db.Timestamptz(3)
+  createdAt              DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([buyerOrganizationId, status])
+  @@index([supplierOrganizationId, status])
+  @@map("return_requests")
+}
+
+/// Supplier promotions (PRD addendum 2.4): automatic when code is null, otherwise a coupon.
+model Promotion {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String        @map("organization_id") @db.Uuid
+  name           String
+  code           String?
+  kind           PromotionKind
+  /// Percent (e.g. 10) or a fixed amount in currency.
+  value          Decimal       @db.Decimal(18, 4)
+  currency       String        @db.Char(3)
+  minSubtotal    Decimal?      @map("min_subtotal") @db.Decimal(18, 4)
+  /// Cap for percent discounts.
+  maxDiscount    Decimal?      @map("max_discount") @db.Decimal(18, 4)
+  startsAt       DateTime?     @map("starts_at") @db.Timestamptz(3)
+  endsAt         DateTime?     @map("ends_at") @db.Timestamptz(3)
+  usageLimit     Int?          @map("usage_limit")
+  perBuyerLimit  Int?          @map("per_buyer_limit")
+  usedCount      Int           @default(0) @map("used_count")
+  active         Boolean       @default(true)
+  /// What buyers see on the offer (e.g. "Free delivery over 5,000 ETB").
+  description    String?
+  /// Advertised to buyers (marketplace, supplier page); a hidden coupon is shared privately.
+  advertised     Boolean       @default(true)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  redemptions PromotionRedemption[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, active])
+  @@map("promotions")
+}
+
+model PromotionRedemption {
+  id                  String   @id @default(uuid()) @db.Uuid
+  promotionId         String   @map("promotion_id") @db.Uuid
+  orderId             String   @unique @map("order_id") @db.Uuid
+  buyerOrganizationId String   @map("buyer_organization_id") @db.Uuid
+  amount              Decimal  @db.Decimal(18, 4)
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  promotion Promotion @relation(fields: [promotionId], references: [id])
+
+  @@index([promotionId, buyerOrganizationId])
+  @@map("promotion_redemptions")
+}
+
 model OrderNumberCounter {
   year Int @id
   last Int

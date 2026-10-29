@@ -31,3 +31,22 @@ export const ReservationStatus = {
 } as const
 
 export type ReservationStatus = (typeof ReservationStatus)[keyof typeof ReservationStatus]
+
+
+export const StockState = {
+  available: 'available',
+  damaged: 'damaged',
+  quarantined: 'quarantined'
+} as const
+
+export type StockState = (typeof StockState)[keyof typeof StockState]
+
+
+export const CycleCountStatus = {
+  counting: 'counting',
+  submitted: 'submitted',
+  approved: 'approved',
+  cancelled: 'cancelled'
+} as const
+
+export type CycleCountStatus = (typeof CycleCountStatus)[keyof typeof CycleCountStatus]

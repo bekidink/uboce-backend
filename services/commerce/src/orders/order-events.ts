@@ -28,6 +28,10 @@ export class OrderEventHandlers extends EventConsumer<Prisma.TransactionClient> 
         this.orders.markException(tx, e.data.orderId, `Stock reservation failed: ${e.data.shortages.map((s) => `${s.itemId} needs ${s.requested}, ${s.available} available`).join('; ')}`),
       ),
       DeliveryConfirmed: this.once('DeliveryConfirmed', (e, tx) => this.orders.applyDelivery(tx, e.data.orderId, e.data.items)),
+      ShipmentStatusChanged: this.once('ShipmentStatusChanged', async (e, tx) => {
+        if (e.data.status !== 'failed') return;
+        for (const orderId of e.data.orderIds) await this.orders.markDeliveryFailed(tx, orderId, e.data.reason ?? 'the carrier could not deliver');
+      }),
     };
   }
 }

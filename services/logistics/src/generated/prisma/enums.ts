@@ -11,7 +11,11 @@
 
 export const ShipmentStatus = {
   created: 'created',
+  assigned: 'assigned',
+  ready_for_pickup: 'ready_for_pickup',
   dispatched: 'dispatched',
+  picked_up: 'picked_up',
+  delayed: 'delayed',
   in_transit: 'in_transit',
   delivered: 'delivered',
   partially_delivered: 'partially_delivered',
@@ -21,3 +25,32 @@ export const ShipmentStatus = {
 } as const
 
 export type ShipmentStatus = (typeof ShipmentStatus)[keyof typeof ShipmentStatus]
+
+
+export const CarrierStatus = {
+  none: 'none',
+  requested: 'requested',
+  accepted: 'accepted',
+  declined: 'declined'
+} as const
+
+export type CarrierStatus = (typeof CarrierStatus)[keyof typeof CarrierStatus]
+
+
+export const FreightPayer = {
+  shipper: 'shipper',
+  consignee: 'consignee',
+  third_party: 'third_party'
+} as const
+
+export type FreightPayer = (typeof FreightPayer)[keyof typeof FreightPayer]
+
+
+export const AssignmentStatus = {
+  assigned: 'assigned',
+  accepted: 'accepted',
+  completed: 'completed',
+  cancelled: 'cancelled'
+} as const
+
+export type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]

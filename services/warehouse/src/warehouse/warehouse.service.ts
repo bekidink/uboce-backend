@@ -5,8 +5,11 @@ import {
   badRequest,
   conflict,
   emitEvent,
+  forbidden,
   InventoryClient,
+  locationScope,
   notFound,
+  OrganizationsClient,
   type PaginationQueryDto,
   requireRole,
   skipTake,
@@ -50,12 +53,19 @@ export class WarehouseService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventory: InventoryClient,
+    private readonly organizations: OrganizationsClient,
   ) {}
 
   // ---- Warehouses & locations ------------------------------------------------------
 
-  async createWarehouse(org: ActingOrganization, dto: { code: string; name: string; countryCode?: string; region?: string; city?: string; addressLine?: string }) {
+  async createWarehouse(
+    org: ActingOrganization,
+    dto: { code: string; name: string; countryCode?: string; region?: string; city?: string; addressLine?: string; branchId?: string },
+  ) {
     requireRole(org, ['owner', 'admin'], 'create warehouses');
+    const scope = locationScope(org);
+    if (scope && (!dto.branchId || !scope.includes(dto.branchId))) throw forbidden('Create warehouses only at your own locations');
+    if (dto.branchId && !(await this.organizations.getBranch(org.organization.id, dto.branchId))) throw notFound('Location');
     try {
       return await this.prisma.warehouse.create({ data: { ...dto, countryCode: dto.countryCode ?? 'ET', organizationId: org.organization.id } });
     } catch (error) {
@@ -66,7 +76,7 @@ export class WarehouseService {
 
   async listWarehouses(org: ActingOrganization, query: PaginationQueryDto) {
     requireRole(org, READ_ROLES, 'view warehouses');
-    const where = { organizationId: org.organization.id };
+    const where = { organizationId: org.organization.id, ...inScope(org) };
     const [items, total] = await Promise.all([
       this.prisma.warehouse.findMany({ where, include: { locations: true }, orderBy: { code: 'asc' }, ...skipTake(query) }),
       this.prisma.warehouse.count({ where }),
@@ -186,7 +196,7 @@ export class WarehouseService {
 
   async listReceipts(org: ActingOrganization, query: PaginationQueryDto) {
     requireRole(org, READ_ROLES, 'view receipts');
-    const where = { organizationId: org.organization.id };
+    const where = { organizationId: org.organization.id, ...(locationScope(org) ? { warehouse: inScope(org) } : {}) };
     const [items, total] = await Promise.all([
       this.prisma.receipt.findMany({ where, include: receiptInclude, orderBy: { createdAt: 'desc' }, ...skipTake(query) }),
       this.prisma.receipt.count({ where }),
@@ -196,7 +206,10 @@ export class WarehouseService {
 
   async getReceipt(org: ActingOrganization, receiptId: string) {
     requireRole(org, READ_ROLES, 'view receipts');
-    const receipt = await this.prisma.receipt.findFirst({ where: { id: receiptId, organizationId: org.organization.id }, include: receiptInclude });
+    const receipt = await this.prisma.receipt.findFirst({
+      where: { id: receiptId, organizationId: org.organization.id, ...(locationScope(org) ? { warehouse: inScope(org) } : {}) },
+      include: receiptInclude,
+    });
     if (!receipt) throw notFound('Receipt');
     return receipt;
   }
@@ -238,7 +251,7 @@ export class WarehouseService {
   }
 
   private async owned(org: ActingOrganization, warehouseId: string) {
-    const warehouse = await this.prisma.warehouse.findFirst({ where: { id: warehouseId, organizationId: org.organization.id } });
+    const warehouse = await this.prisma.warehouse.findFirst({ where: { id: warehouseId, organizationId: org.organization.id, ...inScope(org) } });
     if (!warehouse) throw notFound('Warehouse');
     return warehouse;
   }
@@ -260,3 +273,9 @@ export class WarehouseService {
     });
   }
 }
+
+/** Staff limited to some locations see only the warehouses at those locations (PRD addendum 2.2). */
+const inScope = (org: ActingOrganization) => {
+  const scope = locationScope(org);
+  return scope ? { branchId: { in: scope } } : {};
+};

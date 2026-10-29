@@ -32,25 +32,25 @@ enum ReservationStatus {
 
 /// Append-only. `quantity` is signed: positive adds stock, negative removes it.
 model StockMovement {
-  id                String       @id @default(uuid()) @db.Uuid
-  organizationId    String       @map("organization_id") @db.Uuid
-  warehouseId       String       @map("warehouse_id") @db.Uuid
+  id                 String       @id @default(uuid()) @db.Uuid
+  organizationId     String       @map("organization_id") @db.Uuid
+  warehouseId        String       @map("warehouse_id") @db.Uuid
   /// Catalog product, produce lot or production batch (external reference).
-  itemId            String       @map("item_id") @db.Uuid
-  type              MovementType
-  quantity          Decimal      @db.Decimal(18, 4)
-  unitOfMeasure     String?      @map("unit_of_measure")
-  sourceType        String       @map("source_type")
-  sourceId          String       @map("source_id")
+  itemId             String       @map("item_id") @db.Uuid
+  type               MovementType
+  quantity           Decimal      @db.Decimal(18, 4)
+  unitOfMeasure      String?      @map("unit_of_measure")
+  sourceType         String       @map("source_type")
+  sourceId           String       @map("source_id")
   /// Retrying a posting with the same key never posts twice.
-  idempotencyKey    String       @unique @map("idempotency_key")
+  idempotencyKey     String       @unique @map("idempotency_key")
   /// SHA-256 of the request, to refuse a reused key with different content.
-  requestHash       String       @map("request_hash")
-  reversesMovementId String?     @unique @map("reverses_movement_id") @db.Uuid
-  reservationId     String?      @map("reservation_id") @db.Uuid
-  note              String?
-  createdBy         String       @map("created_by")
-  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  requestHash        String       @map("request_hash")
+  reversesMovementId String?      @unique @map("reverses_movement_id") @db.Uuid
+  reservationId      String?      @map("reservation_id") @db.Uuid
+  note               String?
+  createdBy          String       @map("created_by")
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@index([organizationId, itemId, createdAt])
   @@index([organizationId, warehouseId, createdAt])
@@ -64,6 +64,10 @@ model StockBalance {
   itemId         String   @map("item_id") @db.Uuid
   onHand         Decimal  @default(0) @map("on_hand") @db.Decimal(18, 4)
   reserved       Decimal  @default(0) @db.Decimal(18, 4)
+  /// Part of onHand that is damaged (not sellable until written off or repaired). PRD addendum 2.1.
+  damaged        Decimal  @default(0) @db.Decimal(18, 4)
+  /// Part of onHand held for quality (inspection hold, recall).
+  quarantined    Decimal  @default(0) @db.Decimal(18, 4)
   updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@id([organizationId, warehouseId, itemId])
@@ -100,6 +104,74 @@ model StockReservationLine {
 
   @@index([reservationId])
   @@map("stock_reservation_lines")
+}
+
+enum StockState {
+  available
+  damaged
+  quarantined
+}
+
+enum CycleCountStatus {
+  counting
+  submitted
+  approved
+  cancelled
+}
+
+/// Moving stock between available, damaged and quarantined (on hand doesn't change). Append-only.
+model StockStateChange {
+  id             String     @id @default(uuid()) @db.Uuid
+  organizationId String     @map("organization_id") @db.Uuid
+  warehouseId    String     @map("warehouse_id") @db.Uuid
+  itemId         String     @map("item_id") @db.Uuid
+  fromState      StockState @map("from_state")
+  toState        StockState @map("to_state")
+  quantity       Decimal    @db.Decimal(18, 4)
+  reason         String
+  sourceType     String     @map("source_type")
+  sourceId       String?    @map("source_id")
+  createdBy      String     @map("created_by")
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([organizationId, itemId, createdAt])
+  @@map("stock_state_changes")
+}
+
+/// A physical count of one warehouse; approval posts the variances as adjustments.
+model CycleCount {
+  id                String           @id @default(uuid()) @db.Uuid
+  number            String           @unique
+  organizationId    String           @map("organization_id") @db.Uuid
+  warehouseId       String           @map("warehouse_id") @db.Uuid
+  status            CycleCountStatus @default(counting)
+  note              String?
+  createdByUserId   String           @map("created_by_user_id") @db.Uuid
+  submittedByUserId String?          @map("submitted_by_user_id") @db.Uuid
+  approvedByUserId  String?          @map("approved_by_user_id") @db.Uuid
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  submittedAt       DateTime?        @map("submitted_at") @db.Timestamptz(3)
+  approvedAt        DateTime?        @map("approved_at") @db.Timestamptz(3)
+
+  lines CycleCountLine[]
+
+  @@index([organizationId, status])
+  @@map("cycle_counts")
+}
+
+model CycleCountLine {
+  id               String   @id @default(uuid()) @db.Uuid
+  cycleCountId     String   @map("cycle_count_id") @db.Uuid
+  itemId           String   @map("item_id") @db.Uuid
+  /// On hand when the count started.
+  expectedQuantity Decimal  @map("expected_quantity") @db.Decimal(18, 4)
+  countedQuantity  Decimal? @map("counted_quantity") @db.Decimal(18, 4)
+  note             String?
+
+  cycleCount CycleCount @relation(fields: [cycleCountId], references: [id], onDelete: Cascade)
+
+  @@unique([cycleCountId, itemId])
+  @@map("cycle_count_lines")
 }
 
 /// Transactional outbox (PRD 8.3).
