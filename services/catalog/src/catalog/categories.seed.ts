@@ -97,7 +97,22 @@ export class CategorySeeder implements OnApplicationBootstrap {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async onApplicationBootstrap() {
+  /** Seeds in the background: an unreachable database is retried (and shown on /health/ready), not a crash at startup. */
+  onApplicationBootstrap() {
+    void this.seedWithRetry();
+  }
+
+  private async seedWithRetry(attempt = 1): Promise<void> {
+    try {
+      await this.seed();
+    } catch (error) {
+      const delay = Math.min(60_000, 5_000 * attempt);
+      this.logger.error(`Category seeding failed (retrying in ${delay / 1000}s): ${(error as Error).message.split('\n').filter(Boolean).pop()}`);
+      setTimeout(() => void this.seedWithRetry(attempt + 1), delay).unref();
+    }
+  }
+
+  private async seed() {
     // Parents are listed before children, so one pass is enough.
     for (const c of CATEGORIES) {
       const parentId = c.parent ? (await this.prisma.category.findUnique({ where: { slug: c.parent } }))?.id : null;
