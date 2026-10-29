@@ -5,7 +5,7 @@ services:
     name: uboce-gateway
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health/live
@@ -70,7 +70,7 @@ services:
     name: uboce-identity
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -136,7 +136,7 @@ services:
     name: uboce-organization
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -192,7 +192,7 @@ services:
     name: uboce-notification
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -250,7 +250,7 @@ services:
     name: uboce-catalog
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -307,7 +307,7 @@ services:
     name: uboce-discovery
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -364,7 +364,7 @@ services:
     name: uboce-procurement
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -423,7 +423,7 @@ services:
     name: uboce-commerce
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -480,7 +480,7 @@ services:
     name: uboce-inventory
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -542,7 +542,7 @@ services:
     name: uboce-warehouse
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -604,7 +604,7 @@ services:
     name: uboce-logistics
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -681,7 +681,7 @@ services:
     name: uboce-quality
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -743,7 +743,7 @@ services:
     name: uboce-agriculture
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -810,7 +810,7 @@ services:
     name: uboce-manufacturing
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -877,7 +877,7 @@ services:
     name: uboce-kyc
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -944,7 +944,7 @@ services:
     name: uboce-kyb
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -1011,7 +1011,7 @@ services:
     name: uboce-finance
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -1073,7 +1073,7 @@ services:
     name: uboce-document
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -1154,7 +1154,7 @@ services:
     name: uboce-dispute
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -1226,7 +1226,7 @@ services:
     name: uboce-integration
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -1302,7 +1302,7 @@ services:
     name: uboce-analytics
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -1359,7 +1359,7 @@ services:
     name: uboce-administration
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     preDeployCommand: npx --no-install prisma migrate deploy
@@ -1420,7 +1420,7 @@ services:
     name: uboce-storage
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     dockerfilePath: ./infrastructure/docker/seaweedfs/Dockerfile
     dockerContext: ./infrastructure/docker/seaweedfs
     disk:
@@ -1439,7 +1439,7 @@ services:
   - type: keyvalue
     name: uboce-redis
     region: frankfurt
-    plan: starter
+    plan: free
     # Event streams must never be evicted.
     maxmemoryPolicy: noeviction
     # Private network only.
