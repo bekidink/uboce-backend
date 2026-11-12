@@ -45,6 +45,34 @@ export class LedgerService {
     }
   }
 
+  /**
+   * Posts several movements all-or-nothing (e.g. every line of a transfer leaving a warehouse):
+   * if one line is short, none is posted. Each keeps its own idempotency key, so a retried batch
+   * replays the lines that already went through.
+   */
+  async postBatch(inputs: MovementInput[]): Promise<{ movements: { movementId: string; replayed: boolean }[] }> {
+    if (new Set(inputs.map((i) => i.idempotencyKey)).size !== inputs.length) {
+      throw new AppError(HttpStatus.BAD_REQUEST, 'duplicate_key', 'Each movement in a batch needs its own idempotency key');
+    }
+    // Balances are locked in one fixed order, so two batches over the same items can't deadlock.
+    const ordered = inputs.map((input, index) => ({ input, index })).sort((a, b) => `${a.input.warehouseId}:${a.input.itemId}`.localeCompare(`${b.input.warehouseId}:${b.input.itemId}`));
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const movements: { movementId: string; replayed: boolean }[] = [];
+        for (const { input, index } of ordered) {
+          const requestHash = hashOf(input);
+          const existing = await tx.stockMovement.findUnique({ where: { idempotencyKey: input.idempotencyKey } });
+          movements[index] = existing ? this.replay(existing.id, existing.requestHash, requestHash) : await this.postTx(tx, input, requestHash);
+        }
+        return { movements };
+      });
+    } catch (error) {
+      // Another request posted one of these keys at the same moment: the caller retries and gets replays.
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') throw conflict('concurrent_change', 'Some of these movements were just posted; retry');
+      throw error;
+    }
+  }
+
   async postTx(tx: Tx, input: MovementInput, requestHash = hashOf(input)) {
     const quantity = new Decimal(input.quantity);
     let fromReserved = new Decimal(0);
@@ -81,10 +109,13 @@ export class LedgerService {
         idempotencyKey: input.idempotencyKey,
         requestHash,
         reservationId: reservationLine?.reservationId,
+        batchCode: input.batchCode,
+        expiresOn: input.expiresOn ? new Date(input.expiresOn) : undefined,
         note: input.note,
         createdBy: input.createdBy,
       },
     });
+    await this.applyBatches(tx, input, quantity);
 
     if (reservationLine && fromReserved.greaterThan(0)) {
       await tx.stockReservationLine.update({ where: { id: reservationLine.id }, data: { consumedQuantity: { increment: fromReserved } } });
@@ -107,7 +138,75 @@ export class LedgerService {
     return { movementId: movement.id, replayed: false };
   }
 
+  /**
+   * Keeps per-batch stock in step with a movement (PRD addendum 2.3). Incoming stock with a batch
+   * code adds to that batch. Outgoing stock with a code must come from that batch; without one it
+   * comes from the batches that expire first (FEFO), and untracked stock covers any remainder.
+   */
+  private async applyBatches(tx: Tx, input: { organizationId: string; warehouseId: string; itemId: string; batchCode?: string; expiresOn?: string }, quantity: Prisma.Decimal) {
+    const key = { organizationId: input.organizationId, warehouseId: input.warehouseId, itemId: input.itemId };
+    if (quantity.isZero()) return;
+    if (quantity.greaterThan(0)) {
+      if (!input.batchCode) return;
+      const expiresOn = input.expiresOn ? new Date(input.expiresOn) : null;
+      await tx.stockBatch.upsert({
+        where: { organizationId_warehouseId_itemId_batchCode: { ...key, batchCode: input.batchCode } },
+        create: { ...key, batchCode: input.batchCode, expiresOn, onHand: quantity },
+        update: { onHand: { increment: quantity }, ...(expiresOn ? { expiresOn } : {}) },
+      });
+      return;
+    }
+    let left = quantity.abs();
+    if (input.batchCode) {
+      const batch = await tx.stockBatch.findUnique({ where: { organizationId_warehouseId_itemId_batchCode: { ...key, batchCode: input.batchCode } } });
+      if (!batch || batch.onHand.lessThan(left)) {
+        throw new AppError(HttpStatus.CONFLICT, 'insufficient_batch_stock', `Batch ${input.batchCode} has ${batch?.onHand.toString() ?? '0'} in this warehouse`, { itemId: input.itemId, batchCode: input.batchCode });
+      }
+      await tx.stockBatch.update({ where: { id: batch.id }, data: { onHand: { decrement: left } } });
+      return;
+    }
+    const batches = await tx.stockBatch.findMany({
+      where: { ...key, onHand: { gt: 0 } },
+      orderBy: [{ expiresOn: { sort: 'asc', nulls: 'last' } }, { createdAt: 'asc' }],
+    });
+    for (const batch of batches) {
+      if (left.lessThanOrEqualTo(0)) break;
+      const take = Decimal.min(left, batch.onHand);
+      await tx.stockBatch.update({ where: { id: batch.id }, data: { onHand: { decrement: take } } });
+      left = left.minus(take);
+    }
+  }
+
+  /** Batches with stock, soonest expiry first; `expiringWithinDays` narrows to those expiring by then (expired included). */
+  async batches(organizationId: string, filter: { itemId?: string; warehouseId?: string | { in: string[] }; expiringWithinDays?: number }, query: PaginationQueryDto) {
+    const { expiringWithinDays, ...rest } = filter;
+    const where: Prisma.StockBatchWhereInput = {
+      organizationId,
+      ...rest,
+      onHand: { gt: 0 },
+      ...(expiringWithinDays !== undefined ? { expiresOn: { not: null, lte: new Date(Date.now() + expiringWithinDays * 86_400_000) } } : {}),
+    };
+    const [rows, total] = await Promise.all([
+      this.prisma.stockBatch.findMany({ where, orderBy: [{ expiresOn: { sort: 'asc', nulls: 'last' } }, { batchCode: 'asc' }], ...skipTake(query) }),
+      this.prisma.stockBatch.count({ where }),
+    ]);
+    const today = new Date(new Date().toISOString().slice(0, 10));
+    const items = rows.map((b) => ({
+      ...b,
+      expiresOn: b.expiresOn?.toISOString().slice(0, 10) ?? null,
+      daysToExpiry: b.expiresOn ? Math.round((b.expiresOn.getTime() - today.getTime()) / 86_400_000) : null,
+      expired: b.expiresOn ? b.expiresOn < today : false,
+    }));
+    return toPage(items, total, query);
+  }
+
   /** Corrections are new, opposite entries — the original is never edited (PRD 5.9). */
+  /** The warehouse of one of the organization's movements (for location checks), or null. */
+  async movementWarehouse(organizationId: string, movementId: string) {
+    const m = await this.prisma.stockMovement.findFirst({ where: { id: movementId, organizationId }, select: { warehouseId: true } });
+    return m?.warehouseId ?? null;
+  }
+
   async reverse(organizationId: string, movementId: string, createdBy: string, reason: string) {
     const original = await this.prisma.stockMovement.findFirst({ where: { id: movementId, organizationId } });
     if (!original) throw notFound('Movement');
@@ -134,10 +233,17 @@ export class LedgerService {
           idempotencyKey: `reversal:${original.id}`,
           requestHash: 'reversal',
           reversesMovementId: original.id,
+          batchCode: original.batchCode,
+          expiresOn: original.expiresOn,
           note: reason,
           createdBy,
         },
       });
+      await this.applyBatches(
+        tx,
+        { organizationId, warehouseId: original.warehouseId, itemId: original.itemId, batchCode: original.batchCode ?? undefined, expiresOn: original.expiresOn?.toISOString().slice(0, 10) },
+        quantity,
+      );
       await emitEvent(tx, SERVICE_NAME, 'StockMovementPosted', movement.id, {
         movementId: movement.id,
         organizationId,
@@ -292,7 +398,7 @@ export class LedgerService {
 
   // ---- Queries ---------------------------------------------------------------------
 
-  async balances(organizationId: string, filter: { itemId?: string; warehouseId?: string }, query: PaginationQueryDto) {
+  async balances(organizationId: string, filter: { itemId?: string; warehouseId?: string | { in: string[] } }, query: PaginationQueryDto) {
     const where = { organizationId, ...filter };
     const [items, total] = await Promise.all([
       this.prisma.stockBalance.findMany({ where, orderBy: [{ itemId: 'asc' }, { warehouseId: 'asc' }], ...skipTake(query) }),
@@ -305,7 +411,7 @@ export class LedgerService {
     );
   }
 
-  async movements(organizationId: string, filter: { itemId?: string; warehouseId?: string }, query: PaginationQueryDto) {
+  async movements(organizationId: string, filter: { itemId?: string; warehouseId?: string | { in: string[] } }, query: PaginationQueryDto) {
     const where = { organizationId, ...filter };
     const [items, total] = await Promise.all([
       this.prisma.stockMovement.findMany({

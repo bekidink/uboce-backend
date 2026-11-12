@@ -5,6 +5,7 @@ import {
   conflict,
   notFound,
   type PaginationQueryDto,
+  requireBusinessAccount,
   requirePermission,
   requireRole,
   skipTake,
@@ -43,6 +44,7 @@ export class PromotionsService {
   }
 
   async create(org: ActingOrganization, dto: PromotionDto) {
+    requireBusinessAccount(org, 'run promotions');
     requireRole(org, SELLER_ROLES, 'manage promotions');
     requirePermission(org, 'promotions:manage', 'manage promotions');
     try {
@@ -286,7 +288,8 @@ export class PromotionsService {
       perBuyerLimit: dto.perBuyerLimit ?? null,
       active: dto.active ?? true,
       description: dto.description?.trim() || null,
-      advertised: dto.advertised ?? true,
+      // Automatic offers are shown to buyers; a coupon code stays private unless the seller advertises it.
+      advertised: dto.advertised ?? !dto.code,
     };
   }
 

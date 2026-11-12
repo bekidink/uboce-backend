@@ -124,6 +124,11 @@ export class InventoryClient extends ServiceClient {
     return this.http.post<{ movementId: string; replayed: boolean }>(this.url('/movements'), request);
   }
 
+  /** All-or-nothing: if any movement can't post (e.g. not enough stock), none is posted. */
+  postMovements(requests: PostMovementRequest[]) {
+    return this.http.post<{ movements: { movementId: string; replayed: boolean }[] }>(this.url('/movements/batch'), { movements: requests });
+  }
+
   reserve(request: ReserveStockRequest) {
     return this.http.post<ReserveStockResult>(this.url('/reservations'), request);
   }
@@ -189,6 +194,11 @@ export class WarehousesClient extends ServiceClient {
 
   get(warehouseId: string) {
     return this.http.get<InternalWarehouse>(this.url(`/warehouses/${warehouseId}`)).catch(notFoundAsNull);
+  }
+
+  /** The organization's warehouses a location-scoped member may use: at those locations, or organization-wide. */
+  forLocations(organizationId: string, branchIds: string[]) {
+    return this.http.get<InternalWarehouse[]>(this.url(`/warehouses?organizationId=${organizationId}&branchIds=${branchIds.join(',')}`));
   }
 }
 

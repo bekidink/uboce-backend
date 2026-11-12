@@ -8,8 +8,15 @@
 //
 // Idempotent: if the demo accounts already exist, it prints their logins and stops.
 // Needs the infrastructure and every service + gateway running.
+//
+// A deployment (no Mailpit, no signed test providers):
+//   SEED_TARGET=deployed API_URL=https://<gateway>/api/v1 SMOKE_DB_KEY=<supabase ref> pnpm seed
+// Emails are marked verified in the database (.env.supabase), team members are added directly
+// instead of by emailed invitation, the test payment/carrier webhooks are skipped, and existing
+// demo users and organizations are reused, so an interrupted run can be resumed.
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 import { adminSession, call, inDays, PDF, PNG, signCallback, tokenFrom, upload, waitFor, waitForEmail } from './smoke-lib.mjs';
@@ -17,6 +24,50 @@ import { adminSession, call, inDays, PDF, PNG, signCallback, tokenFrom, upload, 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const envOf = (path) => Object.fromEntries([...readFileSync(`${root}${path}`, 'utf8').matchAll(/^([A-Z0-9_]+)=(.*)$/gm)].map((m) => [m[1], m[2]]));
 const providerSecret = (name) => envOf('services/integration/.env').PROVIDERS.split(',').find((p) => p.startsWith(`${name}:`)).split(':')[2];
+const DEPLOYED = process.env.SEED_TARGET === 'deployed';
+
+/** Deployed only: runs SQL on the deployment's database (.env.supabase, session pooler). */
+async function withDatabase(fn) {
+  const require = createRequire(`${root}services/identity/package.json`);
+  const pg = require(require.resolve('pg', { paths: [require.resolve('@prisma/adapter-pg')] }));
+  const cfg = envOf('.env.supabase');
+  const client = new pg.Client({
+    host: cfg.SUPABASE_POOLER_HOST,
+    port: 5432,
+    user: `postgres.${cfg.SUPABASE_PROJECT_REF}`,
+    password: cfg.SUPABASE_DB_PASSWORD,
+    database: 'postgres',
+    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 30_000,
+  });
+  await client.connect();
+  try {
+    return await fn(client);
+  } finally {
+    await client.end();
+  }
+}
+
+/** Deployed only: marks an email verified directly in Identity's schema (there is no inbox to read). */
+const markEmailVerified = (email) =>
+  withDatabase((db) => db.query('UPDATE identity.users SET email_verified_at = now() WHERE lower(email) = lower($1) AND email_verified_at IS NULL', [email]));
+
+/**
+ * Deployed only: gives the admin the platform_admin role, as ADMIN_BOOTSTRAP_EMAILS would (grant + audit entry),
+ * when the deployment doesn't set that variable. Does nothing if the admin already has a role.
+ */
+const ensurePlatformAdmin = (email) =>
+  withDatabase(async (db) => {
+    const user = (await db.query('SELECT id FROM identity.users WHERE lower(email) = lower($1)', [email])).rows[0];
+    if (!user) throw new Error(`${email} does not exist`);
+    const has = (await db.query('SELECT 1 FROM administration.platform_role_grants WHERE user_id = $1 AND revoked_at IS NULL', [user.id])).rowCount;
+    if (has) return;
+    await db.query("INSERT INTO administration.platform_role_grants (id, user_id, role, reason) VALUES (gen_random_uuid(), $1, 'platform_admin', 'Bootstrap administrator (seed)')", [user.id]);
+    await db.query(
+      "INSERT INTO administration.audit_entries (id, actor_user_id, action, target_type, target_id, reason_code, reason) VALUES (gen_random_uuid(), NULL, 'staff.bootstrap', 'user', $1, 'bootstrap', 'Seed of a deployment without ADMIN_BOOTSTRAP_EMAILS')",
+      [user.id],
+    );
+  });
 
 const PASSWORD = 'Demo-pass-2026!';
 const DOMAIN = 'demo.uboce.local';
@@ -45,7 +96,8 @@ async function ok(label, promise, expected = [200, 201, 202, 204]) {
   return res.body;
 }
 const section = (title) => console.log(`• ${title}`);
-const until = async (label, fn, timeoutMs = 30_000) => {
+// Deployed services may be asleep and events cross the internet: allow longer.
+const until = async (label, fn, timeoutMs = DEPLOYED ? 240_000 : 30_000) => {
   const value = await waitFor(fn, timeoutMs);
   if (!value) {
     console.error(`\n✗ timed out waiting for: ${label}`);
@@ -73,28 +125,57 @@ async function seed() {
   section('Identity: 6 people with verified emails');
   const users = {};
   for (const [key, p] of Object.entries(PEOPLE)) {
-    const tokens = await ok(`register ${key}`, call('POST', '/auth/register', { body: { email: emailOf(key), password: PASSWORD, displayName: p.displayName, locale: p.locale } }));
+    const registered = await call('POST', '/auth/register', { body: { email: emailOf(key), password: PASSWORD, displayName: p.displayName, locale: p.locale } });
+    // Deployed and resuming: the person already exists, so sign in instead.
+    const tokens =
+      DEPLOYED && registered.status === 409
+        ? await ok(`login ${key}`, call('POST', '/auth/login', { body: { email: emailOf(key), password: PASSWORD } }))
+        : await ok(`register ${key}`, Promise.resolve(registered));
     const me = await ok(`me ${key}`, call('GET', '/auth/me', { token: tokens.accessToken }));
-    const mail = await until(`verification email for ${key}`, () => waitForEmail(emailOf(key), /Confirm your email|ኢሜይል/));
-    await ok(`verify ${key}`, call('POST', '/auth/email/verify', { body: { token: tokenFrom(mail) } }));
+    if (DEPLOYED) {
+      await markEmailVerified(emailOf(key));
+    } else {
+      const mail = await until(`verification email for ${key}`, () => waitForEmail(emailOf(key), /Confirm your email|ኢሜይል/));
+      await ok(`verify ${key}`, call('POST', '/auth/email/verify', { body: { token: tokenFrom(mail) } }));
+    }
     users[key] = { ...tokens, id: me.id, token: tokens.accessToken, email: emailOf(key) };
   }
   const { selam, dawit, hana, yonas, meron, kebede } = users;
   const admin = await adminSession(root, adminEmail);
+  if (DEPLOYED) await ensurePlatformAdmin(adminEmail);
 
   // ---- Organization: orgs, branches, invitations ----------------------------------------
 
   section('Organization: 4 organizations, branches, invited team members');
-  const createOrg = (user, body) => ok(`org ${body.name}`, call('POST', '/organizations', { token: user.token, body }));
+  const createOrg = async (user, body) => {
+    if (DEPLOYED) {
+      const mine = await ok(`orgs of ${user.email}`, call('GET', '/organizations?limit=100', { token: user.token }));
+      const existing = (mine.items ?? mine).find?.((o) => o.name === body.name);
+      if (existing) return existing;
+    }
+    return ok(`org ${body.name}`, call('POST', '/organizations', { token: user.token, body }));
+  };
+  const branch = async (owner, orgId, body) => {
+    if (DEPLOYED) {
+      const list = await ok('branches', call('GET', `/organizations/${orgId}/branches?limit=100`, { token: owner.token }));
+      if ((list.items ?? []).some((b) => b.name === body.name)) return;
+    }
+    await ok('branch', call('POST', `/organizations/${orgId}/branches`, { token: owner.token, body }));
+  };
   const sidama = (await createOrg(selam, { name: 'Sidama Coffee Farmers Cooperative Union', legalName: 'Sidama Coffee Farmers Cooperative Union Ltd.', type: 'cooperative' })).id;
   const roasters = (await createOrg(hana, { name: 'Addis Roasters PLC', legalName: 'Addis Roasters Private Limited Company', type: 'business' })).id;
   const agro = (await createOrg(meron, { name: 'Ethio Agro Processing', legalName: 'Ethio Agro Processing Share Company', type: 'manufacturer' })).id;
   await createOrg(kebede, { name: 'Habesha Logistics', type: 'logistics_provider' });
 
-  await ok('branch', call('POST', `/organizations/${sidama}/branches`, { token: selam.token, body: { name: 'Hawassa head office', region: 'Sidama', city: 'Hawassa' } }));
-  await ok('branch', call('POST', `/organizations/${roasters}/branches`, { token: hana.token, body: { name: 'Bole roastery', region: 'Addis Ababa', city: 'Addis Ababa' } }));
+  await branch(selam, sidama, { name: 'Hawassa head office', region: 'Sidama', city: 'Hawassa' });
+  await branch(hana, roasters, { name: 'Bole roastery', region: 'Addis Ababa', city: 'Addis Ababa' });
 
   const invite = async (owner, orgId, orgName, member, role) => {
+    if (DEPLOYED) {
+      // No inbox to read the invitation from: the owner adds the existing user directly.
+      await ok(`add ${member.email}`, call('POST', `/organizations/${orgId}/members`, { token: owner.token, body: { userId: member.id, role } }), [200, 201, 409]);
+      return;
+    }
     await ok(`invite ${member.email}`, call('POST', `/organizations/${orgId}/invitations`, { token: owner.token, body: { email: member.email, role } }));
     const mail = await until(`invitation for ${member.email}`, () => waitForEmail(member.email, new RegExp(orgName.split(' ')[0])));
     await ok(`accept ${member.email}`, call('POST', '/invitations/accept', { token: member.token, body: { token: tokenFrom(mail) } }));
@@ -421,8 +502,9 @@ async function seed() {
     body: { orderId: awardedOrder.id, originWarehouseId: hawassa, carrierName: 'Habesha Logistics', trackingNumber: tracking, expectedDeliveryAt: inDays(3), items: [{ orderLineId: coffeeLine.id, quantity: '720' }, { orderLineId: bagsLine.id, quantity: '12' }] },
   }));
   await ok('dispatch', call('POST', `/shipments/${shipment1.id}/dispatch`, { token: dawit.token, org: sidama }));
-  const carrierSecret = providerSecret('testcarrier');
-  for (const [status, location] of [['in_transit', 'Shashemene'], ['in_transit', 'Mojo dry port']]) {
+  // The test carrier is only configured locally (signed webhooks need its secret).
+  const carrierSecret = DEPLOYED ? null : providerSecret('testcarrier');
+  for (const [status, location] of DEPLOYED ? [] : [['in_transit', 'Shashemene'], ['in_transit', 'Mojo dry port']]) {
     const body = JSON.stringify({ eventId: `seed-${randomUUID()}`, trackingNumber: tracking, status, location, occurredAt: new Date().toISOString() });
     await ok('carrier webhook', call('POST', '/integrations/callbacks/testcarrier', { body, headers: signCallback(carrierSecret, body) }));
   }
@@ -448,8 +530,10 @@ async function seed() {
   const coffeeInvoice = await ok('invoice', call('POST', '/invoices/from-order', { token: selam.token, org: sidama, body: { orderId: awardedOrder.id, taxRatePct: '15', dueInDays: 30, notes: 'Bank: CBE, account 1000-000-000 (demo)' } }));
   await ok('issue', call('POST', `/invoices/${coffeeInvoice.id}/issue`, { token: selam.token, org: sidama }));
   await ok('payment claim', call('POST', `/invoices/${coffeeInvoice.id}/payments`, { token: hana.token, org: roasters, body: { provider: 'bank_transfer', externalReference: `CBE-${randomUUID().slice(0, 8).toUpperCase()}`, amount: '200000.00', paidAt: new Date().toISOString() } }));
-  const paySecret = providerSecret('testpay');
-  const pay = (invoice, amount) => {
+  // The test payment provider is only configured locally; deployed invoices stay open.
+  const paySecret = DEPLOYED ? null : providerSecret('testpay');
+  const pay = async (invoice, amount) => {
+    if (DEPLOYED) return;
     const body = JSON.stringify({ eventId: `seed-${randomUUID()}`, type: 'payment.confirmed', reference: `TP-${randomUUID().slice(0, 10)}`, invoiceNumber: invoice.number, amount, currency: 'ETB', occurredAt: new Date().toISOString() });
     return ok('payment webhook', call('POST', '/integrations/callbacks/testpay', { body, headers: signCallback(paySecret, body) }));
   };
@@ -485,6 +569,8 @@ async function seed() {
   console.log(`\nDone: ${steps} API calls succeeded across all 21 services.`);
 }
 
-if (probe.status === 200) console.log('Demo data is already seeded.');
+// Deployed: the demo users may exist from an interrupted run, so "done" means Sidama's products are listed.
+const seeded = DEPLOYED ? ((await call('GET', '/discovery/products?q=sidama')).body?.meta?.total ?? 0) > 0 : probe.status === 200;
+if (seeded) console.log('Demo data is already seeded.');
 else await seed();
 printLogins(adminEmail);

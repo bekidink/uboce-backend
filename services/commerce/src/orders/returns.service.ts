@@ -48,6 +48,11 @@ export class ReturnsService {
       if (quantity.gt(returnable)) throw badRequest('over_return', `Line ${line.lineNumber}: at most ${returnable.toString()} can be returned`);
       amount = amount.plus(quantity.times(line.unitPrice));
     }
+    // An order-level discount (promotion, coupon) was shared across all lines: refund the returned
+    // goods at what was actually paid for them, not at list price.
+    if (order.discountTotal.gt(0) && order.subtotal.gt(0)) {
+      amount = amount.minus(amount.times(order.discountTotal).dividedBy(order.subtotal));
+    }
     const restockingFee = amount.times(policy?.restockingFeePct ?? 0).dividedBy(100).toDecimalPlaces(2);
 
     return this.prisma.$transaction(async (tx) => {

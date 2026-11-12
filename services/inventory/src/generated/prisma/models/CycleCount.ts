@@ -475,10 +475,6 @@ export type EnumCycleCountStatusFieldUpdateOperationsInput = {
   set?: $Enums.CycleCountStatus
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type CycleCountCreateNestedOneWithoutLinesInput = {
   create?: Prisma.XOR<Prisma.CycleCountCreateWithoutLinesInput, Prisma.CycleCountUncheckedCreateWithoutLinesInput>
   connectOrCreate?: Prisma.CycleCountCreateOrConnectWithoutLinesInput

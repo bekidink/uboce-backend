@@ -94,6 +94,9 @@ model ReceiptLine {
   /// Set when posted: received − rejected, or what inspection accepted.
   acceptedQuantity Decimal? @map("accepted_quantity") @db.Decimal(18, 4)
   discrepancyNote  String?  @map("discrepancy_note")
+  /// Batch / lot and expiry printed on the goods; passed to Inventory for batch tracking.
+  batchCode        String?  @map("batch_code")
+  expiresOn        DateTime? @map("expires_on") @db.Date
 
   receipt Receipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
 

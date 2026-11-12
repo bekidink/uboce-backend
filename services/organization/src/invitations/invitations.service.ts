@@ -47,6 +47,7 @@ export class InvitationsService {
   /** Invites someone by email or phone. They join only after accepting while signed in as that address. */
   async create(userId: string, organizationId: string, dto: CreateInvitationDto) {
     const actor = await this.organizations.authorize(organizationId, userId, 'members:manage');
+    await this.organizations.requireBusiness(organizationId, 'invite staff');
     if (!canAssignRole(actor.role, dto.role)) throw forbidden('You cannot grant this role');
     if (!!dto.email === !!dto.phone) throw badRequest('email_or_phone', 'Invite by exactly one of email or phone');
 

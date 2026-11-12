@@ -12,7 +12,16 @@ export interface ModuleDefinition {
 }
 
 /** Organization (business) types; admins decide which modules each type gets. */
-export const BUSINESS_TYPES = ['business', 'cooperative', 'farm', 'manufacturer', 'wholesaler', 'distributor', 'warehouse', 'logistics_provider', 'other'] as const;
+export const BUSINESS_TYPES = ['business', 'cooperative', 'farm', 'manufacturer', 'wholesaler', 'distributor', 'warehouse', 'logistics_provider', 'other', 'individual'] as const;
+
+/**
+ * A single customer buying for themselves: a one-member "personal account" organization, so every
+ * buyer flow (orders, invoices, payments, returns, disputes) works unchanged. It can't sell or add staff.
+ */
+export const PERSONAL_ACCOUNT_TYPE = 'individual';
+
+/** Non-core modules a personal account gets by default: buying needs only returns and messages. */
+const PERSONAL_MODULES: readonly string[] = ['returns', 'chat'];
 
 export const MODULES = [
   { key: 'catalog', name: 'Catalog', description: 'Products, variants, images, price tiers and price lists', core: true, defaultEnabled: true },
@@ -36,6 +45,7 @@ export const MODULES = [
 /** A module's default for a business type, before any admin setting. */
 export function moduleDefault(m: ModuleDefinition, type: string | null | undefined) {
   if (m.core) return true;
+  if (type === PERSONAL_ACCOUNT_TYPE) return PERSONAL_MODULES.includes(m.key);
   if (m.defaultTypes) return Boolean(type && m.defaultTypes.includes(type));
   return m.defaultEnabled;
 }

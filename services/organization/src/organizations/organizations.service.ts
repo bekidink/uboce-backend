@@ -22,6 +22,7 @@ import type {
   AddMemberDto,
   CreateBranchDto,
   CreateOrganizationDto,
+  CreatePersonalAccountDto,
   MemberLocationsDto,
   MemberTemplateDto,
   RoleTemplateDto,
@@ -56,6 +57,7 @@ export class OrganizationsService {
   }
 
   async create(userId: string, dto: CreateOrganizationDto) {
+    if (dto.type === 'individual') throw badRequest('use_personal_account', 'Create a personal account with POST /organizations/personal');
     return this.prisma.$transaction(async (tx) => {
       const organization = await tx.organization.create({
         data: {
@@ -82,6 +84,46 @@ export class OrganizationsService {
       await this.emitMembershipAdded(tx, membership, userId);
       return organization;
     });
+  }
+
+  /**
+   * Get-or-create the caller's personal account: a one-member organization of type "individual"
+   * that buys like any business but can't sell, add staff or locations (see requireBusinessAccount).
+   */
+  async personalAccount(userId: string, dto: CreatePersonalAccountDto) {
+    const existing = await this.prisma.organization.findUnique({ where: { personalUserId: userId } });
+    if (existing) return existing;
+    const user = await this.identity.getUser(userId);
+    if (!user || user.status !== 'active') throw forbidden('Your account is not active');
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const organization = await tx.organization.create({
+          data: {
+            name: (dto.name ?? user.displayName).trim() || 'Personal account',
+            type: 'individual',
+            countryCode: dto.countryCode ?? 'ET',
+            contactPhone: dto.contactPhone ?? user.phone,
+            contactEmail: user.email,
+            createdByUserId: userId,
+            personalUserId: userId,
+          },
+        });
+        const membership = await tx.membership.create({ data: { organizationId: organization.id, userId, role: 'owner', addedByUserId: userId } });
+        await this.emit(tx, 'OrganizationCreated', organization.id, {
+          organizationId: organization.id,
+          name: organization.name,
+          type: organization.type,
+          countryCode: organization.countryCode,
+          createdByUserId: userId,
+        });
+        await this.emitMembershipAdded(tx, membership, userId);
+        return organization;
+      });
+    } catch (error) {
+      // Two sign-ins at once: the other request created it.
+      if ((error as { code?: string }).code === 'P2002') return this.prisma.organization.findUniqueOrThrow({ where: { personalUserId: userId } });
+      throw error;
+    }
   }
 
   /** Organizations the caller actively belongs to, with their role in each. */
@@ -168,6 +210,7 @@ export class OrganizationsService {
 
   async addMember(userId: string, organizationId: string, dto: AddMemberDto) {
     const actor = await this.authorize(organizationId, userId, 'members:manage');
+    await this.requireBusiness(organizationId, 'add members');
     if (!canAssignRole(actor.role, dto.role)) throw forbidden('You cannot grant this role');
 
     return this.prisma.$transaction((tx) => this.addMembershipTx(tx, organizationId, dto.userId, dto.role, userId));
@@ -237,6 +280,7 @@ export class OrganizationsService {
 
   async saveTemplate(userId: string, organizationId: string, dto: RoleTemplateDto, templateId?: string) {
     await this.authorize(organizationId, userId, 'members:manage');
+    await this.requireBusiness(organizationId, 'use role templates');
     const unknown = dto.permissions.filter((p) => !PERMISSION_KEYS.has(p));
     if (unknown.length) throw badRequest('unknown_permission', `Unknown permissions: ${unknown.join(', ')}`);
     if (Boolean(dto.approvalLimit) !== Boolean(dto.approvalCurrency)) throw badRequest('limit_currency', 'An approval limit needs a currency (and only then)');
@@ -319,6 +363,7 @@ export class OrganizationsService {
 
   async createBranch(userId: string, organizationId: string, dto: CreateBranchDto) {
     await this.authorize(organizationId, userId, 'branches:manage');
+    await this.requireBusiness(organizationId, 'add locations');
     const { operatingHours, ...rest } = dto;
     return this.prisma.$transaction(async (tx) => {
       const branch = await tx.branch.create({
@@ -419,6 +464,12 @@ export class OrganizationsService {
       throw new AppError(HttpStatus.FORBIDDEN, 'organization_inactive', 'This organization is not active');
     }
     return membership;
+  }
+
+  /** Personal accounts have exactly one member and no locations. */
+  async requireBusiness(organizationId: string, action: string) {
+    const org = await this.prisma.organization.findUnique({ where: { id: organizationId }, select: { type: true } });
+    if (org?.type === 'individual') throw forbidden(`A personal account cannot ${action}`);
   }
 
   private async activeMembership(organizationId: string, membershipId: string) {

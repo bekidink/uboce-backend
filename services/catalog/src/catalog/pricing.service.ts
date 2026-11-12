@@ -1,5 +1,17 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { type ActingOrganization, AppError, badRequest, conflict, notFound, requirePermission, requireRole, skipTake, toPage, type PaginationQueryDto } from '@uboce/common';
+import {
+  type ActingOrganization,
+  AppError,
+  badRequest,
+  conflict,
+  notFound,
+  type PaginationQueryDto,
+  requireBusinessAccount,
+  requirePermission,
+  requireRole,
+  skipTake,
+  toPage,
+} from '@uboce/common';
 import type { CatalogQuote, CatalogQuoteLine, CatalogQuoteRequest } from '@uboce/contracts';
 
 import { Prisma } from '../generated/prisma/client.js';
@@ -63,6 +75,7 @@ export class PricingService {
   }
 
   async createPriceList(org: ActingOrganization, dto: PriceListDto) {
+    requireBusinessAccount(org, 'create price lists');
     requireRole(org, CATALOG_ROLES, 'manage prices');
     requirePermission(org, 'prices:manage', 'change prices');
     await this.checkEntries(org, dto);

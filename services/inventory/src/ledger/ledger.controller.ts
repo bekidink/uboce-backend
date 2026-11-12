@@ -13,7 +13,6 @@ import {
   PaginationQueryDto,
   requireRole,
   type ServiceCaller,
-  WarehousesClient,
   RequiresModule,
 } from '@uboce/common';
 import { Type } from 'class-transformer';
@@ -21,21 +20,27 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsIn,
+  IsInt,
   IsOptional,
   IsString,
   IsUUID,
   Length,
   Matches,
+  Max,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import type { Response } from 'express';
 
 import { LedgerService } from './ledger.service.js';
+import { WarehouseScope } from './scope.js';
 
 const STOCK_ROLES = ['owner', 'admin', 'warehouse_operator'];
 const READ_ROLES = [...STOCK_ROLES, 'sales_representative', 'procurement_officer', 'manufacturer', 'farmer', 'logistics_operator', 'finance_officer', 'auditor', 'quality_inspector'];
 const SIGNED_DECIMAL = /^-?\d{1,14}(\.\d{1,4})?$/;
 const IDEMPOTENCY_KEY = /^[A-Za-z0-9_:.-]{8,150}$/;
+const BATCH_CODE = /^[A-Za-z0-9_./-]{1,60}$/;
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 class FilterQueryDto extends PaginationQueryDto {
   @IsOptional()
@@ -45,6 +50,16 @@ class FilterQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsUUID()
   warehouseId?: string;
+}
+
+class BatchQueryDto extends FilterQueryDto {
+  /** Only batches expiring within this many days (already expired ones included). */
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(3650)
+  expiringWithinDays?: number;
 }
 
 class AdjustmentDto {
@@ -110,6 +125,22 @@ class InternalMovementDto {
 
   @IsOptional()
   reservation?: { referenceType: 'order' | 'production_order'; referenceId: string };
+
+  @IsOptional()
+  @Matches(BATCH_CODE)
+  batchCode?: string;
+
+  @IsOptional()
+  @Matches(DATE)
+  expiresOn?: string;
+}
+
+class InternalMovementBatchDto {
+  @ValidateNested({ each: true })
+  @Type(() => InternalMovementDto)
+  @ArrayMinSize(1)
+  @ArrayMaxSize(200)
+  movements: InternalMovementDto[];
 }
 
 class ReserveLineDto {
@@ -149,21 +180,28 @@ class InternalReserveDto {
 export class InventoryController {
   constructor(
     private readonly ledger: LedgerService,
-    private readonly warehouses: WarehousesClient,
+    private readonly scope: WarehouseScope,
   ) {}
 
   /** On hand, reserved and available, per item and warehouse. */
   @Get('balances')
-  balances(@ActingOrg() org: ActingOrganization, @Query() q: FilterQueryDto) {
+  async balances(@ActingOrg() org: ActingOrganization, @Query() q: FilterQueryDto) {
     requireRole(org, READ_ROLES, 'view stock');
-    return this.ledger.balances(org.organization.id, { itemId: q.itemId, warehouseId: q.warehouseId }, q);
+    return this.ledger.balances(org.organization.id, { itemId: q.itemId, warehouseId: await this.scope.filter(org, q.warehouseId) }, q);
   }
 
   /** The full ledger, newest first. */
   @Get('movements')
-  movements(@ActingOrg() org: ActingOrganization, @Query() q: FilterQueryDto) {
+  async movements(@ActingOrg() org: ActingOrganization, @Query() q: FilterQueryDto) {
     requireRole(org, READ_ROLES, 'view stock');
-    return this.ledger.movements(org.organization.id, { itemId: q.itemId, warehouseId: q.warehouseId }, q);
+    return this.ledger.movements(org.organization.id, { itemId: q.itemId, warehouseId: await this.scope.filter(org, q.warehouseId) }, q);
+  }
+
+  /** Stock per batch / lot with expiry, soonest first (first-expiry-first-out and expiry reports). */
+  @Get('batches')
+  async batches(@ActingOrg() org: ActingOrganization, @Query() q: BatchQueryDto) {
+    requireRole(org, READ_ROLES, 'view stock');
+    return this.ledger.batches(org.organization.id, { itemId: q.itemId, warehouseId: await this.scope.filter(org, q.warehouseId), expiringWithinDays: q.expiringWithinDays }, q);
   }
 
   @Get('reservations/:referenceType/:referenceId')
@@ -188,8 +226,7 @@ export class InventoryController {
   ) {
     requireRole(org, STOCK_ROLES, 'adjust stock');
     if (!key || !IDEMPOTENCY_KEY.test(key)) throw badRequest('idempotency_key_required', 'Send an Idempotency-Key header');
-    const warehouse = await this.warehouses.get(dto.warehouseId);
-    if (!warehouse || warehouse.organizationId !== org.organization.id) throw badRequest('unknown_warehouse', 'Warehouse not found in your organization');
+    await this.scope.require(org, dto.warehouseId, 'adjust stock here');
     const result = await this.ledger.post({
       idempotencyKey: `adjustment:${org.organization.id}:${key}`,
       organizationId: org.organization.id,
@@ -207,8 +244,10 @@ export class InventoryController {
   }
 
   @Post('movements/:movementId/reverse')
-  reverse(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @Param('movementId', new ParseUUIDPipe()) id: string, @Body() dto: ReverseDto) {
+  async reverse(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @Param('movementId', new ParseUUIDPipe()) id: string, @Body() dto: ReverseDto) {
     requireRole(org, STOCK_ROLES, 'reverse movements');
+    const warehouseId = await this.ledger.movementWarehouse(org.organization.id, id);
+    if (warehouseId) await this.scope.require(org, warehouseId, 'reverse movements here');
     return this.ledger.reverse(org.organization.id, id, `user:${user.userId}`, dto.reason);
   }
 }
@@ -224,6 +263,14 @@ export class InternalInventoryController {
   @HttpCode(200)
   movement(@CallingService() caller: ServiceCaller, @Body() dto: InternalMovementDto) {
     return this.ledger.post({ ...dto, createdBy: `service:${caller.service}` });
+  }
+
+  /** All-or-nothing: either every movement posts or none does (e.g. dispatching a multi-line transfer). */
+  @Internal('warehouse', 'logistics', 'manufacturing', 'agriculture')
+  @Post('movements/batch')
+  @HttpCode(200)
+  movements(@CallingService() caller: ServiceCaller, @Body() dto: InternalMovementBatchDto) {
+    return this.ledger.postBatch(dto.movements.map((m) => ({ ...m, createdBy: `service:${caller.service}` })));
   }
 
   @Internal('manufacturing')

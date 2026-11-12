@@ -12,19 +12,20 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
-  type ActingOrganization,
   ActingOrg,
+  type ActingOrganization,
   ActsForOrganization,
   badRequest,
   conflict,
   notFound,
+  requireBusinessAccount,
   requireRole,
 } from '@uboce/common';
 import { IsInt, IsOptional, IsString, IsUUID, Length, Max, Min } from 'class-validator';
 
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
-import { CATALOG_ROLES } from './catalog.service.js';
+import { CATALOG_ROLES, CatalogService } from './catalog.service.js';
 
 class CategoryDto {
   @IsString()
@@ -83,7 +84,10 @@ const slugify = (s: string) =>
  */
 @Injectable()
 export class CategoriesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly catalog: CatalogService,
+  ) {}
 
   /** Platform categories, plus the acting organization's own when given. */
   list(organizationId?: string) {
@@ -103,6 +107,7 @@ export class CategoriesService {
   }
 
   async create(org: ActingOrganization, dto: CategoryDto) {
+    requireBusinessAccount(org, 'create categories');
     requireRole(org, CATALOG_ROLES, 'manage categories');
     const parent = await this.platformParent(dto.parentId);
     const count = await this.prisma.category.count({ where: { organizationId: org.organization.id } });
@@ -133,22 +138,35 @@ export class CategoriesService {
 
   async update(org: ActingOrganization, id: string, dto: UpdateCategoryDto) {
     requireRole(org, CATALOG_ROLES, 'manage categories');
-    await this.owned(org, id);
+    const existing = await this.owned(org, id);
     const parent = dto.parentId ? await this.platformParent(dto.parentId) : null;
-    return this.prisma.category.update({
-      where: { id },
-      data: {
-        name: dto.name?.trim(),
-        description: dto.description === undefined ? undefined : dto.description.trim() || null,
-        sortOrder: dto.sortOrder,
-        ...(parent
-          ? {
-              parentId: parent.id,
-              requiredAttributes: parent.requiredAttributes,
-              attributeDefinitions: parent.attributeDefinitions as Prisma.InputJsonValue,
-            }
-          : {}),
-      },
+    const moved = parent !== null && parent.id !== existing.parentId;
+    return this.prisma.$transaction(async (tx) => {
+      const category = await tx.category.update({
+        where: { id },
+        data: {
+          name: dto.name?.trim(),
+          description: dto.description === undefined ? undefined : dto.description.trim() || null,
+          sortOrder: dto.sortOrder,
+          ...(parent
+            ? {
+                parentId: parent.id,
+                requiredAttributes: parent.requiredAttributes,
+                attributeDefinitions: parent.attributeDefinitions as Prisma.InputJsonValue,
+              }
+            : {}),
+        },
+      });
+      // Moving a category changes its sector path: re-publish its live products so search
+      // (sector-wide filters, facets) finds them under the new sector.
+      if (moved) {
+        const live = await tx.product.findMany({
+          where: { categoryId: id, status: 'published' },
+          select: { id: true },
+        });
+        for (const product of live) await this.catalog.afterChange(tx, product.id);
+      }
+      return category;
     });
   }
 

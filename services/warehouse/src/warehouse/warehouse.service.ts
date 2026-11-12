@@ -35,6 +35,9 @@ export interface ReceiptLineInput {
   receivedQuantity: string;
   rejectedQuantity?: string;
   discrepancyNote?: string;
+  batchCode?: string;
+  /** YYYY-MM-DD */
+  expiresOn?: string;
 }
 
 export interface ReceiptInput {
@@ -98,7 +101,13 @@ export class WarehouseService {
   async internalGet(warehouseId: string): Promise<InternalWarehouse> {
     const w = await this.prisma.warehouse.findUnique({ where: { id: warehouseId } });
     if (!w) throw notFound('Warehouse');
-    return { id: w.id, organizationId: w.organizationId, name: w.name, status: w.status };
+    return { id: w.id, organizationId: w.organizationId, name: w.name, status: w.status, branchId: w.branchId };
+  }
+
+  /** Warehouses at the given locations plus organization-wide ones (no location). */
+  async internalForLocations(organizationId: string, branchIds: string[]): Promise<InternalWarehouse[]> {
+    const rows = await this.prisma.warehouse.findMany({ where: { organizationId, OR: [{ branchId: { in: branchIds } }, { branchId: null }] } });
+    return rows.map((w) => ({ id: w.id, organizationId: w.organizationId, name: w.name, status: w.status, branchId: w.branchId }));
   }
 
   // ---- Receiving --------------------------------------------------------------------
@@ -139,6 +148,8 @@ export class WarehouseService {
               receivedQuantity: l.receivedQuantity,
               rejectedQuantity: l.rejectedQuantity ?? '0',
               discrepancyNote: l.discrepancyNote,
+              batchCode: l.batchCode,
+              expiresOn: l.expiresOn ? new Date(l.expiresOn) : undefined,
             })),
           },
         },
@@ -187,6 +198,8 @@ export class WarehouseService {
           quantity: accepted.toString(),
           sourceType: 'receipt',
           sourceId: receiptId,
+          ...(line.batchCode ? { batchCode: line.batchCode } : {}),
+          ...(line.expiresOn ? { expiresOn: line.expiresOn.toISOString().slice(0, 10) } : {}),
         });
       }
       await this.prisma.receiptLine.update({ where: { id: lineId }, data: { acceptedQuantity: accepted } });

@@ -9,10 +9,11 @@ import {
   notFound,
   OrganizationsClient,
   type PaginationQueryDto,
+  qualified,
+  requireBusinessAccount,
   requireRole,
   skipTake,
   toPage,
-  qualified,
 } from '@uboce/common';
 import type { PaymentNotification } from '@uboce/contracts';
 
@@ -45,6 +46,7 @@ export class InvoicesService {
 
   /** Draft from an order's immutable lines (seller side). */
   async fromOrder(org: ActingOrganization, userId: string, dto: { orderId: string; taxRatePct: string; dueInDays: number; notes?: string }) {
+    requireBusinessAccount(org, 'issue invoices');
     requireRole(org, SELLER_ROLES, 'invoice orders');
     const order = await this.commerce.getOrder(dto.orderId);
     if (!order || order.supplierOrganizationId !== org.organization.id) throw notFound('Order');
@@ -68,6 +70,7 @@ export class InvoicesService {
   }
 
   async manual(org: ActingOrganization, userId: string, dto: { buyerOrganizationId: string; currency: string; dueInDays: number; notes?: string; lines: LineInput[] }) {
+    requireBusinessAccount(org, 'issue invoices');
     requireRole(org, SELLER_ROLES, 'create invoices');
     if (dto.buyerOrganizationId === org.organization.id) throw badRequest('self_invoice', 'You cannot invoice your own organization');
     const buyer = await this.organizations.getOrganization(dto.buyerOrganizationId);

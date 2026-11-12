@@ -173,8 +173,13 @@ S3 storage stay local either way.
   APNs key uploaded in Firebase. Without it, pushes are logged.
 - **Email:** any SMTP server via `SMTP_URL`. Locally Mailpit catches everything.
 - **Storage:** any S3-compatible store via `S3_*` in `services/document/.env`.
-- **Webhooks:** `PROVIDERS=name:kind:secret,…` in `services/integration/.env` (`kind` is `payment` or
-  `carrier`); providers sign with their secret. `pnpm setup` adds two local test providers.
+- **Webhooks:** `PROVIDERS=name:kind:secret,…` in `services/integration/.env` (`kind` is `payment`,
+  `carrier`, `chapa` or `stripe`); providers sign with their secret. `pnpm setup` adds two local test providers.
+- **Stripe:** in Finance set `PAYMENT_PROVIDERS=…,stripe` and `STRIPE_SECRET_KEY`. In the Stripe dashboard add a
+  webhook endpoint `<PUBLIC_API_URL>/api/v1/integrations/callbacks/stripe` for `checkout.session.completed`,
+  `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`,
+  `refund.created`, `refund.updated` and `charge.dispute.closed`, and put its signing secret in Integration's
+  `PROVIDERS` as `stripe:stripe:whsec_…`. Optionally give Integration a `STRIPE_SECRET_KEY` too (real fees, chargebacks).
 - **First administrator:** list the email in `ADMIN_BOOTSTRAP_EMAILS` (Administration). The account
   becomes `platform_admin` once its email is verified and MFA is on.
 - **Rate limits:** local `.env` values are raised so `pnpm smoke` can run; production should keep the

@@ -21,6 +21,8 @@ enum OrganizationType {
   warehouse
   logistics_provider
   other
+  /// A single customer buying for themselves (personal account): one member, buys only.
+  individual
 }
 
 enum OrganizationStatus {
@@ -91,6 +93,8 @@ model Organization {
   contactEmail       String?            @map("contact_email")
   /// Identity user ID (external reference — no cross-database foreign key).
   createdByUserId    String             @map("created_by_user_id") @db.Uuid
+  /// Set on personal (individual) accounts: the one customer it belongs to. At most one per user.
+  personalUserId     String?            @unique @map("personal_user_id") @db.Uuid
   createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
 

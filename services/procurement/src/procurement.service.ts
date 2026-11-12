@@ -8,6 +8,7 @@ import {
   notFound,
   OrganizationsClient,
   requireApprovalLimit,
+  requireBusinessAccount,
   requirePermission,
   requireRole,
   skipTake,
@@ -204,6 +205,7 @@ export class ProcurementService {
 
   /** Submits a quotation, or revises this supplier's existing one (history is kept). */
   async submitQuotation(org: ActingOrganization, userId: string, rfqId: string, dto: SubmitQuotationDto) {
+    requireBusinessAccount(org, 'quote on RFQs');
     requireRole(org, SUPPLIER_ROLES, 'submit quotations');
     const supplierId = org.organization.id;
     const rfq = await this.prisma.rfq.findUnique({ where: { id: rfqId }, include: rfqInclude });

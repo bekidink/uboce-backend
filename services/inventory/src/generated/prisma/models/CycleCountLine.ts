@@ -42,6 +42,7 @@ export type CycleCountLineMinAggregateOutputType = {
   itemId: string | null
   expectedQuantity: runtime.Decimal | null
   countedQuantity: runtime.Decimal | null
+  countedAt: Date | null
   note: string | null
 }
 
@@ -51,6 +52,7 @@ export type CycleCountLineMaxAggregateOutputType = {
   itemId: string | null
   expectedQuantity: runtime.Decimal | null
   countedQuantity: runtime.Decimal | null
+  countedAt: Date | null
   note: string | null
 }
 
@@ -60,6 +62,7 @@ export type CycleCountLineCountAggregateOutputType = {
   itemId: number
   expectedQuantity: number
   countedQuantity: number
+  countedAt: number
   note: number
   _all: number
 }
@@ -81,6 +84,7 @@ export type CycleCountLineMinAggregateInputType = {
   itemId?: true
   expectedQuantity?: true
   countedQuantity?: true
+  countedAt?: true
   note?: true
 }
 
@@ -90,6 +94,7 @@ export type CycleCountLineMaxAggregateInputType = {
   itemId?: true
   expectedQuantity?: true
   countedQuantity?: true
+  countedAt?: true
   note?: true
 }
 
@@ -99,6 +104,7 @@ export type CycleCountLineCountAggregateInputType = {
   itemId?: true
   expectedQuantity?: true
   countedQuantity?: true
+  countedAt?: true
   note?: true
   _all?: true
 }
@@ -195,6 +201,7 @@ export type CycleCountLineGroupByOutputType = {
   itemId: string
   expectedQuantity: runtime.Decimal
   countedQuantity: runtime.Decimal | null
+  countedAt: Date | null
   note: string | null
   _count: CycleCountLineCountAggregateOutputType | null
   _avg: CycleCountLineAvgAggregateOutputType | null
@@ -227,6 +234,7 @@ export type CycleCountLineWhereInput = {
   itemId?: Prisma.UuidFilter<"CycleCountLine"> | string
   expectedQuantity?: Prisma.DecimalFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.DecimalNullableFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.DateTimeNullableFilter<"CycleCountLine"> | Date | string | null
   note?: Prisma.StringNullableFilter<"CycleCountLine"> | string | null
   cycleCount?: Prisma.XOR<Prisma.CycleCountScalarRelationFilter, Prisma.CycleCountWhereInput>
 }
@@ -237,6 +245,7 @@ export type CycleCountLineOrderByWithRelationInput = {
   itemId?: Prisma.SortOrder
   expectedQuantity?: Prisma.SortOrder
   countedQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
+  countedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   cycleCount?: Prisma.CycleCountOrderByWithRelationInput
 }
@@ -251,6 +260,7 @@ export type CycleCountLineWhereUniqueInput = Prisma.AtLeast<{
   itemId?: Prisma.UuidFilter<"CycleCountLine"> | string
   expectedQuantity?: Prisma.DecimalFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.DecimalNullableFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.DateTimeNullableFilter<"CycleCountLine"> | Date | string | null
   note?: Prisma.StringNullableFilter<"CycleCountLine"> | string | null
   cycleCount?: Prisma.XOR<Prisma.CycleCountScalarRelationFilter, Prisma.CycleCountWhereInput>
 }, "id" | "cycleCountId_itemId">
@@ -261,6 +271,7 @@ export type CycleCountLineOrderByWithAggregationInput = {
   itemId?: Prisma.SortOrder
   expectedQuantity?: Prisma.SortOrder
   countedQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
+  countedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CycleCountLineCountOrderByAggregateInput
   _avg?: Prisma.CycleCountLineAvgOrderByAggregateInput
@@ -278,6 +289,7 @@ export type CycleCountLineScalarWhereWithAggregatesInput = {
   itemId?: Prisma.UuidWithAggregatesFilter<"CycleCountLine"> | string
   expectedQuantity?: Prisma.DecimalWithAggregatesFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.DecimalNullableWithAggregatesFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CycleCountLine"> | Date | string | null
   note?: Prisma.StringNullableWithAggregatesFilter<"CycleCountLine"> | string | null
 }
 
@@ -286,6 +298,7 @@ export type CycleCountLineCreateInput = {
   itemId: string
   expectedQuantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Date | string | null
   note?: string | null
   cycleCount: Prisma.CycleCountCreateNestedOneWithoutLinesInput
 }
@@ -296,6 +309,7 @@ export type CycleCountLineUncheckedCreateInput = {
   itemId: string
   expectedQuantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Date | string | null
   note?: string | null
 }
 
@@ -304,6 +318,7 @@ export type CycleCountLineUpdateInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   expectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cycleCount?: Prisma.CycleCountUpdateOneRequiredWithoutLinesNestedInput
 }
@@ -314,6 +329,7 @@ export type CycleCountLineUncheckedUpdateInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   expectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -323,6 +339,7 @@ export type CycleCountLineCreateManyInput = {
   itemId: string
   expectedQuantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Date | string | null
   note?: string | null
 }
 
@@ -331,6 +348,7 @@ export type CycleCountLineUpdateManyMutationInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   expectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -340,6 +358,7 @@ export type CycleCountLineUncheckedUpdateManyInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   expectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -364,6 +383,7 @@ export type CycleCountLineCountOrderByAggregateInput = {
   itemId?: Prisma.SortOrder
   expectedQuantity?: Prisma.SortOrder
   countedQuantity?: Prisma.SortOrder
+  countedAt?: Prisma.SortOrder
   note?: Prisma.SortOrder
 }
 
@@ -378,6 +398,7 @@ export type CycleCountLineMaxOrderByAggregateInput = {
   itemId?: Prisma.SortOrder
   expectedQuantity?: Prisma.SortOrder
   countedQuantity?: Prisma.SortOrder
+  countedAt?: Prisma.SortOrder
   note?: Prisma.SortOrder
 }
 
@@ -387,6 +408,7 @@ export type CycleCountLineMinOrderByAggregateInput = {
   itemId?: Prisma.SortOrder
   expectedQuantity?: Prisma.SortOrder
   countedQuantity?: Prisma.SortOrder
+  countedAt?: Prisma.SortOrder
   note?: Prisma.SortOrder
 }
 
@@ -450,6 +472,7 @@ export type CycleCountLineCreateWithoutCycleCountInput = {
   itemId: string
   expectedQuantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Date | string | null
   note?: string | null
 }
 
@@ -458,6 +481,7 @@ export type CycleCountLineUncheckedCreateWithoutCycleCountInput = {
   itemId: string
   expectedQuantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Date | string | null
   note?: string | null
 }
 
@@ -496,6 +520,7 @@ export type CycleCountLineScalarWhereInput = {
   itemId?: Prisma.UuidFilter<"CycleCountLine"> | string
   expectedQuantity?: Prisma.DecimalFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.DecimalNullableFilter<"CycleCountLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.DateTimeNullableFilter<"CycleCountLine"> | Date | string | null
   note?: Prisma.StringNullableFilter<"CycleCountLine"> | string | null
 }
 
@@ -504,6 +529,7 @@ export type CycleCountLineCreateManyCycleCountInput = {
   itemId: string
   expectedQuantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Date | string | null
   note?: string | null
 }
 
@@ -512,6 +538,7 @@ export type CycleCountLineUpdateWithoutCycleCountInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   expectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -520,6 +547,7 @@ export type CycleCountLineUncheckedUpdateWithoutCycleCountInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   expectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -528,6 +556,7 @@ export type CycleCountLineUncheckedUpdateManyWithoutCycleCountInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   expectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   countedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  countedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -539,6 +568,7 @@ export type CycleCountLineSelect<ExtArgs extends runtime.Types.Extensions.Intern
   itemId?: boolean
   expectedQuantity?: boolean
   countedQuantity?: boolean
+  countedAt?: boolean
   note?: boolean
   cycleCount?: boolean | Prisma.CycleCountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cycleCountLine"]>
@@ -549,6 +579,7 @@ export type CycleCountLineSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   itemId?: boolean
   expectedQuantity?: boolean
   countedQuantity?: boolean
+  countedAt?: boolean
   note?: boolean
   cycleCount?: boolean | Prisma.CycleCountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cycleCountLine"]>
@@ -559,6 +590,7 @@ export type CycleCountLineSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   itemId?: boolean
   expectedQuantity?: boolean
   countedQuantity?: boolean
+  countedAt?: boolean
   note?: boolean
   cycleCount?: boolean | Prisma.CycleCountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cycleCountLine"]>
@@ -569,10 +601,11 @@ export type CycleCountLineSelectScalar = {
   itemId?: boolean
   expectedQuantity?: boolean
   countedQuantity?: boolean
+  countedAt?: boolean
   note?: boolean
 }
 
-export type CycleCountLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cycleCountId" | "itemId" | "expectedQuantity" | "countedQuantity" | "note", ExtArgs["result"]["cycleCountLine"]>
+export type CycleCountLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cycleCountId" | "itemId" | "expectedQuantity" | "countedQuantity" | "countedAt" | "note", ExtArgs["result"]["cycleCountLine"]>
 export type CycleCountLineInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cycleCount?: boolean | Prisma.CycleCountDefaultArgs<ExtArgs>
 }
@@ -597,6 +630,10 @@ export type $CycleCountLinePayload<ExtArgs extends runtime.Types.Extensions.Inte
      */
     expectedQuantity: runtime.Decimal
     countedQuantity: runtime.Decimal | null
+    /**
+     * When the count was recorded: movements between the snapshot and this moment are already in it.
+     */
+    countedAt: Date | null
     note: string | null
   }, ExtArgs["result"]["cycleCountLine"]>
   composites: {}
@@ -1027,6 +1064,7 @@ export interface CycleCountLineFieldRefs {
   readonly itemId: Prisma.FieldRef<"CycleCountLine", 'String'>
   readonly expectedQuantity: Prisma.FieldRef<"CycleCountLine", 'Decimal'>
   readonly countedQuantity: Prisma.FieldRef<"CycleCountLine", 'Decimal'>
+  readonly countedAt: Prisma.FieldRef<"CycleCountLine", 'DateTime'>
   readonly note: Prisma.FieldRef<"CycleCountLine", 'String'>
 }
     

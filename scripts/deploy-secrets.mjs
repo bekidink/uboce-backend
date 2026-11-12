@@ -12,6 +12,8 @@
 //   DEPLOY_ADMIN_EMAILS   first platform admin(s), comma-separated
 //   DEPLOY_SMTP_URL       e.g. smtps://user:pass@smtp.example.com:465
 //   DEPLOY_PROVIDERS      name:kind:secret,… for signed payment/carrier webhooks
+//                         (Stripe: stripe:stripe:whsec_…)
+//   DEPLOY_CHAPA_SECRET_KEY, DEPLOY_STRIPE_SECRET_KEY   payment provider API keys
 import { createHash, generateKeyPairSync, randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -99,6 +101,10 @@ for (const [service, keys] of Object.entries(needs)) {
         break;
       case 'PROVIDERS':
         values[key] = process.env.DEPLOY_PROVIDERS ?? previous[service]?.[key] ?? '';
+        break;
+      case 'CHAPA_SECRET_KEY':
+      case 'STRIPE_SECRET_KEY':
+        values[key] = process.env[`DEPLOY_${key}`] ?? previous[service]?.[key] ?? '';
         break;
       case 'SERVICE_CLIENTS':
         break; // filled in once every service's secret exists

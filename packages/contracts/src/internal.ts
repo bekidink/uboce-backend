@@ -91,6 +91,13 @@ export interface PostMovementRequest {
   note?: string;
   /** Draw down an existing reservation instead of free stock (e.g. dispatching a confirmed order). */
   reservation?: { referenceType: 'order' | 'production_order'; referenceId: string };
+  /**
+   * Batch / lot code (PRD addendum 2.3). Incoming stock with a code is tracked per batch; outgoing
+   * stock with a code comes from that batch, without one from the batches that expire first.
+   */
+  batchCode?: string;
+  /** Expiry date (YYYY-MM-DD) of the batch, on incoming stock. */
+  expiresOn?: string;
 }
 
 /** Warehouse: GET /internal/warehouses/:warehouseId */
@@ -99,6 +106,8 @@ export interface InternalWarehouse {
   organizationId: string;
   name: string;
   status: string;
+  /** The location it belongs to; null = organization-wide. Drives location-scoped staff access. */
+  branchId: string | null;
 }
 
 /** Inventory: POST /internal/reservations (idempotent on referenceType + referenceId) */

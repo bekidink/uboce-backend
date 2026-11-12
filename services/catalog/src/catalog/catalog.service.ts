@@ -9,6 +9,7 @@ import {
   forbidden,
   GroqClient,
   notFound,
+  requireBusinessAccount,
   requireRole,
   skipTake,
   toOutboxRow,
@@ -107,6 +108,7 @@ export class CatalogService {
   }
 
   async create(org: ActingOrganization, userId: string, dto: CreateProductDto) {
+    requireBusinessAccount(org, 'list products');
     requireRole(org, CATALOG_ROLES, 'manage the catalog');
     const category = await this.category(dto.categoryId, org.organization.id);
     const organizationId = org.organization.id;
@@ -279,6 +281,7 @@ Return {"description": 2–4 sentences, "highlights": up to 5 short bullet phras
   }
 
   async publish(org: ActingOrganization, productId: string) {
+    requireBusinessAccount(org, 'publish products');
     requireRole(org, CATALOG_ROLES, 'publish products');
     const product = await this.owned(org, productId);
     if (product.status === 'published') return product;

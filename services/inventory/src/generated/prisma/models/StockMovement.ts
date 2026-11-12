@@ -48,6 +48,8 @@ export type StockMovementMinAggregateOutputType = {
   requestHash: string | null
   reversesMovementId: string | null
   reservationId: string | null
+  batchCode: string | null
+  expiresOn: Date | null
   note: string | null
   createdBy: string | null
   createdAt: Date | null
@@ -67,6 +69,8 @@ export type StockMovementMaxAggregateOutputType = {
   requestHash: string | null
   reversesMovementId: string | null
   reservationId: string | null
+  batchCode: string | null
+  expiresOn: Date | null
   note: string | null
   createdBy: string | null
   createdAt: Date | null
@@ -86,6 +90,8 @@ export type StockMovementCountAggregateOutputType = {
   requestHash: number
   reversesMovementId: number
   reservationId: number
+  batchCode: number
+  expiresOn: number
   note: number
   createdBy: number
   createdAt: number
@@ -115,6 +121,8 @@ export type StockMovementMinAggregateInputType = {
   requestHash?: true
   reversesMovementId?: true
   reservationId?: true
+  batchCode?: true
+  expiresOn?: true
   note?: true
   createdBy?: true
   createdAt?: true
@@ -134,6 +142,8 @@ export type StockMovementMaxAggregateInputType = {
   requestHash?: true
   reversesMovementId?: true
   reservationId?: true
+  batchCode?: true
+  expiresOn?: true
   note?: true
   createdBy?: true
   createdAt?: true
@@ -153,6 +163,8 @@ export type StockMovementCountAggregateInputType = {
   requestHash?: true
   reversesMovementId?: true
   reservationId?: true
+  batchCode?: true
+  expiresOn?: true
   note?: true
   createdBy?: true
   createdAt?: true
@@ -259,6 +271,8 @@ export type StockMovementGroupByOutputType = {
   requestHash: string
   reversesMovementId: string | null
   reservationId: string | null
+  batchCode: string | null
+  expiresOn: Date | null
   note: string | null
   createdBy: string
   createdAt: Date
@@ -301,6 +315,8 @@ export type StockMovementWhereInput = {
   requestHash?: Prisma.StringFilter<"StockMovement"> | string
   reversesMovementId?: Prisma.UuidNullableFilter<"StockMovement"> | string | null
   reservationId?: Prisma.UuidNullableFilter<"StockMovement"> | string | null
+  batchCode?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  expiresOn?: Prisma.DateTimeNullableFilter<"StockMovement"> | Date | string | null
   note?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   createdBy?: Prisma.StringFilter<"StockMovement"> | string
   createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
@@ -320,6 +336,8 @@ export type StockMovementOrderByWithRelationInput = {
   requestHash?: Prisma.SortOrder
   reversesMovementId?: Prisma.SortOrderInput | Prisma.SortOrder
   reservationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  batchCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresOn?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -342,6 +360,8 @@ export type StockMovementWhereUniqueInput = Prisma.AtLeast<{
   sourceId?: Prisma.StringFilter<"StockMovement"> | string
   requestHash?: Prisma.StringFilter<"StockMovement"> | string
   reservationId?: Prisma.UuidNullableFilter<"StockMovement"> | string | null
+  batchCode?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  expiresOn?: Prisma.DateTimeNullableFilter<"StockMovement"> | Date | string | null
   note?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   createdBy?: Prisma.StringFilter<"StockMovement"> | string
   createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
@@ -361,6 +381,8 @@ export type StockMovementOrderByWithAggregationInput = {
   requestHash?: Prisma.SortOrder
   reversesMovementId?: Prisma.SortOrderInput | Prisma.SortOrder
   reservationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  batchCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresOn?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -388,6 +410,8 @@ export type StockMovementScalarWhereWithAggregatesInput = {
   requestHash?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
   reversesMovementId?: Prisma.UuidNullableWithAggregatesFilter<"StockMovement"> | string | null
   reservationId?: Prisma.UuidNullableWithAggregatesFilter<"StockMovement"> | string | null
+  batchCode?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+  expiresOn?: Prisma.DateTimeNullableWithAggregatesFilter<"StockMovement"> | Date | string | null
   note?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   createdBy?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StockMovement"> | Date | string
@@ -407,6 +431,8 @@ export type StockMovementCreateInput = {
   requestHash: string
   reversesMovementId?: string | null
   reservationId?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
   note?: string | null
   createdBy: string
   createdAt?: Date | string
@@ -426,6 +452,8 @@ export type StockMovementUncheckedCreateInput = {
   requestHash: string
   reversesMovementId?: string | null
   reservationId?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
   note?: string | null
   createdBy: string
   createdAt?: Date | string
@@ -445,6 +473,8 @@ export type StockMovementUpdateInput = {
   requestHash?: Prisma.StringFieldUpdateOperationsInput | string
   reversesMovementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reservationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -464,6 +494,8 @@ export type StockMovementUncheckedUpdateInput = {
   requestHash?: Prisma.StringFieldUpdateOperationsInput | string
   reversesMovementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reservationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -483,6 +515,8 @@ export type StockMovementCreateManyInput = {
   requestHash: string
   reversesMovementId?: string | null
   reservationId?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
   note?: string | null
   createdBy: string
   createdAt?: Date | string
@@ -502,6 +536,8 @@ export type StockMovementUpdateManyMutationInput = {
   requestHash?: Prisma.StringFieldUpdateOperationsInput | string
   reversesMovementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reservationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -521,6 +557,8 @@ export type StockMovementUncheckedUpdateManyInput = {
   requestHash?: Prisma.StringFieldUpdateOperationsInput | string
   reversesMovementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reservationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -540,6 +578,8 @@ export type StockMovementCountOrderByAggregateInput = {
   requestHash?: Prisma.SortOrder
   reversesMovementId?: Prisma.SortOrder
   reservationId?: Prisma.SortOrder
+  batchCode?: Prisma.SortOrder
+  expiresOn?: Prisma.SortOrder
   note?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -563,6 +603,8 @@ export type StockMovementMaxOrderByAggregateInput = {
   requestHash?: Prisma.SortOrder
   reversesMovementId?: Prisma.SortOrder
   reservationId?: Prisma.SortOrder
+  batchCode?: Prisma.SortOrder
+  expiresOn?: Prisma.SortOrder
   note?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -582,6 +624,8 @@ export type StockMovementMinOrderByAggregateInput = {
   requestHash?: Prisma.SortOrder
   reversesMovementId?: Prisma.SortOrder
   reservationId?: Prisma.SortOrder
+  batchCode?: Prisma.SortOrder
+  expiresOn?: Prisma.SortOrder
   note?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -611,6 +655,10 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
@@ -631,6 +679,8 @@ export type StockMovementSelect<ExtArgs extends runtime.Types.Extensions.Interna
   requestHash?: boolean
   reversesMovementId?: boolean
   reservationId?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
   note?: boolean
   createdBy?: boolean
   createdAt?: boolean
@@ -650,6 +700,8 @@ export type StockMovementSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   requestHash?: boolean
   reversesMovementId?: boolean
   reservationId?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
   note?: boolean
   createdBy?: boolean
   createdAt?: boolean
@@ -669,6 +721,8 @@ export type StockMovementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   requestHash?: boolean
   reversesMovementId?: boolean
   reservationId?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
   note?: boolean
   createdBy?: boolean
   createdAt?: boolean
@@ -688,12 +742,14 @@ export type StockMovementSelectScalar = {
   requestHash?: boolean
   reversesMovementId?: boolean
   reservationId?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
   note?: boolean
   createdBy?: boolean
   createdAt?: boolean
 }
 
-export type StockMovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "warehouseId" | "itemId" | "type" | "quantity" | "unitOfMeasure" | "sourceType" | "sourceId" | "idempotencyKey" | "requestHash" | "reversesMovementId" | "reservationId" | "note" | "createdBy" | "createdAt", ExtArgs["result"]["stockMovement"]>
+export type StockMovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "warehouseId" | "itemId" | "type" | "quantity" | "unitOfMeasure" | "sourceType" | "sourceId" | "idempotencyKey" | "requestHash" | "reversesMovementId" | "reservationId" | "batchCode" | "expiresOn" | "note" | "createdBy" | "createdAt", ExtArgs["result"]["stockMovement"]>
 
 export type $StockMovementPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StockMovement"
@@ -721,6 +777,11 @@ export type $StockMovementPayload<ExtArgs extends runtime.Types.Extensions.Inter
     requestHash: string
     reversesMovementId: string | null
     reservationId: string | null
+    /**
+     * Batch / lot this movement went into or came out of (PRD addendum 2.3).
+     */
+    batchCode: string | null
+    expiresOn: Date | null
     note: string | null
     createdBy: string
     createdAt: Date
@@ -1160,6 +1221,8 @@ export interface StockMovementFieldRefs {
   readonly requestHash: Prisma.FieldRef<"StockMovement", 'String'>
   readonly reversesMovementId: Prisma.FieldRef<"StockMovement", 'String'>
   readonly reservationId: Prisma.FieldRef<"StockMovement", 'String'>
+  readonly batchCode: Prisma.FieldRef<"StockMovement", 'String'>
+  readonly expiresOn: Prisma.FieldRef<"StockMovement", 'DateTime'>
   readonly note: Prisma.FieldRef<"StockMovement", 'String'>
   readonly createdBy: Prisma.FieldRef<"StockMovement", 'String'>
   readonly createdAt: Prisma.FieldRef<"StockMovement", 'DateTime'>

@@ -405,7 +405,8 @@ export const ModelName = {
   CycleCount: 'CycleCount',
   CycleCountLine: 'CycleCountLine',
   OutboxEvent: 'OutboxEvent',
-  ProcessedEvent: 'ProcessedEvent'
+  ProcessedEvent: 'ProcessedEvent',
+  StockBatch: 'StockBatch'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "stockMovement" | "stockBalance" | "stockReservation" | "stockReservationLine" | "stockStateChange" | "cycleCount" | "cycleCountLine" | "outboxEvent" | "processedEvent"
+    modelProps: "stockMovement" | "stockBalance" | "stockReservation" | "stockReservationLine" | "stockStateChange" | "cycleCount" | "cycleCountLine" | "outboxEvent" | "processedEvent" | "stockBatch"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1091,6 +1092,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StockBatch: {
+      payload: Prisma.$StockBatchPayload<ExtArgs>
+      fields: Prisma.StockBatchFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StockBatchFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StockBatchFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>
+        }
+        findFirst: {
+          args: Prisma.StockBatchFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StockBatchFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>
+        }
+        findMany: {
+          args: Prisma.StockBatchFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>[]
+        }
+        create: {
+          args: Prisma.StockBatchCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>
+        }
+        createMany: {
+          args: Prisma.StockBatchCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StockBatchCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>[]
+        }
+        delete: {
+          args: Prisma.StockBatchDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>
+        }
+        update: {
+          args: Prisma.StockBatchUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>
+        }
+        deleteMany: {
+          args: Prisma.StockBatchDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StockBatchUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StockBatchUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>[]
+        }
+        upsert: {
+          args: Prisma.StockBatchUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockBatchPayload>
+        }
+        aggregate: {
+          args: Prisma.StockBatchAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStockBatch>
+        }
+        groupBy: {
+          args: Prisma.StockBatchGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StockBatchGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StockBatchCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StockBatchCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1144,6 +1219,8 @@ export const StockMovementScalarFieldEnum = {
   requestHash: 'requestHash',
   reversesMovementId: 'reversesMovementId',
   reservationId: 'reservationId',
+  batchCode: 'batchCode',
+  expiresOn: 'expiresOn',
   note: 'note',
   createdBy: 'createdBy',
   createdAt: 'createdAt'
@@ -1234,6 +1311,7 @@ export const CycleCountLineScalarFieldEnum = {
   itemId: 'itemId',
   expectedQuantity: 'expectedQuantity',
   countedQuantity: 'countedQuantity',
+  countedAt: 'countedAt',
   note: 'note'
 } as const
 
@@ -1260,6 +1338,21 @@ export const ProcessedEventScalarFieldEnum = {
 } as const
 
 export type ProcessedEventScalarFieldEnum = (typeof ProcessedEventScalarFieldEnum)[keyof typeof ProcessedEventScalarFieldEnum]
+
+
+export const StockBatchScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  warehouseId: 'warehouseId',
+  itemId: 'itemId',
+  batchCode: 'batchCode',
+  expiresOn: 'expiresOn',
+  onHand: 'onHand',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StockBatchScalarFieldEnum = (typeof StockBatchScalarFieldEnum)[keyof typeof StockBatchScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1615,6 +1708,7 @@ export type GlobalOmitConfig = {
   cycleCountLine?: Prisma.CycleCountLineOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit
+  stockBatch?: Prisma.StockBatchOmit
 }
 
 /* Types for Logging */

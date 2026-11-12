@@ -12,7 +12,8 @@ export class CallbacksController {
 
   /**
    * Webhook endpoint for a configured provider. Authenticated by signature,
-   * not by a user token. Answers 200 for processed or duplicate events.
+   * not by a user token. Answers 200 for processed, duplicate or ignored events.
+   * Chapa and Stripe use their own signature headers (x-chapa-signature, Stripe-Signature).
    */
   @Public()
   @ApiHeader({ name: 'x-uboce-timestamp', required: true, description: 'Unix seconds' })
@@ -25,8 +26,9 @@ export class CallbacksController {
     @Headers('x-uboce-signature') signature: string | undefined,
     @Req() req: RawBodyRequest<Request>,
     @Headers('x-chapa-signature') chapaSignature?: string,
+    @Headers('stripe-signature') stripeSignature?: string,
   ) {
-    return this.callbacks.handle(provider, { timestamp, signature, chapaSignature }, req.rawBody);
+    return this.callbacks.handle(provider, { timestamp, signature, chapaSignature, stripeSignature }, req.rawBody);
   }
 
   @ApiBearerAuth()

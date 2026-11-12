@@ -282,7 +282,7 @@ export class PromotionDto {
   @Length(0, 300)
   description?: string | null;
 
-  /** Show it to buyers; turn off for private coupons. */
+  /** Show it to buyers. Defaults to on for automatic offers and off for coupon codes. */
   @IsOptional()
   @IsBoolean()
   advertised?: boolean;

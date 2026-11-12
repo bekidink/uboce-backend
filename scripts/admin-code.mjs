@@ -1,5 +1,6 @@
-// Prints the local platform admin's current two-step code: pnpm admin:code
-// (local development only; the login lives in the git-ignored .smoke-admin.json).
+// Prints the platform admin's current two-step code: pnpm admin:code [database]
+// (the login lives in the git-ignored .smoke-admin.json). Without an argument it uses the
+// database the local services point at; pass a saved key (e.g. a Supabase project ref) for another.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -16,7 +17,8 @@ try {
 } catch {
   // keep the local entry
 }
-const saved = typeof all.password === 'string' ? all : (all[key] ?? all.localhost);
+if (process.argv[2]) key = process.argv[2];
+const saved = typeof all.password === 'string' ? all : process.argv[2] ? all[key] : (all[key] ?? all.localhost);
 if (!saved) {
   console.error(`No admin login saved for database "${key}".`);
   process.exit(1);

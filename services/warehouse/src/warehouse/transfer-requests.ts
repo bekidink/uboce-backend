@@ -332,33 +332,40 @@ export class TransferRequestsService {
     await this.warehouse(org, request.fromWarehouseId, true);
     if (request.status !== 'approved')
       throw conflict('not_approved', 'Only approved requests can be dispatched');
-    for (const line of request.lines) {
-      if (!line.approvedQuantity || line.approvedQuantity.lte(0)) continue;
+    const lines = request.lines.filter((l) => l.approvedQuantity && l.approvedQuantity.gt(0));
+    // One all-or-nothing batch: a short line leaves every line in the source warehouse, so a
+    // failed dispatch never strands part of the stock between warehouses.
+    if (lines.length) {
       try {
-        await this.inventory.postMovement({
-          idempotencyKey: `transfer-request:${id}:${line.id}:out`,
-          organizationId: request.organizationId,
-          warehouseId: request.fromWarehouseId,
-          itemId: line.itemId,
-          type: 'transfer_out',
-          quantity: `-${line.approvedQuantity.toString()}`,
-          sourceType: 'transfer_request',
-          sourceId: id,
-        });
+        await this.inventory.postMovements(
+          lines.map((line) => ({
+            idempotencyKey: `transfer-request:${id}:${line.id}:out`,
+            organizationId: request.organizationId,
+            warehouseId: request.fromWarehouseId,
+            itemId: line.itemId,
+            type: 'transfer_out' as const,
+            quantity: `-${line.approvedQuantity!.toString()}`,
+            sourceType: 'transfer_request',
+            sourceId: id,
+          })),
+        );
       } catch (error) {
-        const body = (error as { body?: { error?: { code?: string; message?: string } } }).body;
+        const body = (error as { body?: { error?: { code?: string; message?: string; details?: { itemId?: string } } } }).body;
+        const short = lines.find((l) => l.itemId === body?.error?.details?.itemId);
         throw new AppError(
           HttpStatus.CONFLICT,
           body?.error?.code ?? 'dispatch_failed',
-          `${line.description}: ${body?.error?.message ?? 'could not be taken out of stock'}`,
+          `${short ? `${short.description}: ` : ''}${body?.error?.message ?? 'could not be taken out of stock'}`,
         );
       }
     }
-    return this.prisma.transferRequest.update({
-      where: { id },
+    // Only one dispatch wins; a concurrent retry replays the movements above and stops here.
+    const { count } = await this.prisma.transferRequest.updateMany({
+      where: { id, status: 'approved' },
       data: { status: 'in_transit', dispatchedByUserId: userId, dispatchedAt: new Date() },
-      include,
     });
+    if (!count) throw conflict('not_approved', 'Only approved requests can be dispatched');
+    return this.prisma.transferRequest.findUniqueOrThrow({ where: { id }, include });
   }
 
   /** Destination confirms what arrived; that quantity is added to its stock. */

@@ -3,6 +3,7 @@
 // through Integration's signed callbacks, never from the buyer's browser.
 
 import { Injectable, Logger } from '@nestjs/common';
+import { toMinorUnits } from '@uboce/common';
 
 import { env } from '../config.js';
 
@@ -111,23 +112,32 @@ class ChapaProvider implements PaymentProvider {
   }
 
   async refund(req: RefundRequest): Promise<RefundResult> {
-    const data = await this.call(`/refund/${encodeURIComponent(req.paymentRef)}`, { amount: req.amount, reason: req.reason, reference: req.refundNumber });
+    const data = await this.call(`/refund/${encodeURIComponent(req.paymentRef)}`, { amount: Number(req.amount).toFixed(2), reason: req.reason, reference: req.refundNumber });
     return { status: 'processing', providerRef: (data.ref_id as string | undefined) ?? req.refundNumber };
   }
 }
 
-/** Stripe Checkout (cards, international buyers). */
+/**
+ * Stripe Checkout (cards, international buyers). Outcomes come back as Stripe webhooks to
+ * Integration (provider "stripe", kind "stripe"), which reads the metadata set here: our
+ * reference and invoice number on the session and its PaymentIntent, the refund number on refunds.
+ */
 class StripeProvider implements PaymentProvider {
   readonly name = 'stripe';
   readonly label = 'Card (Stripe)';
   readonly supportsRefunds = true;
   constructor(private readonly secret: string) {}
 
-  private async call(path: string, form: Record<string, string>) {
+  private async call(method: 'GET' | 'POST', path: string, form?: Record<string, string>, idempotencyKey?: string) {
     const res = await fetch(`${env.STRIPE_API_URL}${path}`, {
-      method: 'POST',
-      headers: { authorization: `Bearer ${this.secret}`, 'content-type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(form).toString(),
+      method,
+      headers: {
+        authorization: `Bearer ${this.secret}`,
+        ...(form ? { 'content-type': 'application/x-www-form-urlencoded' } : {}),
+        // Stripe replays the first response for a repeated key, so a retried call never charges or refunds twice.
+        ...(idempotencyKey ? { 'idempotency-key': idempotencyKey } : {}),
+      },
+      ...(form ? { body: new URLSearchParams(form).toString() } : {}),
       signal: AbortSignal.timeout(15_000),
     });
     const json = (await res.json().catch(() => ({}))) as Record<string, unknown> & { error?: { message?: string } };
@@ -136,30 +146,56 @@ class StripeProvider implements PaymentProvider {
   }
 
   async createCheckout(req: CheckoutRequest): Promise<CheckoutResult> {
-    // Stripe amounts are in the currency's minor unit.
-    const minor = Math.round(Number(req.amount) * 100).toString();
-    const session = await this.call('/checkout/sessions', {
-      mode: 'payment',
-      success_url: req.returnUrl,
-      cancel_url: req.returnUrl,
-      client_reference_id: req.reference,
-      'metadata[reference]': req.reference,
-      'metadata[invoice_number]': req.invoiceNumber,
-      'payment_intent_data[metadata][reference]': req.reference,
-      'line_items[0][quantity]': '1',
-      'line_items[0][price_data][currency]': req.currency.toLowerCase(),
-      'line_items[0][price_data][unit_amount]': minor,
-      'line_items[0][price_data][product_data][name]': req.description.slice(0, 120),
-    });
+    const session = await this.call(
+      'POST',
+      '/checkout/sessions',
+      {
+        mode: 'payment',
+        success_url: req.returnUrl,
+        cancel_url: req.returnUrl,
+        client_reference_id: req.reference,
+        ...(req.payerEmail ? { customer_email: req.payerEmail } : {}),
+        'metadata[reference]': req.reference,
+        'metadata[invoice_number]': req.invoiceNumber,
+        'metadata[intent_id]': req.intentId,
+        'payment_intent_data[metadata][reference]': req.reference,
+        'payment_intent_data[metadata][invoice_number]': req.invoiceNumber,
+        'payment_intent_data[description]': req.description.slice(0, 200),
+        'line_items[0][quantity]': '1',
+        'line_items[0][price_data][currency]': req.currency.toLowerCase(),
+        // Stripe amounts are integers in the currency's minor unit (none for JPY, three for KWD).
+        'line_items[0][price_data][unit_amount]': toMinorUnits(req.amount, req.currency),
+        'line_items[0][price_data][product_data][name]': req.description.slice(0, 120),
+      },
+      `checkout-${req.intentId}`,
+    );
     return { checkoutUrl: String(session.url) };
   }
 
+  /** Our paymentRef is our own reference; Stripe refunds need its PaymentIntent ID, found by metadata. */
+  private async paymentIntentFor(reference: string) {
+    // Our references are "<invoice number>__<8 hex>": no quotes to escape.
+    const query = `metadata['reference']:'${reference}'`;
+    const found = (await this.call('GET', `/payment_intents/search?query=${encodeURIComponent(query)}&limit=10`)) as { data?: { id: string; status: string }[] };
+    const pi = found.data?.find((p) => p.status === 'succeeded');
+    if (!pi) throw new ProviderError('Stripe: no succeeded payment found for this invoice (search can lag a minute after payment; try again)');
+    return pi.id;
+  }
+
   async refund(req: RefundRequest): Promise<RefundResult> {
-    const refund = await this.call('/refunds', {
-      payment_intent: req.paymentRef,
-      amount: Math.round(Number(req.amount) * 100).toString(),
-      'metadata[refund_number]': req.refundNumber,
-    });
+    const paymentIntent = req.paymentRef.startsWith('pi_') ? req.paymentRef : await this.paymentIntentFor(req.paymentRef);
+    const refund = await this.call(
+      'POST',
+      '/refunds',
+      {
+        payment_intent: paymentIntent,
+        amount: toMinorUnits(req.amount, req.currency),
+        reason: 'requested_by_customer',
+        'metadata[refund_number]': req.refundNumber,
+        'metadata[reason]': req.reason.slice(0, 450),
+      },
+      `refund-${req.refundNumber}`,
+    );
     return { status: refund.status === 'succeeded' ? 'succeeded' : 'processing', providerRef: String(refund.id) };
   }
 }

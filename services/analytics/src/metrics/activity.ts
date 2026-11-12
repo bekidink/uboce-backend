@@ -33,7 +33,11 @@ export const AREAS = [
 export type Area = (typeof AREAS)[number];
 
 /** Area and plain-language wording for each event the activity log records. */
-const ACTIVITY: Partial<Record<EventType, { area: Area; text: string }>> = {
+/**
+ * `actor` names the payload key of the organization that did it, for events between two parties
+ * without a plain `organizationId`. Without it nobody is marked as the actor (never guessed from key order).
+ */
+const ACTIVITY: Partial<Record<EventType, { area: Area; text: string; actor?: string }>> = {
   OrganizationCreated: { area: 'organization', text: 'Organization created' },
   OrganizationUpdated: { area: 'organization', text: 'Organization details updated' },
   MembershipAdded: { area: 'organization', text: 'Member added' },
@@ -46,33 +50,33 @@ const ACTIVITY: Partial<Record<EventType, { area: Area; text: string }>> = {
   ProductPublished: { area: 'catalog', text: 'Product published' },
   ProductArchived: { area: 'catalog', text: 'Product archived' },
   RFQPublished: { area: 'procurement', text: 'RFQ published' },
-  QuotationSubmitted: { area: 'procurement', text: 'Quotation submitted' },
-  QuotationAccepted: { area: 'procurement', text: 'Quotation accepted' },
-  PurchaseOrderCreated: { area: 'sales', text: 'Order placed' },
+  QuotationSubmitted: { area: 'procurement', text: 'Quotation submitted', actor: 'supplierOrganizationId' },
+  QuotationAccepted: { area: 'procurement', text: 'Quotation accepted', actor: 'buyerOrganizationId' },
+  PurchaseOrderCreated: { area: 'sales', text: 'Order placed', actor: 'buyerOrganizationId' },
   PurchaseOrderConfirmed: { area: 'sales', text: 'Order confirmed' },
   PurchaseOrderCancelled: { area: 'sales', text: 'Order cancelled' },
-  PurchaseOrderFulfillmentUpdated: { area: 'sales', text: 'Order fulfilment updated' },
-  OrderChargeAssessed: { area: 'finance', text: 'Order fee charged' },
+  PurchaseOrderFulfillmentUpdated: { area: 'sales', text: 'Order fulfilment updated', actor: 'supplierOrganizationId' },
+  OrderChargeAssessed: { area: 'finance', text: 'Order fee charged', actor: 'supplierOrganizationId' },
   StockReserved: { area: 'inventory', text: 'Stock reserved' },
   StockReservationFailed: { area: 'inventory', text: 'Stock reservation failed' },
   StockMovementPosted: { area: 'inventory', text: 'Stock movement posted' },
   GoodsReceived: { area: 'warehouse', text: 'Goods received' },
   InspectionCompleted: { area: 'quality', text: 'Inspection completed' },
-  QualityClaimOpened: { area: 'quality', text: 'Quality claim opened' },
+  QualityClaimOpened: { area: 'quality', text: 'Quality claim opened', actor: 'buyerOrganizationId' },
   ReviewPublished: { area: 'quality', text: 'Review published' },
-  ShipmentDispatched: { area: 'logistics', text: 'Shipment dispatched' },
+  ShipmentDispatched: { area: 'logistics', text: 'Shipment dispatched', actor: 'shipperOrganizationId' },
   ShipmentStatusChanged: { area: 'logistics', text: 'Shipment status changed' },
-  ShipmentCarrierChanged: { area: 'logistics', text: 'Shipment carrier changed' },
-  DeliveryConfirmed: { area: 'logistics', text: 'Delivery confirmed' },
+  ShipmentCarrierChanged: { area: 'logistics', text: 'Shipment carrier changed', actor: 'shipperOrganizationId' },
+  DeliveryConfirmed: { area: 'logistics', text: 'Delivery confirmed', actor: 'consigneeOrganizationId' },
   ProduceLotCreated: { area: 'inventory', text: 'Produce lot recorded' },
   ProductionCompleted: { area: 'inventory', text: 'Production completed' },
-  InvoiceIssued: { area: 'finance', text: 'Invoice issued' },
-  ReconciliationUpdated: { area: 'finance', text: 'Payment reconciled' },
-  RefundStatusChanged: { area: 'finance', text: 'Refund status changed' },
-  DisputeOpened: { area: 'disputes', text: 'Dispute opened' },
+  InvoiceIssued: { area: 'finance', text: 'Invoice issued', actor: 'sellerOrganizationId' },
+  ReconciliationUpdated: { area: 'finance', text: 'Payment reconciled', actor: 'sellerOrganizationId' },
+  RefundStatusChanged: { area: 'finance', text: 'Refund status changed', actor: 'sellerOrganizationId' },
+  DisputeOpened: { area: 'disputes', text: 'Dispute opened', actor: 'openedByOrganizationId' },
   DisputeResolved: { area: 'disputes', text: 'Dispute resolved' },
-  ReturnRequested: { area: 'returns', text: 'Return requested' },
-  ReturnStatusChanged: { area: 'returns', text: 'Return status changed' },
+  ReturnRequested: { area: 'returns', text: 'Return requested', actor: 'buyerOrganizationId' },
+  ReturnStatusChanged: { area: 'returns', text: 'Return status changed', actor: 'supplierOrganizationId' },
 };
 
 export const ACTIVITY_TYPES = Object.keys(ACTIVITY) as EventType[];
@@ -138,7 +142,8 @@ export function activityRows(e: EventEnvelope) {
     .filter(Boolean)
     .join(' ');
   // The organization that "owns" the event did it; the others are the counterparties it happened to.
-  const actorOrg = own.size ? own : new Set([...others].slice(0, 1));
+  const actorId = meta.actor ? data[meta.actor] : undefined;
+  const actorOrg = own.size ? own : new Set(typeof actorId === 'string' && others.has(actorId) ? [actorId] : []);
   const all = new Set([...own, ...others]);
   return [...all].map((organizationId) => ({
     eventId: e.eventId,

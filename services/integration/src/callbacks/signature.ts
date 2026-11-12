@@ -33,3 +33,23 @@ export function verifyChapaSignature(secret: string, signature: string | undefin
   if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return { ok: false, reason: 'mismatch' };
   return { ok: true };
 }
+
+/**
+ * Stripe signs webhooks as `Stripe-Signature: t=<unix>,v1=<hex>[,v1=<hex>…]`, the hex being
+ * HMAC-SHA256 of "<t>.<raw body>" with the endpoint's signing secret (whsec_…). Several v1
+ * values appear while a secret is being rolled; any match is enough.
+ */
+export function verifyStripeSignature(secret: string, header: string | undefined, rawBody: Buffer, maxAgeSeconds: number, nowMs = Date.now()): SignatureCheck {
+  if (!header) return { ok: false, reason: 'missing' };
+  const parts = header.split(',').map((p) => p.trim().split('='));
+  const timestamp = parts.find(([k]) => k === 't')?.[1];
+  const signatures = parts.filter(([k, v]) => k === 'v1' && v).map(([, v]) => v!);
+  if (!timestamp || !/^\d{9,12}$/.test(timestamp) || signatures.length === 0) return { ok: false, reason: 'missing' };
+  if (Math.abs(nowMs / 1000 - Number(timestamp)) > maxAgeSeconds) return { ok: false, reason: 'stale' };
+  const expected = Buffer.from(createHmac('sha256', secret).update(`${timestamp}.`).update(rawBody).digest('hex'));
+  const match = signatures.some((s) => {
+    const actual = Buffer.from(s);
+    return actual.length === expected.length && timingSafeEqual(actual, expected);
+  });
+  return match ? { ok: true } : { ok: false, reason: 'mismatch' };
+}

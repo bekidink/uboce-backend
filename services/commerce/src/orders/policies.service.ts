@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { type ActingOrganization, requireRole } from '@uboce/common';
+import { type ActingOrganization, requireBusinessAccount, requireRole } from '@uboce/common';
 
 import type { CancellationPolicy } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
@@ -40,6 +40,7 @@ export class PoliciesService {
   }
 
   async publish(org: ActingOrganization, userId: string, dto: CancellationPolicyDto) {
+    requireBusinessAccount(org, 'publish cancellation policies');
     requireRole(org, MANAGE_ROLES, 'change cancellation policies');
     const organizationId = org.organization.id;
     return this.prisma.$transaction(async (tx) => {

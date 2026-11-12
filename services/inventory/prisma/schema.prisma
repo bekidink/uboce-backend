@@ -48,6 +48,9 @@ model StockMovement {
   requestHash        String       @map("request_hash")
   reversesMovementId String?      @unique @map("reverses_movement_id") @db.Uuid
   reservationId      String?      @map("reservation_id") @db.Uuid
+  /// Batch / lot this movement went into or came out of (PRD addendum 2.3).
+  batchCode          String?      @map("batch_code")
+  expiresOn          DateTime?    @map("expires_on") @db.Date
   note               String?
   createdBy          String       @map("created_by")
   createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -166,6 +169,8 @@ model CycleCountLine {
   /// On hand when the count started.
   expectedQuantity Decimal  @map("expected_quantity") @db.Decimal(18, 4)
   countedQuantity  Decimal? @map("counted_quantity") @db.Decimal(18, 4)
+  /// When the count was recorded: movements between the snapshot and this moment are already in it.
+  countedAt        DateTime? @map("counted_at") @db.Timestamptz(3)
   note             String?
 
   cycleCount CycleCount @relation(fields: [cycleCountId], references: [id], onDelete: Cascade)
@@ -195,4 +200,22 @@ model ProcessedEvent {
   processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
 
   @@map("processed_events")
+}
+
+/// Stock per batch / lot with its expiry (PRD addendum 2.3). The item's StockBalance stays the
+/// source of truth; batches show which lots make it up, for first-expiry-first-out and expiry reports.
+model StockBatch {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  warehouseId    String    @map("warehouse_id") @db.Uuid
+  itemId         String    @map("item_id") @db.Uuid
+  batchCode      String    @map("batch_code")
+  expiresOn      DateTime? @map("expires_on") @db.Date
+  onHand         Decimal   @default(0) @map("on_hand") @db.Decimal(18, 4)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@unique([organizationId, warehouseId, itemId, batchCode])
+  @@index([organizationId, expiresOn])
+  @@map("stock_batches")
 }

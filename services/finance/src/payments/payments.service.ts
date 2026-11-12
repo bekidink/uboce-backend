@@ -222,17 +222,25 @@ export class PaymentsService {
     requireApprovalLimit(org, refund.amount.toString(), refund.currency, 'approve refunds');
     const inv = refund.invoiceId ? await this.prisma.invoice.findUnique({ where: { id: refund.invoiceId } }) : null;
 
+    // Every path first moves the refund out of "requested" with a conditional update, so a
+    // double click or two approvers at once can't send money (or book a credit note) twice.
+    const claim = async (tx: Tx, data: Prisma.RefundUpdateManyMutationInput) => {
+      const { count } = await tx.refund.updateMany({ where: { id: refund.id, status: 'requested' }, data: { ...data, approvedByUserId: userId, failureReason: null } });
+      if (!count) throw conflict('invalid_transition', 'This refund was already handled');
+    };
+
     // Nothing paid yet: reduce what is owed instead of sending money.
     if (inv && inv.paidAmount.lte(0)) {
       return this.prisma.$transaction(async (tx) => {
-        await tx.refund.update({ where: { id: refund.id }, data: { status: 'approved', method: 'credit_note', approvedByUserId: userId } });
+        await claim(tx, { status: 'approved', method: 'credit_note' });
         return this.complete(tx, refund.id, userId, null);
       });
     }
 
     if (method === 'manual') {
       return this.prisma.$transaction(async (tx) => {
-        const updated = await tx.refund.update({ where: { id: refund.id }, data: { status: 'processing', method: 'manual', approvedByUserId: userId } });
+        await claim(tx, { status: 'processing', method: 'manual' });
+        const updated = await tx.refund.findUniqueOrThrow({ where: { id: refund.id } });
         await this.announce(tx, updated);
         return updated;
       });
@@ -244,20 +252,25 @@ export class PaymentsService {
     const provider = payment ? this.providers.get(payment.provider) : null;
     if (!payment || !provider?.supportsRefunds) throw conflict('no_online_payment', 'There is no online payment to refund through; refund it manually');
 
+    // Claimed as "processing" before calling the provider, so the provider's webhook (which can
+    // arrive before the call returns) finds it, and a second approval is refused.
+    await this.prisma.$transaction((tx) => claim(tx, { status: 'processing', method: 'provider', provider: provider.name }));
     let result;
     try {
-      result = await provider.refund({ refundNumber: refund.number, paymentRef: payment.providerRef, amount: refund.amount.toFixed(2), currency: refund.currency, reason: refund.reason });
+      result = await provider.refund({ refundNumber: refund.number, paymentRef: payment.providerRef, amount: refund.amount.toFixed(4), currency: refund.currency, reason: refund.reason });
     } catch (error) {
-      await this.prisma.refund.update({ where: { id: refund.id }, data: { failureReason: (error as Error).message.slice(0, 300) } });
+      // Nothing was sent: hand it back to the seller to retry or refund manually.
+      await this.prisma.refund.updateMany({
+        where: { id: refund.id, status: 'processing' },
+        data: { status: 'requested', method: null, provider: null, approvedByUserId: null, failureReason: (error as Error).message.slice(0, 300) },
+      });
       throw providerFailure(error);
     }
     return this.prisma.$transaction(async (tx) => {
-      const updated = await tx.refund.update({
-        where: { id: refund.id },
-        data: { status: 'processing', method: 'provider', provider: provider.name, providerRef: result.providerRef, approvedByUserId: userId },
-      });
+      await tx.refund.updateMany({ where: { id: refund.id, status: 'processing' }, data: { providerRef: result.providerRef } });
       if (result.status === 'succeeded') return this.complete(tx, refund.id, userId, result.providerRef);
-      await this.announce(tx, updated);
+      const updated = await tx.refund.findUniqueOrThrow({ where: { id: refund.id } });
+      if (updated.status === 'processing') await this.announce(tx, updated);
       return updated;
     });
   }
@@ -290,12 +303,13 @@ export class PaymentsService {
     if (refund.provider !== n.provider) throw conflict('provider_mismatch', 'This refund was sent through another provider');
     if (refund.status !== 'processing') return { applied: false };
     return this.prisma.$transaction(async (tx) => {
-      if (n.status === 'succeeded') await this.complete(tx, refund.id, SYSTEM_USER, n.providerRef ?? refund.providerRef);
-      else {
-        const failed = await tx.refund.update({ where: { id: refund.id }, data: { status: 'failed', failureReason: n.reason ?? 'the provider could not refund' } });
-        await this.announce(tx, failed);
+      if (n.status === 'succeeded') {
+        const done = await this.complete(tx, refund.id, SYSTEM_USER, n.providerRef ?? refund.providerRef);
+        return { applied: done.applied };
       }
-      return { applied: true };
+      const { count } = await tx.refund.updateMany({ where: { id: refund.id, status: 'processing' }, data: { status: 'failed', failureReason: n.reason ?? 'the provider could not refund' } });
+      if (count) await this.announce(tx, await tx.refund.findUniqueOrThrow({ where: { id: refund.id } }));
+      return { applied: count > 0 };
     });
   }
 
@@ -303,8 +317,11 @@ export class PaymentsService {
    * Books a finished refund: a credit note reduces what the invoice says is owed, and (when
    * money actually went back) a negative payment reduces what it says was paid.
    */
-  private async complete(tx: Tx, refundId: string, userId: string, providerRef: string | null) {
-    const refund = await tx.refund.update({ where: { id: refundId }, data: { status: 'succeeded', providerRef: providerRef ?? undefined } });
+  private async complete(tx: Tx, refundId: string, userId: string, providerRef: string | null): Promise<Refund & { applied: boolean }> {
+    // Only one caller books it: the approval's own result and the provider's webhook can both arrive.
+    const { count } = await tx.refund.updateMany({ where: { id: refundId, status: { in: ['approved', 'processing'] } }, data: { status: 'succeeded', providerRef: providerRef ?? undefined } });
+    const refund = await tx.refund.findUniqueOrThrow({ where: { id: refundId } });
+    if (!count) return { ...refund, applied: false };
     if (refund.invoiceId) {
       const year = new Date().getUTCFullYear();
       const [row] = await tx.$queryRaw<{ last: number }[]>`
@@ -337,7 +354,7 @@ export class PaymentsService {
       }
     }
     await this.announce(tx, refund);
-    return refund;
+    return { ...refund, applied: true };
   }
 
   private announce(tx: Tx, r: Refund) {

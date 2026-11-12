@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiHeader } from '@nestjs/swagger';
-import type { InternalMembership } from '@uboce/contracts';
+import { type InternalMembership, PERSONAL_ACCOUNT_TYPE } from '@uboce/contracts';
 
 import type { AuthUser } from '../auth/token-verifier.js';
 import { AppError } from '../errors.js';
@@ -72,6 +72,16 @@ export function requireLocation(org: ActingOrganization, locationId: string | nu
   if (!locationId || !org.locationIds?.length) return;
   if (!org.locationIds.includes(locationId)) {
     throw new AppError(403, 'location_forbidden', `You are not assigned to this location and cannot ${action}`);
+  }
+}
+
+/**
+ * Throws 403 for a personal (single customer) account: it buys but doesn't sell, list products,
+ * quote, invoice or run operations.
+ */
+export function requireBusinessAccount(org: ActingOrganization, action: string) {
+  if (org.organization.type === PERSONAL_ACCOUNT_TYPE) {
+    throw new AppError(403, 'personal_account', `A personal account cannot ${action}; create a business account to sell`);
   }
 }
 

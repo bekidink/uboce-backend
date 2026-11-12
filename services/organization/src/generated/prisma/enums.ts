@@ -18,7 +18,8 @@ export const OrganizationType = {
   distributor: 'distributor',
   warehouse: 'warehouse',
   logistics_provider: 'logistics_provider',
-  other: 'other'
+  other: 'other',
+  individual: 'individual'
 } as const
 
 export type OrganizationType = (typeof OrganizationType)[keyof typeof OrganizationType]

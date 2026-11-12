@@ -6,6 +6,7 @@ import {
   AddMemberDto,
   CreateBranchDto,
   CreateOrganizationDto,
+  CreatePersonalAccountDto,
   DirectoryQueryDto,
   MemberLocationsDto,
   MemberTemplateDto,
@@ -29,6 +30,15 @@ export class OrganizationsController {
   @Post()
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateOrganizationDto) {
     return this.organizations.create(user.userId, dto);
+  }
+
+  /**
+   * A single customer's personal account (buy without registering a business). Returns the
+   * existing one when the caller already has it, so it is safe to call on every sign-in.
+   */
+  @Post('personal')
+  personal(@CurrentUser() user: AuthUser, @Body() dto: CreatePersonalAccountDto) {
+    return this.organizations.personalAccount(user.userId, dto);
   }
 
   @Get()

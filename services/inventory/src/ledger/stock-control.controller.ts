@@ -5,17 +5,16 @@ import {
   ActingOrg,
   ActsForOrganization,
   type AuthUser,
-  badRequest,
   CurrentUser,
   IsDecimalString,
   PaginationQueryDto,
-  WarehousesClient,
   RequiresModule,
 } from '@uboce/common';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsIn, IsOptional, IsString, IsUUID, Length, ValidateNested } from 'class-validator';
 
 import { StockControlService } from './stock-control.service.js';
+import { WarehouseScope } from './scope.js';
 
 const STATES = ['available', 'damaged', 'quarantined'] as const;
 
@@ -114,12 +113,18 @@ const Id = () => Param('id', new ParseUUIDPipe());
 export class StockControlController {
   constructor(
     private readonly stock: StockControlService,
-    private readonly warehouses: WarehousesClient,
+    private readonly scope: WarehouseScope,
   ) {}
 
   private async ownWarehouse(org: ActingOrganization, warehouseId: string) {
-    const warehouse = await this.warehouses.get(warehouseId);
-    if (!warehouse || warehouse.organizationId !== org.organization.id) throw badRequest('unknown_warehouse', 'Warehouse not found in your organization');
+    await this.scope.require(org, warehouseId, 'manage stock here');
+  }
+
+  /** A cycle count, checked against the member's locations. */
+  private async ownCount(org: ActingOrganization, id: string) {
+    const count = await this.stock.getCount(org, id);
+    await this.ownWarehouse(org, count.warehouseId);
+    return count;
   }
 
   /** Mark stock damaged or quarantined (or release it back to available). */
@@ -130,8 +135,8 @@ export class StockControlController {
   }
 
   @Get('state-changes')
-  stateChanges(@ActingOrg() org: ActingOrganization, @Query() q: FilterDto) {
-    return this.stock.stateChanges(org, { itemId: q.itemId, warehouseId: q.warehouseId }, q);
+  async stateChanges(@ActingOrg() org: ActingOrganization, @Query() q: FilterDto) {
+    return this.stock.stateChanges(org, { itemId: q.itemId, warehouseId: await this.scope.filter(org, q.warehouseId) }, q);
   }
 
   /** Remove damaged stock from the books. */
@@ -148,37 +153,41 @@ export class StockControlController {
   }
 
   @Get('cycle-counts')
-  counts(@ActingOrg() org: ActingOrganization, @Query() q: PaginationQueryDto) {
-    return this.stock.listCounts(org, q);
+  async counts(@ActingOrg() org: ActingOrganization, @Query() q: PaginationQueryDto) {
+    return this.stock.listCounts(org, q, await this.scope.filter(org));
   }
 
   @Get('cycle-counts/:id')
   count(@ActingOrg() org: ActingOrganization, @Id() id: string) {
-    return this.stock.getCount(org, id);
+    return this.ownCount(org, id);
   }
 
   @Post('cycle-counts/:id/lines')
   @HttpCode(200)
-  record(@ActingOrg() org: ActingOrganization, @Id() id: string, @Body() dto: CountLinesDto) {
+  async record(@ActingOrg() org: ActingOrganization, @Id() id: string, @Body() dto: CountLinesDto) {
+    await this.ownCount(org, id);
     return this.stock.record(org, id, dto.lines);
   }
 
   @Post('cycle-counts/:id/submit')
   @HttpCode(200)
-  submit(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @Id() id: string) {
+  async submit(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @Id() id: string) {
+    await this.ownCount(org, id);
     return this.stock.submit(org, user.userId, id);
   }
 
   /** Posts the variances; a different person than the counter must approve. */
   @Post('cycle-counts/:id/approve')
   @HttpCode(200)
-  approve(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @Id() id: string) {
+  async approve(@ActingOrg() org: ActingOrganization, @CurrentUser() user: AuthUser, @Id() id: string) {
+    await this.ownCount(org, id);
     return this.stock.approve(org, user.userId, id);
   }
 
   @Post('cycle-counts/:id/cancel')
   @HttpCode(200)
-  cancel(@ActingOrg() org: ActingOrganization, @Id() id: string) {
+  async cancel(@ActingOrg() org: ActingOrganization, @Id() id: string) {
+    await this.ownCount(org, id);
     return this.stock.cancel(org, id);
   }
 }

@@ -1188,7 +1188,9 @@ export const ReceiptLineScalarFieldEnum = {
   receivedQuantity: 'receivedQuantity',
   rejectedQuantity: 'rejectedQuantity',
   acceptedQuantity: 'acceptedQuantity',
-  discrepancyNote: 'discrepancyNote'
+  discrepancyNote: 'discrepancyNote',
+  batchCode: 'batchCode',
+  expiresOn: 'expiresOn'
 } as const
 
 export type ReceiptLineScalarFieldEnum = (typeof ReceiptLineScalarFieldEnum)[keyof typeof ReceiptLineScalarFieldEnum]

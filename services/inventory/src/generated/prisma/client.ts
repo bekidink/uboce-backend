@@ -86,3 +86,9 @@ export type OutboxEvent = Prisma.OutboxEventModel
  * Inbox for idempotent event consumption.
  */
 export type ProcessedEvent = Prisma.ProcessedEventModel
+/**
+ * Model StockBatch
+ * Stock per batch / lot with its expiry (PRD addendum 2.3). The item's StockBalance stays the
+ * source of truth; batches show which lots make it up, for first-expiry-first-out and expiry reports.
+ */
+export type StockBatch = Prisma.StockBatchModel

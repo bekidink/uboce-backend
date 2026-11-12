@@ -97,7 +97,7 @@ export class StockControlService {
     });
   }
 
-  async stateChanges(org: ActingOrganization, filter: { itemId?: string; warehouseId?: string }, query: PaginationQueryDto) {
+  async stateChanges(org: ActingOrganization, filter: { itemId?: string; warehouseId?: string | { in: string[] } }, query: PaginationQueryDto) {
     const where = { organizationId: org.organization.id, ...filter };
     const [items, total] = await Promise.all([
       this.prisma.stockStateChange.findMany({ where, orderBy: { createdAt: 'desc' }, ...skipTake(query) }),
@@ -111,16 +111,18 @@ export class StockControlService {
   /** Starts a count: snapshots what the ledger expects for each item (all items in the warehouse, or the given ones). */
   async startCount(org: ActingOrganization, userId: string, dto: { warehouseId: string; itemIds?: string[]; note?: string }) {
     requireRole(org, STOCK_ROLES, 'count stock');
-    const balances = await this.prisma.stockBalance.findMany({
-      where: { organizationId: org.organization.id, warehouseId: dto.warehouseId, ...(dto.itemIds?.length ? { itemId: { in: dto.itemIds } } : {}) },
-    });
-    const known = new Map(balances.map((b) => [b.itemId, b.onHand]));
-    const itemIds = dto.itemIds?.length ? dto.itemIds : balances.map((b) => b.itemId);
-    if (!itemIds.length) throw badRequest('nothing_to_count', 'This warehouse has no stock yet; name the items to count');
     const open = await this.prisma.cycleCount.count({ where: { organizationId: org.organization.id, warehouseId: dto.warehouseId, status: { in: ['counting', 'submitted'] } } });
     if (open) throw conflict('count_in_progress', 'Finish the open count for this warehouse first');
-    return this.prisma.$transaction(async (tx) =>
-      tx.cycleCount.create({
+    // The snapshot and the count's start time are taken together: approval adds the movements
+    // after this instant (and before each line was counted) to what the snapshot expected.
+    return this.prisma.$transaction(async (tx) => {
+      const balances = await tx.stockBalance.findMany({
+        where: { organizationId: org.organization.id, warehouseId: dto.warehouseId, ...(dto.itemIds?.length ? { itemId: { in: dto.itemIds } } : {}) },
+      });
+      const known = new Map(balances.map((b) => [b.itemId, b.onHand]));
+      const itemIds = dto.itemIds?.length ? dto.itemIds : balances.map((b) => b.itemId);
+      if (!itemIds.length) throw badRequest('nothing_to_count', 'This warehouse has no stock yet; name the items to count');
+      return tx.cycleCount.create({
         data: {
           number: await this.nextNumber(tx),
           organizationId: org.organization.id,
@@ -130,12 +132,12 @@ export class StockControlService {
           lines: { create: itemIds.map((itemId) => ({ itemId, expectedQuantity: known.get(itemId) ?? new Decimal(0) })) },
         },
         include: { lines: true },
-      }),
-    );
+      });
+    });
   }
 
-  async listCounts(org: ActingOrganization, query: PaginationQueryDto) {
-    const where = { organizationId: org.organization.id };
+  async listCounts(org: ActingOrganization, query: PaginationQueryDto, warehouseId?: string | { in: string[] }) {
+    const where = { organizationId: org.organization.id, ...(warehouseId ? { warehouseId } : {}) };
     const [items, total] = await Promise.all([
       this.prisma.cycleCount.findMany({ where, include: { lines: true }, orderBy: { createdAt: 'desc' }, ...skipTake(query) }),
       this.prisma.cycleCount.count({ where }),
@@ -158,8 +160,9 @@ export class StockControlService {
     return this.prisma.$transaction(async (tx) => {
       for (const l of lines) {
         const line = byItem.get(l.itemId);
-        if (line) await tx.cycleCountLine.update({ where: { id: line.id }, data: { countedQuantity: l.countedQuantity, note: l.note } });
-        else await tx.cycleCountLine.create({ data: { cycleCountId: id, itemId: l.itemId, expectedQuantity: 0, countedQuantity: l.countedQuantity, note: l.note } });
+        const countedAt = new Date();
+        if (line) await tx.cycleCountLine.update({ where: { id: line.id }, data: { countedQuantity: l.countedQuantity, countedAt, note: l.note } });
+        else await tx.cycleCountLine.create({ data: { cycleCountId: id, itemId: l.itemId, expectedQuantity: 0, countedQuantity: l.countedQuantity, countedAt, note: l.note } });
       }
       return tx.cycleCount.findUniqueOrThrow({ where: { id }, include: { lines: true } });
     });
@@ -182,16 +185,29 @@ export class StockControlService {
     const count = await this.getCount(org, id);
     if (count.status !== 'submitted') throw conflict('invalid_state', `A ${count.status} count cannot be approved`);
     if (count.submittedByUserId === userId) throw forbidden('The person who submitted a count cannot approve it');
+    const adjustments = [];
     for (const line of count.lines) {
-      // Variance against the ledger now (movements during the count are counted by the snapshot difference).
-      const variance = new Decimal(line.countedQuantity!).minus(line.expectedQuantity);
+      // The shelf was counted at countedAt. Stock that moved between the snapshot and then (sales,
+      // receipts) is already in the counted figure, so it is added to what the snapshot expected;
+      // movements after countedAt are not in either and stay untouched.
+      const moved = await this.prisma.stockMovement.aggregate({
+        where: {
+          organizationId: count.organizationId,
+          warehouseId: count.warehouseId,
+          itemId: line.itemId,
+          createdAt: { gt: count.createdAt, lte: line.countedAt ?? count.submittedAt ?? new Date() },
+        },
+        _sum: { quantity: true },
+      });
+      const expectedAtCount = line.expectedQuantity.plus(moved._sum.quantity ?? 0);
+      const variance = new Decimal(line.countedQuantity!).minus(expectedAtCount);
       if (variance.isZero()) continue;
-      await this.ledger.post({
+      adjustments.push({
         idempotencyKey: `count:${count.id}:${line.itemId}`,
         organizationId: count.organizationId,
         warehouseId: count.warehouseId,
         itemId: line.itemId,
-        type: 'adjustment',
+        type: 'adjustment' as const,
         quantity: variance.toString(),
         sourceType: 'adjustment',
         sourceId: 'cycle_count',
@@ -199,7 +215,11 @@ export class StockControlService {
         createdBy: `user:${userId}`,
       });
     }
-    return this.prisma.cycleCount.update({ where: { id }, data: { status: 'approved', approvedByUserId: userId, approvedAt: new Date() }, include: { lines: true } });
+    // All variances post together, or none (a retry replays them).
+    if (adjustments.length) await this.ledger.postBatch(adjustments);
+    const { count: approved } = await this.prisma.cycleCount.updateMany({ where: { id, status: 'submitted' }, data: { status: 'approved', approvedByUserId: userId, approvedAt: new Date() } });
+    if (!approved) throw conflict('invalid_state', 'This count was already approved or cancelled');
+    return this.prisma.cycleCount.findUniqueOrThrow({ where: { id }, include: { lines: true } });
   }
 
   async cancel(org: ActingOrganization, id: string) {

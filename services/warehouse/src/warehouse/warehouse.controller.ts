@@ -86,6 +86,16 @@ class ReceiptLineDto {
   @IsString()
   @Length(0, 500)
   discrepancyNote?: string;
+
+  /** Batch / lot code on the goods, for batch and expiry tracking. */
+  @IsOptional()
+  @Matches(/^[A-Za-z0-9_./-]{1,60}$/)
+  batchCode?: string;
+
+  /** Expiry date on the goods (YYYY-MM-DD). */
+  @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  expiresOn?: string;
 }
 
 class ReceiptDto {
@@ -178,6 +188,13 @@ export class WarehouseController {
 @Controller('internal/warehouses')
 export class InternalWarehouseController {
   constructor(private readonly warehouse: WarehouseService) {}
+
+  @Internal('inventory', 'logistics')
+  @Get()
+  forLocations(@Query('organizationId', new ParseUUIDPipe()) organizationId: string, @Query('branchIds') branchIds = '') {
+    const ids = branchIds.split(',').filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+    return this.warehouse.internalForLocations(organizationId, ids);
+  }
 
   @Internal()
   @Get(':warehouseId')

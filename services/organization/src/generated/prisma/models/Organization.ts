@@ -35,6 +35,7 @@ export type OrganizationMinAggregateOutputType = {
   contactPhone: string | null
   contactEmail: string | null
   createdByUserId: string | null
+  personalUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,6 +51,7 @@ export type OrganizationMaxAggregateOutputType = {
   contactPhone: string | null
   contactEmail: string | null
   createdByUserId: string | null
+  personalUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,6 +68,7 @@ export type OrganizationCountAggregateOutputType = {
   contactPhone: number
   contactEmail: number
   createdByUserId: number
+  personalUserId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -83,6 +86,7 @@ export type OrganizationMinAggregateInputType = {
   contactPhone?: true
   contactEmail?: true
   createdByUserId?: true
+  personalUserId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -98,6 +102,7 @@ export type OrganizationMaxAggregateInputType = {
   contactPhone?: true
   contactEmail?: true
   createdByUserId?: true
+  personalUserId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -114,6 +119,7 @@ export type OrganizationCountAggregateInputType = {
   contactPhone?: true
   contactEmail?: true
   createdByUserId?: true
+  personalUserId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -203,6 +209,7 @@ export type OrganizationGroupByOutputType = {
   contactPhone: string | null
   contactEmail: string | null
   createdByUserId: string
+  personalUserId: string | null
   createdAt: Date
   updatedAt: Date
   _count: OrganizationCountAggregateOutputType | null
@@ -240,6 +247,7 @@ export type OrganizationWhereInput = {
   contactPhone?: Prisma.StringNullableFilter<"Organization"> | string | null
   contactEmail?: Prisma.StringNullableFilter<"Organization"> | string | null
   createdByUserId?: Prisma.UuidFilter<"Organization"> | string
+  personalUserId?: Prisma.UuidNullableFilter<"Organization"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   memberships?: Prisma.MembershipListRelationFilter
@@ -259,6 +267,7 @@ export type OrganizationOrderByWithRelationInput = {
   contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   contactEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
+  personalUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
@@ -268,6 +277,7 @@ export type OrganizationOrderByWithRelationInput = {
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  personalUserId?: string
   AND?: Prisma.OrganizationWhereInput | Prisma.OrganizationWhereInput[]
   OR?: Prisma.OrganizationWhereInput[]
   NOT?: Prisma.OrganizationWhereInput | Prisma.OrganizationWhereInput[]
@@ -286,7 +296,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   memberships?: Prisma.MembershipListRelationFilter
   branches?: Prisma.BranchListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
-}, "id">
+}, "id" | "personalUserId">
 
 export type OrganizationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -300,6 +310,7 @@ export type OrganizationOrderByWithAggregationInput = {
   contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   contactEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
+  personalUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.OrganizationCountOrderByAggregateInput
@@ -322,6 +333,7 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   contactPhone?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
   contactEmail?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
   createdByUserId?: Prisma.UuidWithAggregatesFilter<"Organization"> | string
+  personalUserId?: Prisma.UuidNullableWithAggregatesFilter<"Organization"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Organization"> | Date | string
 }
@@ -338,6 +350,7 @@ export type OrganizationCreateInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
@@ -357,6 +370,7 @@ export type OrganizationUncheckedCreateInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
@@ -376,6 +390,7 @@ export type OrganizationUpdateInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
@@ -395,6 +410,7 @@ export type OrganizationUncheckedUpdateInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -414,6 +430,7 @@ export type OrganizationCreateManyInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -430,6 +447,7 @@ export type OrganizationUpdateManyMutationInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -446,6 +464,7 @@ export type OrganizationUncheckedUpdateManyInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -470,6 +489,7 @@ export type OrganizationCountOrderByAggregateInput = {
   contactPhone?: Prisma.SortOrder
   contactEmail?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
+  personalUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -485,6 +505,7 @@ export type OrganizationMaxOrderByAggregateInput = {
   contactPhone?: Prisma.SortOrder
   contactEmail?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
+  personalUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -500,6 +521,7 @@ export type OrganizationMinOrderByAggregateInput = {
   contactPhone?: Prisma.SortOrder
   contactEmail?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
+  personalUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -596,6 +618,7 @@ export type OrganizationCreateWithoutMembershipsInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   branches?: Prisma.BranchCreateNestedManyWithoutOrganizationInput
@@ -614,6 +637,7 @@ export type OrganizationUncheckedCreateWithoutMembershipsInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   branches?: Prisma.BranchUncheckedCreateNestedManyWithoutOrganizationInput
@@ -648,6 +672,7 @@ export type OrganizationUpdateWithoutMembershipsInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branches?: Prisma.BranchUpdateManyWithoutOrganizationNestedInput
@@ -666,6 +691,7 @@ export type OrganizationUncheckedUpdateWithoutMembershipsInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branches?: Prisma.BranchUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -684,6 +710,7 @@ export type OrganizationCreateWithoutBranchesInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
@@ -702,6 +729,7 @@ export type OrganizationUncheckedCreateWithoutBranchesInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
@@ -736,6 +764,7 @@ export type OrganizationUpdateWithoutBranchesInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
@@ -754,6 +783,7 @@ export type OrganizationUncheckedUpdateWithoutBranchesInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -772,6 +802,7 @@ export type OrganizationCreateWithoutInvitationsInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
@@ -790,6 +821,7 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   contactPhone?: string | null
   contactEmail?: string | null
   createdByUserId: string
+  personalUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
@@ -824,6 +856,7 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
@@ -842,6 +875,7 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  personalUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -909,6 +943,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   contactPhone?: boolean
   contactEmail?: boolean
   createdByUserId?: boolean
+  personalUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   memberships?: boolean | Prisma.Organization$membershipsArgs<ExtArgs>
@@ -929,6 +964,7 @@ export type OrganizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   contactPhone?: boolean
   contactEmail?: boolean
   createdByUserId?: boolean
+  personalUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["organization"]>
@@ -945,6 +981,7 @@ export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   contactPhone?: boolean
   contactEmail?: boolean
   createdByUserId?: boolean
+  personalUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["organization"]>
@@ -961,11 +998,12 @@ export type OrganizationSelectScalar = {
   contactPhone?: boolean
   contactEmail?: boolean
   createdByUserId?: boolean
+  personalUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "legalName" | "type" | "countryCode" | "status" | "verificationStatus" | "businessModels" | "contactPhone" | "contactEmail" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["organization"]>
+export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "legalName" | "type" | "countryCode" | "status" | "verificationStatus" | "businessModels" | "contactPhone" | "contactEmail" | "createdByUserId" | "personalUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Organization$membershipsArgs<ExtArgs>
   branches?: boolean | Prisma.Organization$branchesArgs<ExtArgs>
@@ -1000,6 +1038,10 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
      * Identity user ID (external reference — no cross-database foreign key).
      */
     createdByUserId: string
+    /**
+     * Set on personal (individual) accounts: the one customer it belongs to. At most one per user.
+     */
+    personalUserId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["organization"]>
@@ -1439,6 +1481,7 @@ export interface OrganizationFieldRefs {
   readonly contactPhone: Prisma.FieldRef<"Organization", 'String'>
   readonly contactEmail: Prisma.FieldRef<"Organization", 'String'>
   readonly createdByUserId: Prisma.FieldRef<"Organization", 'String'>
+  readonly personalUserId: Prisma.FieldRef<"Organization", 'String'>
   readonly createdAt: Prisma.FieldRef<"Organization", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Organization", 'DateTime'>
 }

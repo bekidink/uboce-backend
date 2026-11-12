@@ -54,6 +54,8 @@ export type ReceiptLineMinAggregateOutputType = {
   rejectedQuantity: runtime.Decimal | null
   acceptedQuantity: runtime.Decimal | null
   discrepancyNote: string | null
+  batchCode: string | null
+  expiresOn: Date | null
 }
 
 export type ReceiptLineMaxAggregateOutputType = {
@@ -68,6 +70,8 @@ export type ReceiptLineMaxAggregateOutputType = {
   rejectedQuantity: runtime.Decimal | null
   acceptedQuantity: runtime.Decimal | null
   discrepancyNote: string | null
+  batchCode: string | null
+  expiresOn: Date | null
 }
 
 export type ReceiptLineCountAggregateOutputType = {
@@ -82,6 +86,8 @@ export type ReceiptLineCountAggregateOutputType = {
   rejectedQuantity: number
   acceptedQuantity: number
   discrepancyNote: number
+  batchCode: number
+  expiresOn: number
   _all: number
 }
 
@@ -114,6 +120,8 @@ export type ReceiptLineMinAggregateInputType = {
   rejectedQuantity?: true
   acceptedQuantity?: true
   discrepancyNote?: true
+  batchCode?: true
+  expiresOn?: true
 }
 
 export type ReceiptLineMaxAggregateInputType = {
@@ -128,6 +136,8 @@ export type ReceiptLineMaxAggregateInputType = {
   rejectedQuantity?: true
   acceptedQuantity?: true
   discrepancyNote?: true
+  batchCode?: true
+  expiresOn?: true
 }
 
 export type ReceiptLineCountAggregateInputType = {
@@ -142,6 +152,8 @@ export type ReceiptLineCountAggregateInputType = {
   rejectedQuantity?: true
   acceptedQuantity?: true
   discrepancyNote?: true
+  batchCode?: true
+  expiresOn?: true
   _all?: true
 }
 
@@ -243,6 +255,8 @@ export type ReceiptLineGroupByOutputType = {
   rejectedQuantity: runtime.Decimal
   acceptedQuantity: runtime.Decimal | null
   discrepancyNote: string | null
+  batchCode: string | null
+  expiresOn: Date | null
   _count: ReceiptLineCountAggregateOutputType | null
   _avg: ReceiptLineAvgAggregateOutputType | null
   _sum: ReceiptLineSumAggregateOutputType | null
@@ -280,6 +294,8 @@ export type ReceiptLineWhereInput = {
   rejectedQuantity?: Prisma.DecimalFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.DecimalNullableFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.StringNullableFilter<"ReceiptLine"> | string | null
+  batchCode?: Prisma.StringNullableFilter<"ReceiptLine"> | string | null
+  expiresOn?: Prisma.DateTimeNullableFilter<"ReceiptLine"> | Date | string | null
   receipt?: Prisma.XOR<Prisma.ReceiptScalarRelationFilter, Prisma.ReceiptWhereInput>
 }
 
@@ -295,6 +311,8 @@ export type ReceiptLineOrderByWithRelationInput = {
   rejectedQuantity?: Prisma.SortOrder
   acceptedQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
   discrepancyNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  batchCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresOn?: Prisma.SortOrderInput | Prisma.SortOrder
   receipt?: Prisma.ReceiptOrderByWithRelationInput
 }
 
@@ -314,6 +332,8 @@ export type ReceiptLineWhereUniqueInput = Prisma.AtLeast<{
   rejectedQuantity?: Prisma.DecimalFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.DecimalNullableFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.StringNullableFilter<"ReceiptLine"> | string | null
+  batchCode?: Prisma.StringNullableFilter<"ReceiptLine"> | string | null
+  expiresOn?: Prisma.DateTimeNullableFilter<"ReceiptLine"> | Date | string | null
   receipt?: Prisma.XOR<Prisma.ReceiptScalarRelationFilter, Prisma.ReceiptWhereInput>
 }, "id" | "receiptId_lineNumber">
 
@@ -329,6 +349,8 @@ export type ReceiptLineOrderByWithAggregationInput = {
   rejectedQuantity?: Prisma.SortOrder
   acceptedQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
   discrepancyNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  batchCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresOn?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ReceiptLineCountOrderByAggregateInput
   _avg?: Prisma.ReceiptLineAvgOrderByAggregateInput
   _max?: Prisma.ReceiptLineMaxOrderByAggregateInput
@@ -351,6 +373,8 @@ export type ReceiptLineScalarWhereWithAggregatesInput = {
   rejectedQuantity?: Prisma.DecimalWithAggregatesFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.DecimalNullableWithAggregatesFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.StringNullableWithAggregatesFilter<"ReceiptLine"> | string | null
+  batchCode?: Prisma.StringNullableWithAggregatesFilter<"ReceiptLine"> | string | null
+  expiresOn?: Prisma.DateTimeNullableWithAggregatesFilter<"ReceiptLine"> | Date | string | null
 }
 
 export type ReceiptLineCreateInput = {
@@ -364,6 +388,8 @@ export type ReceiptLineCreateInput = {
   rejectedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
   receipt: Prisma.ReceiptCreateNestedOneWithoutLinesInput
 }
 
@@ -379,6 +405,8 @@ export type ReceiptLineUncheckedCreateInput = {
   rejectedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
 }
 
 export type ReceiptLineUpdateInput = {
@@ -392,6 +420,8 @@ export type ReceiptLineUpdateInput = {
   rejectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   receipt?: Prisma.ReceiptUpdateOneRequiredWithoutLinesNestedInput
 }
 
@@ -407,6 +437,8 @@ export type ReceiptLineUncheckedUpdateInput = {
   rejectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ReceiptLineCreateManyInput = {
@@ -421,6 +453,8 @@ export type ReceiptLineCreateManyInput = {
   rejectedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
 }
 
 export type ReceiptLineUpdateManyMutationInput = {
@@ -434,6 +468,8 @@ export type ReceiptLineUpdateManyMutationInput = {
   rejectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ReceiptLineUncheckedUpdateManyInput = {
@@ -448,6 +484,8 @@ export type ReceiptLineUncheckedUpdateManyInput = {
   rejectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ReceiptLineListRelationFilter = {
@@ -477,6 +515,8 @@ export type ReceiptLineCountOrderByAggregateInput = {
   rejectedQuantity?: Prisma.SortOrder
   acceptedQuantity?: Prisma.SortOrder
   discrepancyNote?: Prisma.SortOrder
+  batchCode?: Prisma.SortOrder
+  expiresOn?: Prisma.SortOrder
 }
 
 export type ReceiptLineAvgOrderByAggregateInput = {
@@ -499,6 +539,8 @@ export type ReceiptLineMaxOrderByAggregateInput = {
   rejectedQuantity?: Prisma.SortOrder
   acceptedQuantity?: Prisma.SortOrder
   discrepancyNote?: Prisma.SortOrder
+  batchCode?: Prisma.SortOrder
+  expiresOn?: Prisma.SortOrder
 }
 
 export type ReceiptLineMinOrderByAggregateInput = {
@@ -513,6 +555,8 @@ export type ReceiptLineMinOrderByAggregateInput = {
   rejectedQuantity?: Prisma.SortOrder
   acceptedQuantity?: Prisma.SortOrder
   discrepancyNote?: Prisma.SortOrder
+  batchCode?: Prisma.SortOrder
+  expiresOn?: Prisma.SortOrder
 }
 
 export type ReceiptLineSumOrderByAggregateInput = {
@@ -600,6 +644,8 @@ export type ReceiptLineCreateWithoutReceiptInput = {
   rejectedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
 }
 
 export type ReceiptLineUncheckedCreateWithoutReceiptInput = {
@@ -613,6 +659,8 @@ export type ReceiptLineUncheckedCreateWithoutReceiptInput = {
   rejectedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
 }
 
 export type ReceiptLineCreateOrConnectWithoutReceiptInput = {
@@ -656,6 +704,8 @@ export type ReceiptLineScalarWhereInput = {
   rejectedQuantity?: Prisma.DecimalFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.DecimalNullableFilter<"ReceiptLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.StringNullableFilter<"ReceiptLine"> | string | null
+  batchCode?: Prisma.StringNullableFilter<"ReceiptLine"> | string | null
+  expiresOn?: Prisma.DateTimeNullableFilter<"ReceiptLine"> | Date | string | null
 }
 
 export type ReceiptLineCreateManyReceiptInput = {
@@ -669,6 +719,8 @@ export type ReceiptLineCreateManyReceiptInput = {
   rejectedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: string | null
+  batchCode?: string | null
+  expiresOn?: Date | string | null
 }
 
 export type ReceiptLineUpdateWithoutReceiptInput = {
@@ -682,6 +734,8 @@ export type ReceiptLineUpdateWithoutReceiptInput = {
   rejectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ReceiptLineUncheckedUpdateWithoutReceiptInput = {
@@ -695,6 +749,8 @@ export type ReceiptLineUncheckedUpdateWithoutReceiptInput = {
   rejectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ReceiptLineUncheckedUpdateManyWithoutReceiptInput = {
@@ -708,6 +764,8 @@ export type ReceiptLineUncheckedUpdateManyWithoutReceiptInput = {
   rejectedQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   acceptedQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discrepancyNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresOn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -724,6 +782,8 @@ export type ReceiptLineSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   rejectedQuantity?: boolean
   acceptedQuantity?: boolean
   discrepancyNote?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
   receipt?: boolean | Prisma.ReceiptDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["receiptLine"]>
 
@@ -739,6 +799,8 @@ export type ReceiptLineSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   rejectedQuantity?: boolean
   acceptedQuantity?: boolean
   discrepancyNote?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
   receipt?: boolean | Prisma.ReceiptDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["receiptLine"]>
 
@@ -754,6 +816,8 @@ export type ReceiptLineSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   rejectedQuantity?: boolean
   acceptedQuantity?: boolean
   discrepancyNote?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
   receipt?: boolean | Prisma.ReceiptDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["receiptLine"]>
 
@@ -769,9 +833,11 @@ export type ReceiptLineSelectScalar = {
   rejectedQuantity?: boolean
   acceptedQuantity?: boolean
   discrepancyNote?: boolean
+  batchCode?: boolean
+  expiresOn?: boolean
 }
 
-export type ReceiptLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "receiptId" | "lineNumber" | "itemId" | "orderLineId" | "description" | "expectedQuantity" | "receivedQuantity" | "rejectedQuantity" | "acceptedQuantity" | "discrepancyNote", ExtArgs["result"]["receiptLine"]>
+export type ReceiptLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "receiptId" | "lineNumber" | "itemId" | "orderLineId" | "description" | "expectedQuantity" | "receivedQuantity" | "rejectedQuantity" | "acceptedQuantity" | "discrepancyNote" | "batchCode" | "expiresOn", ExtArgs["result"]["receiptLine"]>
 export type ReceiptLineInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   receipt?: boolean | Prisma.ReceiptDefaultArgs<ExtArgs>
 }
@@ -805,6 +871,11 @@ export type $ReceiptLinePayload<ExtArgs extends runtime.Types.Extensions.Interna
      */
     acceptedQuantity: runtime.Decimal | null
     discrepancyNote: string | null
+    /**
+     * Batch / lot and expiry printed on the goods; passed to Inventory for batch tracking.
+     */
+    batchCode: string | null
+    expiresOn: Date | null
   }, ExtArgs["result"]["receiptLine"]>
   composites: {}
 }
@@ -1240,6 +1311,8 @@ export interface ReceiptLineFieldRefs {
   readonly rejectedQuantity: Prisma.FieldRef<"ReceiptLine", 'Decimal'>
   readonly acceptedQuantity: Prisma.FieldRef<"ReceiptLine", 'Decimal'>
   readonly discrepancyNote: Prisma.FieldRef<"ReceiptLine", 'String'>
+  readonly batchCode: Prisma.FieldRef<"ReceiptLine", 'String'>
+  readonly expiresOn: Prisma.FieldRef<"ReceiptLine", 'DateTime'>
 }
     
 

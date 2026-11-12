@@ -8,9 +8,11 @@ import {
   DocumentsClient,
   emitEvent,
   InventoryClient,
+  locationScope,
   notFound,
   OrganizationsClient,
   type PaginationQueryDto,
+  requireLocation,
   requireRole,
   skipTake,
   toPage,
@@ -102,6 +104,7 @@ export class ShipmentsService {
     if (input.originWarehouseId) {
       const warehouse = await this.warehouses.get(input.originWarehouseId);
       if (!warehouse || warehouse.organizationId !== org.organization.id) throw badRequest('unknown_warehouse', 'Warehouse not found in your organization');
+      requireLocation(org, warehouse.branchId, 'ship from this warehouse');
     }
     const carrier = input.carrierId ? await this.prisma.carrier.findFirst({ where: { id: input.carrierId, organizationId: org.organization.id, active: true } }) : null;
     if (input.carrierId && !carrier) throw badRequest('unknown_carrier', 'Carrier not found');
@@ -387,6 +390,7 @@ export class ShipmentsService {
     const where: Prisma.ShipmentWhereInput = {
       [sideField[side]]: org.organization.id,
       ...(side === 'carrier' ? { carrierStatus: { in: ['requested', 'accepted'] } } : {}),
+      ...(side === 'shipper' ? await this.shipperScope(org) : {}),
       ...(query.status ? { status: query.status as ShipmentStatus } : {}),
       ...(query.orderId ? { orders: { some: { orderId: query.orderId } } } : {}),
     };
@@ -439,9 +443,25 @@ export class ShipmentsService {
     });
   }
 
+  /**
+   * Location-scoped staff (PRD addendum 2.2) of the shipper only see shipments leaving warehouses at
+   * their locations (or with no origin warehouse). Members without locations see everything.
+   */
+  private async shipperScope(org: ActingOrganization): Promise<Prisma.ShipmentWhereInput> {
+    const branches = locationScope(org);
+    if (!branches) return {};
+    const warehouses = await this.warehouses.forLocations(org.organization.id, branches);
+    return { OR: [{ originWarehouseId: null }, { originWarehouseId: { in: warehouses.map((w) => w.id) } }] };
+  }
+
   async owned(org: ActingOrganization, shipmentId: string, side: Side) {
     const shipment = await this.prisma.shipment.findFirst({
-      where: { id: shipmentId, [sideField[side]]: org.organization.id, ...(side === 'carrier' ? { carrierStatus: { in: ['requested', 'accepted'] } } : {}) },
+      where: {
+        id: shipmentId,
+        [sideField[side]]: org.organization.id,
+        ...(side === 'carrier' ? { carrierStatus: { in: ['requested', 'accepted'] } } : {}),
+        ...(side === 'shipper' ? await this.shipperScope(org) : {}),
+      },
       include,
     });
     if (!shipment) throw notFound('Shipment');
@@ -454,7 +474,7 @@ export class ShipmentsService {
       where: {
         id: shipmentId,
         OR: [
-          { shipperOrganizationId: org.organization.id },
+          { shipperOrganizationId: org.organization.id, ...(await this.shipperScope(org)) },
           { consigneeOrganizationId: org.organization.id },
           { carrierOrganizationId: org.organization.id, carrierStatus: { in: ['requested', 'accepted'] } },
         ],

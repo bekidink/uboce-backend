@@ -7,7 +7,8 @@ import { z } from 'zod';
 import { env, providers } from '../config.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
-import { verifyChapaSignature, verifySignature } from './signature.js';
+import { verifyChapaSignature, verifySignature, verifyStripeSignature } from './signature.js';
+import { fromStripe, stripeFee, stripePaymentIntent } from './stripe.js';
 
 // The normalized payloads providers send (or adapters translate to).
 const paymentSchema = z.object({
@@ -86,7 +87,7 @@ export class CallbacksService {
    * Verifies, deduplicates and forwards one provider callback. A failure to
    * forward returns 502 so the provider retries; a duplicate returns 200 so it stops.
    */
-  async handle(providerName: string, headers: { timestamp?: string; signature?: string; chapaSignature?: string }, rawBody: Buffer | undefined) {
+  async handle(providerName: string, headers: { timestamp?: string; signature?: string; chapaSignature?: string; stripeSignature?: string }, rawBody: Buffer | undefined) {
     const provider = providers.get(providerName);
     if (!provider) throw reject('Unknown provider', 'unknown_provider');
     const body = rawBody ?? Buffer.alloc(0);
@@ -95,7 +96,9 @@ export class CallbacksService {
     const check =
       provider.kind === 'chapa'
         ? verifyChapaSignature(provider.secret, headers.chapaSignature, body)
-        : verifySignature(provider.secret, headers.timestamp, headers.signature, body, env.CALLBACK_MAX_AGE_SECONDS);
+        : provider.kind === 'stripe'
+          ? verifyStripeSignature(provider.secret, headers.stripeSignature, body, env.CALLBACK_MAX_AGE_SECONDS)
+          : verifySignature(provider.secret, headers.timestamp, headers.signature, body, env.CALLBACK_MAX_AGE_SECONDS);
     if (!check.ok) {
       await this.receipt(provider.name, null, false, 'rejected', `signature ${check.reason}`, payloadSha256);
       throw reject(`Signature ${check.reason}`);
@@ -108,9 +111,33 @@ export class CallbacksService {
       await this.receipt(provider.name, null, true, 'rejected', 'invalid JSON', payloadSha256);
       throw new AppError(HttpStatus.BAD_REQUEST, 'invalid_payload', 'Body is not JSON');
     }
+    // Stripe sends its own event format; translate it to the normalized payment/refund shapes.
+    let normalizedInput: unknown = parsed;
+    let stripePaymentIntentId: string | undefined;
+    if (provider.kind === 'stripe') {
+      const t = fromStripe(parsed);
+      if (!t) {
+        await this.receipt(provider.name, null, true, 'rejected', 'not a Stripe event', payloadSha256);
+        throw new AppError(HttpStatus.BAD_REQUEST, 'invalid_payload', 'Payload is not a Stripe event');
+      }
+      if (t.kind === 'ignored') return this.ignore(provider.name, t.eventId, `${t.type} needs no action`, payloadSha256);
+      if (t.kind === 'dispute_lost') {
+        const pi = await stripePaymentIntent(t.paymentIntentId);
+        if (!pi?.reference || !pi.invoiceNumber) return this.ignore(provider.name, t.eventId, `lost dispute on ${t.paymentIntentId} could not be matched to an invoice`, payloadSha256);
+        normalizedInput = { eventId: t.eventId, type: 'payment.reversed', reference: pi.reference, invoiceNumber: pi.invoiceNumber, amount: t.amount, currency: t.currency, occurredAt: t.occurredAt };
+      } else {
+        const { kind: _kind, paymentIntentId, ...rest } = t as typeof t & { paymentIntentId?: string };
+        normalizedInput = rest;
+        stripePaymentIntentId = paymentIntentId;
+      }
+    }
+
     // Refund callbacks share the payment provider's secret; Chapa sends its own format.
-    const isRefund = provider.kind === 'payment' && typeof (parsed as { type?: unknown })?.type === 'string' && String((parsed as { type: string }).type).startsWith('refund.');
-    const normalized = provider.kind === 'chapa' ? fromChapa(parsed) : parsed;
+    const isRefund =
+      (provider.kind === 'payment' || provider.kind === 'stripe') &&
+      typeof (normalizedInput as { type?: unknown })?.type === 'string' &&
+      String((normalizedInput as { type: string }).type).startsWith('refund.');
+    const normalized = provider.kind === 'chapa' ? fromChapa(parsed) : normalizedInput;
     const schema = isRefund ? refundSchema : provider.kind === 'carrier' ? carrierSchema : paymentSchema;
     const result = normalized ? schema.safeParse(normalized) : ({ success: false } as const);
     if (!result.success) {
@@ -133,8 +160,10 @@ export class CallbacksService {
           providerRef: r.providerRef,
           reason: r.reason,
         });
-      } else if (provider.kind === 'payment' || provider.kind === 'chapa') {
+      } else if (provider.kind === 'payment' || provider.kind === 'chapa' || provider.kind === 'stripe') {
         const p = result.data as z.infer<typeof paymentSchema>;
+        // Stripe doesn't put the fee on the event; fetch it (best effort) for confirmed payments.
+        if (!p.fee && stripePaymentIntentId && p.type === 'payment.confirmed') p.fee = await stripeFee(stripePaymentIntentId, p.currency);
         await this.finance.paymentNotification({
           fee: p.fee ?? null,
           provider: provider.name,
@@ -175,6 +204,16 @@ export class CallbacksService {
     for (const name of providers.keys()) byProvider[name] = {};
     for (const r of rows) (byProvider[r.provider] ??= {})[r.outcome] = r._count;
     return { windowHours: sinceHours, providers: byProvider };
+  }
+
+  /** Acknowledges a valid event that needs no action, once per event ID. */
+  private async ignore(provider: string, externalEventId: string, note: string, payloadSha256: string) {
+    try {
+      await this.prisma.callbackReceipt.create({ data: { provider, externalEventId, signatureValid: true, outcome: 'ignored', error: note.slice(0, 300), payloadSha256 } });
+    } catch (error) {
+      if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')) throw error;
+    }
+    return { status: 'ignored' };
   }
 
   private async claim(provider: string, externalEventId: string, payloadSha256: string) {

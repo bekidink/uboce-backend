@@ -63,6 +63,23 @@ export class CreateOrganizationDto extends BusinessProfileDto {
   countryCode?: string;
 }
 
+/** A single customer's personal account. Everything is optional: the name defaults to the user's. */
+export class CreatePersonalAccountDto {
+  @IsOptional()
+  @IsString()
+  @Length(2, 150)
+  name?: string;
+
+  @IsOptional()
+  @Matches(PHONE, { message: 'contactPhone must be a phone number' })
+  contactPhone?: string;
+
+  /** ISO 3166-1 alpha-2. Defaults to ET. */
+  @IsOptional()
+  @Matches(COUNTRY, { message: 'countryCode must be an ISO 3166-1 alpha-2 code, e.g. ET' })
+  countryCode?: string;
+}
+
 export class UpdateOrganizationDto extends BusinessProfileDto {
   @IsOptional()
   @IsString()

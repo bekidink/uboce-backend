@@ -18,18 +18,31 @@ export const finish = () => {
   process.exit(failures === 0 ? 0 : 1);
 };
 
+/** A deployed API (e.g. Render): services may be asleep (502/503/504 while they wake) and requests are rate limited. */
+const REMOTE = !/\/\/(localhost|127\.0\.0\.1)[:/]/.test(API);
+
 export async function call(method, path, { token, org, body, headers = {} } = {}) {
-  const res = await fetch(`${API}${path}`, {
-    method,
-    headers: {
-      'content-type': 'application/json',
-      'x-correlation-id': `smoke-${randomUUID()}`,
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-      ...(org ? { 'x-organization-id': org } : {}),
-      ...headers,
-    },
-    body: body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body),
-  });
+  const request = () =>
+    fetch(`${API}${path}`, {
+      method,
+      headers: {
+        'content-type': 'application/json',
+        'x-correlation-id': `smoke-${randomUUID()}`,
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+        ...(org ? { 'x-organization-id': org } : {}),
+        ...headers,
+      },
+      body: body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body),
+    });
+  let res = await request();
+  for (let attempt = 1; REMOTE && attempt <= 12 && [429, 502, 503, 504].includes(res.status); attempt++) {
+    // Rate limited: wait for the window to reset. Waking service: give it time to start.
+    const reset = Number(res.headers.get('x-ratelimit-reset') ?? res.headers.get('retry-after'));
+    const waitMs = res.status === 429 ? (Number.isFinite(reset) && reset > 0 ? reset : 20) * 1000 + 500 : 10_000;
+    await res.text().catch(() => {});
+    await new Promise((r) => setTimeout(r, waitMs));
+    res = await request();
+  }
   const text = await res.text();
   let parsed = null;
   try {
@@ -123,8 +136,9 @@ export const PNG = () => Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0
 
 // ---- Local platform admin (shared by the smoke tests and the seed) ---------------
 
-/** Which database the services use (local Docker or a Supabase project), from Identity's .env. */
+/** Which database the services use (local Docker or a Supabase project), from Identity's .env; SMOKE_DB_KEY overrides (e.g. a deployed project). */
 function databaseKey(root, readFileSync) {
+  if (process.env.SMOKE_DB_KEY) return process.env.SMOKE_DB_KEY;
   try {
     const url = readFileSync(`${root}services/identity/.env`, 'utf8').match(/^DATABASE_URL=(.*)$/m)?.[1];
     const u = new URL(url);

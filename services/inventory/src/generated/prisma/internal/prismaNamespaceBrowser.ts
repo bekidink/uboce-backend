@@ -59,7 +59,8 @@ export const ModelName = {
   CycleCount: 'CycleCount',
   CycleCountLine: 'CycleCountLine',
   OutboxEvent: 'OutboxEvent',
-  ProcessedEvent: 'ProcessedEvent'
+  ProcessedEvent: 'ProcessedEvent',
+  StockBatch: 'StockBatch'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -92,6 +93,8 @@ export const StockMovementScalarFieldEnum = {
   requestHash: 'requestHash',
   reversesMovementId: 'reversesMovementId',
   reservationId: 'reservationId',
+  batchCode: 'batchCode',
+  expiresOn: 'expiresOn',
   note: 'note',
   createdBy: 'createdBy',
   createdAt: 'createdAt'
@@ -182,6 +185,7 @@ export const CycleCountLineScalarFieldEnum = {
   itemId: 'itemId',
   expectedQuantity: 'expectedQuantity',
   countedQuantity: 'countedQuantity',
+  countedAt: 'countedAt',
   note: 'note'
 } as const
 
@@ -208,6 +212,21 @@ export const ProcessedEventScalarFieldEnum = {
 } as const
 
 export type ProcessedEventScalarFieldEnum = (typeof ProcessedEventScalarFieldEnum)[keyof typeof ProcessedEventScalarFieldEnum]
+
+
+export const StockBatchScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  warehouseId: 'warehouseId',
+  itemId: 'itemId',
+  batchCode: 'batchCode',
+  expiresOn: 'expiresOn',
+  onHand: 'onHand',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StockBatchScalarFieldEnum = (typeof StockBatchScalarFieldEnum)[keyof typeof StockBatchScalarFieldEnum]
 
 
 export const SortOrder = {

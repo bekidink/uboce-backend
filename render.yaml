@@ -846,6 +846,12 @@ services:
         value: https://uboce-notification.onrender.com
       - key: COMMERCE_URL
         value: https://uboce-commerce.onrender.com
+      - key: PAYMENT_PROVIDERS
+        value: manual,sandbox
+      - key: CHAPA_SECRET_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
       - key: MIGRATE_DATABASE_URL
         sync: false
       - key: DATABASE_POOL_MAX
@@ -1016,6 +1022,8 @@ services:
       - key: LOGISTICS_URL
         value: https://uboce-logistics.onrender.com
       - key: PROVIDERS
+        sync: false
+      - key: STRIPE_SECRET_KEY
         sync: false
       - key: CALLBACK_MAX_AGE_SECONDS
         value: "300"
