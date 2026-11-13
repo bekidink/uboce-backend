@@ -72,6 +72,11 @@ export class OrganizationsClient extends ServiceClient {
   }
 
   /** The user's active membership, or null when they don't belong to the organization. */
+  /** Business organizations where this user is the only active owner (they'd be left without one). */
+  soleOwnerships(userId: string) {
+    return this.http.get<{ id: string; name: string }[]>(this.url(`/users/${userId}/sole-ownerships`));
+  }
+
   getMembership(organizationId: string, userId: string) {
     return this.http
       .get<InternalMembership>(this.url(`/organizations/${organizationId}/members/${userId}`))

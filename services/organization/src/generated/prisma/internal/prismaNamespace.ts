@@ -404,7 +404,8 @@ export const ModelName = {
   MembershipLocation: 'MembershipLocation',
   Invitation: 'Invitation',
   OutboxEvent: 'OutboxEvent',
-  ProcessedEvent: 'ProcessedEvent'
+  ProcessedEvent: 'ProcessedEvent',
+  DeliveryAddress: 'DeliveryAddress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "membership" | "branch" | "roleTemplate" | "membershipLocation" | "invitation" | "outboxEvent" | "processedEvent"
+    modelProps: "organization" | "membership" | "branch" | "roleTemplate" | "membershipLocation" | "invitation" | "outboxEvent" | "processedEvent" | "deliveryAddress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1016,6 +1017,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DeliveryAddress: {
+      payload: Prisma.$DeliveryAddressPayload<ExtArgs>
+      fields: Prisma.DeliveryAddressFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeliveryAddressFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeliveryAddressFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>
+        }
+        findFirst: {
+          args: Prisma.DeliveryAddressFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeliveryAddressFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>
+        }
+        findMany: {
+          args: Prisma.DeliveryAddressFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>[]
+        }
+        create: {
+          args: Prisma.DeliveryAddressCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>
+        }
+        createMany: {
+          args: Prisma.DeliveryAddressCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeliveryAddressCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>[]
+        }
+        delete: {
+          args: Prisma.DeliveryAddressDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>
+        }
+        update: {
+          args: Prisma.DeliveryAddressUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>
+        }
+        deleteMany: {
+          args: Prisma.DeliveryAddressDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeliveryAddressUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeliveryAddressUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>[]
+        }
+        upsert: {
+          args: Prisma.DeliveryAddressUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryAddressPayload>
+        }
+        aggregate: {
+          args: Prisma.DeliveryAddressAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryAddress>
+        }
+        groupBy: {
+          args: Prisma.DeliveryAddressGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryAddressGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeliveryAddressCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryAddressCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1178,6 +1253,28 @@ export const ProcessedEventScalarFieldEnum = {
 } as const
 
 export type ProcessedEventScalarFieldEnum = (typeof ProcessedEventScalarFieldEnum)[keyof typeof ProcessedEventScalarFieldEnum]
+
+
+export const DeliveryAddressScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  label: 'label',
+  recipientName: 'recipientName',
+  phone: 'phone',
+  line1: 'line1',
+  line2: 'line2',
+  city: 'city',
+  region: 'region',
+  countryCode: 'countryCode',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  instructions: 'instructions',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DeliveryAddressScalarFieldEnum = (typeof DeliveryAddressScalarFieldEnum)[keyof typeof DeliveryAddressScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1587,6 +1684,7 @@ export type GlobalOmitConfig = {
   invitation?: Prisma.InvitationOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit
+  deliveryAddress?: Prisma.DeliveryAddressOmit
 }
 
 /* Types for Logging */

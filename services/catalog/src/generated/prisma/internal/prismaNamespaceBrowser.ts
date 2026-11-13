@@ -60,7 +60,8 @@ export const ModelName = {
   ProductOption: 'ProductOption',
   PriceList: 'PriceList',
   PriceListEntry: 'PriceListEntry',
-  OutboxEvent: 'OutboxEvent'
+  OutboxEvent: 'OutboxEvent',
+  SavedProduct: 'SavedProduct'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -226,6 +227,16 @@ export const OutboxEventScalarFieldEnum = {
 } as const
 
 export type OutboxEventScalarFieldEnum = (typeof OutboxEventScalarFieldEnum)[keyof typeof OutboxEventScalarFieldEnum]
+
+
+export const SavedProductScalarFieldEnum = {
+  organizationId: 'organizationId',
+  productId: 'productId',
+  savedByUserId: 'savedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type SavedProductScalarFieldEnum = (typeof SavedProductScalarFieldEnum)[keyof typeof SavedProductScalarFieldEnum]
 
 
 export const SortOrder = {

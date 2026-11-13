@@ -92,3 +92,8 @@ export type PriceListEntry = Prisma.PriceListEntryModel
  * 
  */
 export type OutboxEvent = Prisma.OutboxEventModel
+/**
+ * Model SavedProduct
+ * Products a buyer saved for later (wishlist), per buyer organization.
+ */
+export type SavedProduct = Prisma.SavedProductModel

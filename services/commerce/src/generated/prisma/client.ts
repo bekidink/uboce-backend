@@ -97,3 +97,9 @@ export type ProcessedEvent = Prisma.ProcessedEventModel
  * Transactional outbox (PRD 8.3).
  */
 export type OutboxEvent = Prisma.OutboxEventModel
+/**
+ * Model CartItem
+ * A buyer's cart (shared by the organization's buyers). Prices are never stored: they are quoted
+ * from the catalog when the cart is read and again at checkout.
+ */
+export type CartItem = Prisma.CartItemModel

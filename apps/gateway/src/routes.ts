@@ -42,6 +42,7 @@ export const ROUTES: [prefix: string, service: ServiceName][] = [
   ['/api/v1/returns', 'commerce'],
   ['/api/v1/promotions', 'commerce'],
   ['/api/v1/cancellation-policies', 'commerce'],
+  ['/api/v1/cart', 'commerce'],
   ['/api/v1/inventory', 'inventory'],
   ['/api/v1/warehouse', 'warehouse'],
   ['/api/v1/shipments', 'logistics'],

@@ -406,7 +406,8 @@ export const ModelName = {
   ProductOption: 'ProductOption',
   PriceList: 'PriceList',
   PriceListEntry: 'PriceListEntry',
-  OutboxEvent: 'OutboxEvent'
+  OutboxEvent: 'OutboxEvent',
+  SavedProduct: 'SavedProduct'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "category" | "product" | "productVariant" | "productMedia" | "variantPriceTier" | "productOptionGroup" | "productOption" | "priceList" | "priceListEntry" | "outboxEvent"
+    modelProps: "category" | "product" | "productVariant" | "productMedia" | "variantPriceTier" | "productOptionGroup" | "productOption" | "priceList" | "priceListEntry" | "outboxEvent" | "savedProduct"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1166,6 +1167,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SavedProduct: {
+      payload: Prisma.$SavedProductPayload<ExtArgs>
+      fields: Prisma.SavedProductFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SavedProductFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SavedProductFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>
+        }
+        findFirst: {
+          args: Prisma.SavedProductFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SavedProductFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>
+        }
+        findMany: {
+          args: Prisma.SavedProductFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>[]
+        }
+        create: {
+          args: Prisma.SavedProductCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>
+        }
+        createMany: {
+          args: Prisma.SavedProductCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SavedProductCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>[]
+        }
+        delete: {
+          args: Prisma.SavedProductDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>
+        }
+        update: {
+          args: Prisma.SavedProductUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>
+        }
+        deleteMany: {
+          args: Prisma.SavedProductDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SavedProductUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SavedProductUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>[]
+        }
+        upsert: {
+          args: Prisma.SavedProductUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedProductPayload>
+        }
+        aggregate: {
+          args: Prisma.SavedProductAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSavedProduct>
+        }
+        groupBy: {
+          args: Prisma.SavedProductGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedProductGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SavedProductCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedProductCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1352,6 +1427,16 @@ export const OutboxEventScalarFieldEnum = {
 } as const
 
 export type OutboxEventScalarFieldEnum = (typeof OutboxEventScalarFieldEnum)[keyof typeof OutboxEventScalarFieldEnum]
+
+
+export const SavedProductScalarFieldEnum = {
+  organizationId: 'organizationId',
+  productId: 'productId',
+  savedByUserId: 'savedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type SavedProductScalarFieldEnum = (typeof SavedProductScalarFieldEnum)[keyof typeof SavedProductScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1679,6 +1764,7 @@ export type GlobalOmitConfig = {
   priceList?: Prisma.PriceListOmit
   priceListEntry?: Prisma.PriceListEntryOmit
   outboxEvent?: Prisma.OutboxEventOmit
+  savedProduct?: Prisma.SavedProductOmit
 }
 
 /* Types for Logging */

@@ -1,16 +1,17 @@
 import type { MembershipRole } from '../generated/prisma/enums.js';
 
 /** Actions on an organization's own records. Other services define their own permissions. */
-export type Permission = 'organization:read' | 'organization:update' | 'members:read' | 'members:manage' | 'branches:manage';
+export type Permission = 'organization:read' | 'organization:update' | 'members:read' | 'members:manage' | 'branches:manage' | 'addresses:manage';
 
 const READ: Permission[] = ['organization:read', 'members:read'];
 
 // Least privilege (PRD 3.1): only owner/admin manage the organization itself;
 // operational roles can see it and their colleagues, nothing more here.
 export const ROLE_PERMISSIONS: Record<MembershipRole, readonly Permission[]> = {
-  owner: ['organization:read', 'organization:update', 'members:read', 'members:manage', 'branches:manage'],
-  admin: ['organization:read', 'organization:update', 'members:read', 'members:manage', 'branches:manage'],
-  procurement_officer: READ,
+  owner: ['organization:read', 'organization:update', 'members:read', 'members:manage', 'branches:manage', 'addresses:manage'],
+  admin: ['organization:read', 'organization:update', 'members:read', 'members:manage', 'branches:manage', 'addresses:manage'],
+  // Buyers keep the delivery addresses they order to.
+  procurement_officer: [...READ, 'addresses:manage'],
   sales_representative: READ,
   warehouse_operator: READ,
   farmer: READ,

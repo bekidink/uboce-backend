@@ -20,6 +20,11 @@ export interface UserRegisteredV1 {
   locale: Locale;
 }
 
+/** The user closed their account: personal data is erased and memberships end. */
+export interface UserAccountClosedV1 {
+  userId: string;
+}
+
 // ---- Organization -------------------------------------------------------------
 
 export interface OrganizationCreatedV1 {
@@ -188,6 +193,7 @@ export interface PurchaseOrderConfirmedV1 extends PurchaseOrderStatusChangedV1 {
 
 export interface EventCatalog {
   UserRegistered: UserRegisteredV1;
+  UserAccountClosed: UserAccountClosedV1;
   OrganizationCreated: OrganizationCreatedV1;
   OrganizationUpdated: OrganizationUpdatedV1;
   MembershipAdded: MembershipAddedV1;
@@ -234,6 +240,7 @@ export type EventType = keyof EventCatalog;
 
 export const EVENT_SCHEMA_VERSIONS: Record<EventType, number> = {
   UserRegistered: 1,
+  UserAccountClosed: 1,
   OrganizationCreated: 1,
   OrganizationUpdated: 1,
   MembershipAdded: 1,

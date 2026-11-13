@@ -1,18 +1,20 @@
 import { randomBytes } from 'node:crypto';
 
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { AppError, conflict, REDIS } from '@uboce/common';
+import { AppError, buildEvent, conflict, forbidden, notFound, OrganizationsClient, REDIS, toOutboxRow } from '@uboce/common';
 import * as argon2 from 'argon2';
 import type { Redis } from 'ioredis';
 
 import { hashRecoveryCode } from '../auth/auth.service.js';
-import { env } from '../config.js';
+import { env, SERVICE_NAME } from '../config.js';
+import { Prisma } from '../generated/prisma/client.js';
 import type { TokenPurpose } from '../generated/prisma/enums.js';
 import { SecretBox } from '../mfa/secret-box.js';
 import { base32Encode, generateTotpSecret, otpauthUrl, verifyTotp } from '../mfa/totp.js';
 import { PrismaService } from '../prisma.service.js';
 import { type RequestMeta, securityEvent, SessionsService } from '../tokens/tokens.module.js';
 import { AccountMailer, hashEmailToken } from './account-mailer.js';
+import type { SessionDto, UpdateProfileDto } from './account.dto.js';
 
 const invalidToken = () => new AppError(HttpStatus.BAD_REQUEST, 'invalid_token', 'This link is invalid or has expired');
 const invalidCode = () => new AppError(HttpStatus.BAD_REQUEST, 'invalid_mfa_code', 'The code is not valid');
@@ -29,7 +31,90 @@ export class AccountService {
     private readonly sessions: SessionsService,
     private readonly mailer: AccountMailer,
     @Inject(REDIS) private readonly redis: Redis,
+    private readonly organizations: OrganizationsClient,
   ) {}
+
+  // ---- Profile, devices, closing the account ------------------------------------------
+
+  async updateProfile(userId: string, dto: UpdateProfileDto, meta: RequestMeta) {
+    try {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { displayName: dto.displayName?.trim(), phone: dto.phone, locale: dto.locale },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') throw conflict('phone_taken', 'Another account uses this phone number');
+      throw error;
+    }
+    await securityEvent(this.prisma, 'profile_updated', userId, meta, { fields: Object.keys(dto) });
+  }
+
+  /** Signed-in devices: one entry per refresh-token family that is still valid. */
+  async listSessions(userId: string, currentSessionId: string): Promise<SessionDto[]> {
+    const rows = await this.prisma.session.findMany({
+      where: { userId, revokedAt: null, expiresAt: { gt: new Date() } },
+      orderBy: { createdAt: 'desc' },
+    });
+    const families = await this.prisma.session.groupBy({ by: ['familyId'], where: { familyId: { in: [...new Set(rows.map((r) => r.familyId))] } }, _min: { createdAt: true } });
+    const firstSeen = new Map(families.map((f) => [f.familyId, f._min.createdAt]));
+    const currentFamily = await this.sessions.familyOf(currentSessionId);
+    const latest = new Map<string, (typeof rows)[number]>();
+    for (const r of rows) if (!latest.has(r.familyId)) latest.set(r.familyId, r);
+    return [...latest.values()].map((s) => ({
+      id: s.familyId,
+      userAgent: s.userAgent,
+      ipAddress: s.ipAddress,
+      signedInAt: firstSeen.get(s.familyId) ?? s.createdAt,
+      lastActiveAt: s.createdAt,
+      current: s.familyId === currentFamily,
+    }));
+  }
+
+  /** Signs one device out (its live access tokens stop working right away). */
+  async revokeSession(userId: string, familyId: string, meta: RequestMeta) {
+    const owned = await this.prisma.session.findFirst({ where: { userId, familyId }, select: { id: true } });
+    if (!owned) throw notFound('Session');
+    await this.sessions.revokeFamily(familyId);
+    await securityEvent(this.prisma, 'session_revoked', userId, meta, { familyId });
+  }
+
+  /**
+   * Closes the account for good: personal data is erased (email, phone, name, MFA), every device is
+   * signed out and other services end the user's memberships. Refused while the user is the only
+   * owner of a business, which would be left without anyone in charge.
+   */
+  async closeAccount(userId: string, password: string, mfaCode: string | undefined, meta: RequestMeta) {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    if (!(await argon2.verify(user.passwordHash, password))) {
+      await securityEvent(this.prisma, 'account_close_failed', userId, meta);
+      throw new AppError(HttpStatus.BAD_REQUEST, 'invalid_password', 'Password is incorrect');
+    }
+    if (user.mfaEnabledAt && user.mfaSecret && (!mfaCode || verifyTotp(this.box.open(user.mfaSecret), mfaCode) === null)) throw invalidCode();
+    const owned = await this.organizations.soleOwnerships(userId);
+    if (owned.length) {
+      throw forbidden(`You are the only owner of ${owned.map((o) => o.name).join(', ')}. Make someone else an owner first.`);
+    }
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          status: 'deleted',
+          email: `deleted+${userId}@users.invalid`,
+          phone: null,
+          displayName: 'Deleted user',
+          passwordHash: await argon2.hash(randomBytes(32).toString('base64url'), { type: argon2.argon2id }),
+          mfaSecret: null,
+          mfaEnabledAt: null,
+          emailVerifiedAt: null,
+        },
+      });
+      await tx.recoveryCode.deleteMany({ where: { userId } });
+      await tx.verificationToken.deleteMany({ where: { userId } });
+      await tx.outboxEvent.create({ data: toOutboxRow(buildEvent(SERVICE_NAME, 'UserAccountClosed', userId, { userId })) });
+      await securityEvent(tx, 'account_closed', userId, meta);
+    });
+    await this.sessions.revokeAllForUser(userId);
+  }
 
   // ---- Email verification -----------------------------------------------------
 

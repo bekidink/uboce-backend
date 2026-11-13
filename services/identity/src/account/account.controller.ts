@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { type AuthUser, CurrentUser, Public } from '@uboce/common';
@@ -7,12 +7,15 @@ import type { Request } from 'express';
 import type { RequestMeta } from '../tokens/tokens.module.js';
 import {
   ChangePasswordDto,
+  CloseAccountDto,
   ForgotPasswordDto,
   MfaCodeDto,
   type MfaSetupDto,
   type RecoveryCodesDto,
   ResetPasswordDto,
+  type SessionDto,
   TokenDto,
+  UpdateProfileDto,
 } from './account.dto.js';
 import { AccountService } from './account.service.js';
 
@@ -83,5 +86,37 @@ export class AccountController {
   @HttpCode(204)
   async disableMfa(@CurrentUser() user: AuthUser, @Body() dto: MfaCodeDto, @Req() req: Request) {
     await this.account.disableMfa(user.userId, dto.code, metaOf(req));
+  }
+
+  /** Change name, phone or language. */
+  @ApiBearerAuth()
+  @Patch('me')
+  @HttpCode(204)
+  async updateProfile(@CurrentUser() user: AuthUser, @Body() dto: UpdateProfileDto, @Req() req: Request) {
+    await this.account.updateProfile(user.userId, dto, metaOf(req));
+  }
+
+  /** Devices signed in to this account. */
+  @ApiBearerAuth()
+  @Get('sessions')
+  sessions(@CurrentUser() user: AuthUser): Promise<SessionDto[]> {
+    return this.account.listSessions(user.userId, user.sessionId);
+  }
+
+  /** Signs one device out. */
+  @ApiBearerAuth()
+  @Delete('sessions/:sessionId')
+  @HttpCode(204)
+  async revokeSession(@CurrentUser() user: AuthUser, @Param('sessionId', new ParseUUIDPipe()) sessionId: string, @Req() req: Request) {
+    await this.account.revokeSession(user.userId, sessionId, metaOf(req));
+  }
+
+  /** Closes the account permanently (password, and the authenticator code when two-factor is on). */
+  @ApiBearerAuth()
+  @UseGuards(ThrottlerGuard)
+  @Post('account/close')
+  @HttpCode(204)
+  async close(@CurrentUser() user: AuthUser, @Body() dto: CloseAccountDto, @Req() req: Request) {
+    await this.account.closeAccount(user.userId, dto.password, dto.mfaCode, metaOf(req));
   }
 }

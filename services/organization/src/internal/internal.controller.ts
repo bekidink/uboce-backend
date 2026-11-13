@@ -125,3 +125,26 @@ export class InternalController {
     });
   }
 }
+
+/** Per-user facts other services need (e.g. Identity before closing an account). */
+@ApiExcludeController()
+@Controller('internal/users/:userId')
+export class InternalUsersController {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /** Business organizations where the user is the only active owner. */
+  @Internal('identity')
+  @Get('sole-ownerships')
+  async soleOwnerships(@Param('userId', new ParseUUIDPipe()) userId: string) {
+    const owned = await this.prisma.membership.findMany({
+      where: { userId, role: 'owner', status: 'active', organization: { type: { not: 'individual' }, status: { not: 'closed' } } },
+      include: { organization: { select: { id: true, name: true } } },
+    });
+    const result: { id: string; name: string }[] = [];
+    for (const m of owned) {
+      const others = await this.prisma.membership.count({ where: { organizationId: m.organizationId, role: 'owner', status: 'active', userId: { not: userId } } });
+      if (!others) result.push(m.organization);
+    }
+    return result;
+  }
+}

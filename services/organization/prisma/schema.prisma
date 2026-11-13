@@ -101,6 +101,7 @@ model Organization {
   memberships Membership[]
   branches    Branch[]
   invitations Invitation[]
+  addresses   DeliveryAddress[]
 
   @@map("organizations")
 }
@@ -243,4 +244,32 @@ model ProcessedEvent {
   processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
 
   @@map("processed_events")
+}
+
+/// Saved delivery addresses a buyer orders to (single customers have no locations of their own).
+model DeliveryAddress {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  /// "Home", "Office", "Main warehouse"…
+  label          String
+  recipientName  String       @map("recipient_name")
+  phone          String
+  line1          String
+  line2          String?
+  city           String
+  region         String?
+  /// ISO 3166-1 alpha-2
+  countryCode    String       @default("ET") @map("country_code") @db.Char(2)
+  latitude       Decimal?     @db.Decimal(9, 6)
+  longitude      Decimal?     @db.Decimal(9, 6)
+  /// Directions for the driver (landmark, gate, floor).
+  instructions   String?
+  isDefault      Boolean      @default(false) @map("is_default")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("delivery_addresses")
 }

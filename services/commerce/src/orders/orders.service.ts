@@ -96,7 +96,7 @@ const stableStringify = (value: unknown): string =>
 const invalidTransition = (error: unknown) => (error instanceof InvalidTransitionError ? conflict('invalid_transition', error.message) : error);
 
 /** Catalog's 422 problems (MOQ, season, options…) pass through to the buyer unchanged. */
-const quoteFailure = (error: unknown) => {
+export const quoteFailure = (error: unknown) => {
   if (error instanceof InternalCallError && error.status && error.status < 500) {
     const body = (error as { body?: { error?: { code?: string; message?: string } } }).body;
     return new AppError(HttpStatus.UNPROCESSABLE_ENTITY, body?.error?.code ?? 'invalid_line', body?.error?.message ?? 'An order line is not valid');

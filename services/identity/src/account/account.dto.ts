@@ -1,4 +1,5 @@
-import { IsEmail, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsIn, IsOptional, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class TokenDto {
   @IsString()
@@ -49,4 +50,43 @@ export class MfaSetupDto {
 export class RecoveryCodesDto {
   /** Shown once. Each code signs in once if the authenticator is lost. */
   recoveryCodes: string[];
+}
+
+/** Profile fields the user can change themselves. Email changes go through verification (not here). */
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  @Length(1, 100)
+  displayName?: string;
+
+  /** E.164, e.g. +251911234567; null removes it. */
+  @IsOptional()
+  @Matches(/^\+[1-9]\d{7,14}$/, { message: 'phone must be in E.164 format, e.g. +251911234567' })
+  phone?: string | null;
+
+  @ApiPropertyOptional({ enum: ['en', 'am'] })
+  @IsOptional()
+  @IsIn(['en', 'am'])
+  locale?: 'en' | 'am';
+}
+
+export class CloseAccountDto {
+  @IsString()
+  @MaxLength(128)
+  password: string;
+
+  /** Required when two-factor sign-in is on. */
+  @IsOptional()
+  @Matches(/^\d{6}$/, { message: 'mfaCode must be 6 digits' })
+  mfaCode?: string;
+}
+
+export interface SessionDto {
+  /** Pass to DELETE /auth/sessions/:id to sign that device out. */
+  id: string;
+  userAgent: string | null;
+  ipAddress: string | null;
+  signedInAt: Date;
+  lastActiveAt: Date;
+  current: boolean;
 }

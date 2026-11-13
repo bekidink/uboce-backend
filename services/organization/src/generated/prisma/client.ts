@@ -81,3 +81,8 @@ export type OutboxEvent = Prisma.OutboxEventModel
  * Inbox for idempotent event consumption.
  */
 export type ProcessedEvent = Prisma.ProcessedEventModel
+/**
+ * Model DeliveryAddress
+ * Saved delivery addresses a buyer orders to (single customers have no locations of their own).
+ */
+export type DeliveryAddress = Prisma.DeliveryAddressModel
