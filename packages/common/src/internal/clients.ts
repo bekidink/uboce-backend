@@ -19,6 +19,10 @@ import type {
   ReserveStockRequest,
   ReserveStockResult,
   SendMessageRequest,
+  TaxQuote,
+  TaxQuoteRequest,
+  DeliveryQuote,
+  DeliveryQuoteRequest,
 } from '@uboce/contracts';
 
 import { serviceUrl } from '../urls.js';
@@ -176,6 +180,10 @@ export class FinanceClient extends ServiceClient {
   refundNotification(notification: RefundNotification) {
     return this.http.post<{ applied: boolean }>(this.url('/refund-notifications'), notification);
   }
+
+  taxQuote(request: TaxQuoteRequest) {
+    return this.http.post<TaxQuote>(this.url('/tax/quote'), request);
+  }
 }
 
 export class LogisticsClient extends ServiceClient {
@@ -189,6 +197,10 @@ export class LogisticsClient extends ServiceClient {
 
   getShipment(shipmentId: string) {
     return this.http.get<InternalShipment>(this.url(`/shipments/${shipmentId}`)).catch(notFoundAsNull);
+  }
+
+  deliveryQuote(request: DeliveryQuoteRequest) {
+    return this.http.post<DeliveryQuote>(this.url('/delivery-quotes'), request);
   }
 }
 

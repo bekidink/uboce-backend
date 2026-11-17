@@ -51,6 +51,12 @@ model Invoice {
   issuedAt             DateTime?      @map("issued_at") @db.Timestamptz(3)
   voidedAt             DateTime?      @map("voided_at") @db.Timestamptz(3)
   voidReason           String?        @map("void_reason")
+  /// Unique code a buyer quotes on a bank transfer, so statement lines match automatically (PRD v2 FIN-06).
+  paymentCode          String?        @unique @map("payment_code")
+  /// Set when the invoice first passes its due date unpaid; reminders follow (PLT-03).
+  overdueAt            DateTime?      @map("overdue_at") @db.Timestamptz(3)
+  remindersSent        Int            @default(0) @map("reminders_sent")
+  lastReminderAt       DateTime?      @map("last_reminder_at") @db.Timestamptz(3)
   createdAt            DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt            DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -62,6 +68,7 @@ model Invoice {
   @@index([sellerOrganizationId, status])
   @@index([buyerOrganizationId, status])
   @@index([orderId])
+  @@index([status, dueDate])
   @@map("invoices")
 }
 
@@ -96,6 +103,9 @@ model PaymentReference {
   /// buyer_claim, seller_confirmation or provider_callback
   source            String
   recordedByUserId  String?       @map("recorded_by_user_id") @db.Uuid
+  /// Buyer-uploaded proof (receipt photo, bank slip) for the seller to review (FIN-06).
+  proofDocumentId   String?       @map("proof_document_id") @db.Uuid
+  reviewNote        String?       @map("review_note")
   occurredAt        DateTime      @map("occurred_at") @db.Timestamptz(3)
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -267,4 +277,180 @@ model ProcessedEvent {
   processedAt DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
 
   @@map("processed_events")
+}
+
+// ---- Cash, manual payments and bank reconciliation (PRD v2 FIN-04, FIN-06) ----------------
+
+enum CashSessionStatus {
+  open
+  closed
+}
+
+/// A till: opened with a float, closed with a count; the difference is the variance.
+model CashSession {
+  id             String            @id @default(uuid()) @db.Uuid
+  organizationId String            @map("organization_id") @db.Uuid
+  branchId       String?           @map("branch_id") @db.Uuid
+  currency       String            @db.Char(3)
+  status         CashSessionStatus @default(open)
+  openingFloat   Decimal           @map("opening_float") @db.Decimal(18, 4)
+  /// Float plus cash received, computed at close.
+  expectedAmount Decimal?          @map("expected_amount") @db.Decimal(18, 4)
+  countedAmount  Decimal?          @map("counted_amount") @db.Decimal(18, 4)
+  variance       Decimal?          @db.Decimal(18, 4)
+  note           String?
+  openedByUserId String            @map("opened_by_user_id") @db.Uuid
+  closedByUserId String?           @map("closed_by_user_id") @db.Uuid
+  openedAt       DateTime          @default(now()) @map("opened_at") @db.Timestamptz(3)
+  closedAt       DateTime?         @map("closed_at") @db.Timestamptz(3)
+  /// The bank statement line the takings were deposited with.
+  depositLineId  String?           @unique @map("deposit_line_id") @db.Uuid
+
+  receipts CashReceipt[]
+
+  @@index([organizationId, status])
+  @@map("cash_sessions")
+}
+
+/// Money a seller's staff received outside a provider, with a receipt number (FIN-04).
+model CashReceipt {
+  id                 String   @id @default(uuid()) @db.Uuid
+  number             String   @unique
+  organizationId     String   @map("organization_id") @db.Uuid
+  invoiceId          String   @map("invoice_id") @db.Uuid
+  sessionId          String?  @map("session_id") @db.Uuid
+  paymentReferenceId String   @unique @map("payment_reference_id") @db.Uuid
+  /// cash, mobile_money, cheque or bank_transfer
+  method             String
+  amount             Decimal  @db.Decimal(18, 4)
+  currency           String   @db.Char(3)
+  /// The payer's own reference (mobile money transaction ID, cheque number).
+  externalReference  String?  @map("external_reference")
+  note               String?
+  idempotencyKey     String?  @map("idempotency_key")
+  receivedByUserId   String   @map("received_by_user_id") @db.Uuid
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  session CashSession? @relation(fields: [sessionId], references: [id])
+
+  @@unique([organizationId, idempotencyKey])
+  @@index([invoiceId])
+  @@map("cash_receipts")
+}
+
+model BankStatementImport {
+  id               String   @id @default(uuid()) @db.Uuid
+  organizationId   String   @map("organization_id") @db.Uuid
+  accountLabel     String   @map("account_label")
+  fileName         String?  @map("file_name")
+  lineCount        Int      @map("line_count")
+  duplicateCount   Int      @map("duplicate_count")
+  matchedCount     Int      @map("matched_count")
+  importedByUserId String   @map("imported_by_user_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  lines StatementLine[]
+
+  @@index([organizationId, createdAt])
+  @@map("bank_statement_imports")
+}
+
+enum StatementLineStatus {
+  unmatched
+  matched
+  ignored
+}
+
+/// One credit on the seller's bank statement, matched to an invoice automatically or by hand.
+model StatementLine {
+  id                 String              @id @default(uuid()) @db.Uuid
+  importId           String              @map("import_id") @db.Uuid
+  organizationId     String              @map("organization_id") @db.Uuid
+  /// Hash of account, date, amount and reference: re-importing the same file adds nothing.
+  fingerprint        String
+  bookedAt           DateTime            @map("booked_at") @db.Timestamptz(3)
+  amount             Decimal             @db.Decimal(18, 4)
+  currency           String              @db.Char(3)
+  reference          String
+  counterparty       String?
+  description        String?
+  status             StatementLineStatus @default(unmatched)
+  /// Why it went to the manual queue, or how it was matched.
+  matchNote          String?             @map("match_note")
+  invoiceId          String?             @map("invoice_id") @db.Uuid
+  paymentReferenceId String?             @unique @map("payment_reference_id") @db.Uuid
+  matchedByUserId    String?             @map("matched_by_user_id") @db.Uuid
+  matchedAt          DateTime?           @map("matched_at") @db.Timestamptz(3)
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  statement BankStatementImport @relation(fields: [importId], references: [id])
+
+  @@unique([organizationId, fingerprint])
+  @@index([organizationId, status])
+  @@map("statement_lines")
+}
+
+// ---- Tax (PRD v2 FIN-09) ------------------------------------------------------------------
+
+/// A tax rate as data. Rates change by adding a rule with a new effective date, never by editing one.
+model TaxRule {
+  id              String    @id @default(uuid()) @db.Uuid
+  /// VAT, TOT, …
+  code            String
+  name            String
+  /// The seller's regime it applies to: vat or tot.
+  regime          String
+  /// standard, zero_rated, exempt or service
+  taxClass        String    @map("tax_class")
+  ratePct         Decimal   @map("rate_pct") @db.Decimal(5, 2)
+  effectiveFrom   DateTime  @map("effective_from") @db.Timestamptz(3)
+  effectiveTo     DateTime? @map("effective_to") @db.Timestamptz(3)
+  createdByUserId String?   @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([regime, taxClass, effectiveFrom])
+  @@map("tax_rules")
+}
+
+/// How a seller is registered for tax, which decides what its orders and invoices charge.
+model SellerTaxProfile {
+  organizationId   String   @id @map("organization_id") @db.Uuid
+  /// vat, tot or none (not registered)
+  regime           String   @default("none")
+  /// Taxpayer identification number, 10 digits.
+  tin              String?
+  vatNumber        String?  @map("vat_number")
+  /// Legal name as registered, printed on invoices.
+  legalName        String?  @map("legal_name")
+  /// Catalog prices already include tax.
+  pricesIncludeTax Boolean  @default(false) @map("prices_include_tax")
+  updatedByUserId  String   @map("updated_by_user_id") @db.Uuid
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("seller_tax_profiles")
+}
+
+enum ExemptionStatus {
+  pending
+  approved
+  rejected
+}
+
+/// A buyer's tax exemption certificate, with evidence; only approved, current ones apply.
+model TaxExemption {
+  id                  String          @id @default(uuid()) @db.Uuid
+  buyerOrganizationId String          @map("buyer_organization_id") @db.Uuid
+  certificateNumber   String          @map("certificate_number")
+  documentId          String          @map("document_id") @db.Uuid
+  validFrom           DateTime        @map("valid_from") @db.Timestamptz(3)
+  validTo             DateTime        @map("valid_to") @db.Timestamptz(3)
+  status              ExemptionStatus @default(pending)
+  reviewNote          String?         @map("review_note")
+  submittedByUserId   String          @map("submitted_by_user_id") @db.Uuid
+  reviewedByUserId    String?         @map("reviewed_by_user_id") @db.Uuid
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([buyerOrganizationId, status])
+  @@map("tax_exemptions")
 }

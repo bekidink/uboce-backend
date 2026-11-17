@@ -300,6 +300,71 @@ export const TEMPLATES = {
       am: { title: () => 'አዲስ ግምገማ', body: (v) => `ገዢ ${v.rating}/5 ሰጥቶዎታል።` },
     },
   },
+  // ---- PRD v2.0 ----
+  invoice_overdue: {
+    push: true,
+    route: (v) => `/invoices/${v.invoiceId}`,
+    text: {
+      en: {
+        title: (v) => (v.reminder === '1' ? 'Invoice overdue' : 'Payment reminder'),
+        body: (v) => `Invoice ${v.invoiceNumber} was due ${v.dueDate}; ${v.outstanding} ${v.currency} is still outstanding.`,
+      },
+      am: {
+        title: (v) => (v.reminder === '1' ? 'ደረሰኙ ጊዜው አልፎበታል' : 'የክፍያ ማስታወሻ'),
+        body: (v) => `ደረሰኝ ${v.invoiceNumber} እስከ ${v.dueDate} መከፈል ነበረበት፤ ${v.outstanding} ${v.currency} ገና አልተከፈለም።`,
+      },
+    },
+  },
+  payment_attempt: {
+    push: true,
+    route: (v) => `/invoices/${v.invoiceId}`,
+    text: {
+      en: {
+        title: (v) => (v.status === 'expired' ? 'Payment not completed' : 'Payment declined'),
+        body: (v) => `Your payment for invoice ${v.invoiceNumber} did not go through. You can pay again, or choose another method.`,
+      },
+      am: {
+        title: (v) => (v.status === 'expired' ? 'ክፍያው አልተጠናቀቀም' : 'ክፍያው ውድቅ ሆኗል'),
+        body: (v) => `ለደረሰኝ ${v.invoiceNumber} ያደረጉት ክፍያ አልተሳካም። እንደገና መክፈል ወይም ሌላ የክፍያ መንገድ መምረጥ ይችላሉ።`,
+      },
+    },
+  },
+  payment_received: {
+    push: true,
+    route: (v) => `/invoices/${v.invoiceId}`,
+    text: {
+      en: { title: () => 'Payment received', body: (v) => `${v.amount} ${v.currency} was received for invoice ${v.invoiceNumber} (receipt ${v.receiptNumber}).` },
+      am: { title: () => 'ክፍያ ደርሷል', body: (v) => `ለደረሰኝ ${v.invoiceNumber} ${v.amount} ${v.currency} ተቀብለናል (ደረሰኝ ቁጥር ${v.receiptNumber})።` },
+    },
+  },
+  stock_expiring: {
+    push: true,
+    route: () => '/inventory/batches?expiring=1',
+    text: {
+      en: { title: () => 'Stock expiring soon', body: (v) => `${v.batches} batch(es) expire within ${v.withinDays} days, the first on ${v.earliestExpiresOn}.` },
+      am: { title: () => 'ጊዜው የሚያልፍ ክምችት', body: (v) => `${v.batches} ባች በ${v.withinDays} ቀናት ውስጥ ጊዜያቸው ያልፋል፤ የመጀመሪያው ${v.earliestExpiresOn}።` },
+    },
+  },
+  job_failed: {
+    text: {
+      en: {
+        title: (v) => `Scheduled job ${v.kind === 'missed' ? 'missed' : 'failing'}: ${v.job}`,
+        body: (v) => `${v.job} ${v.kind === 'missed' ? 'has not run on schedule' : `failed ${v.failures} times in a row`}. ${v.error ? `Last error: ${v.error}` : ''} Check Administration → Jobs.`,
+      },
+      am: {
+        title: (v) => `የታቀደ ሥራ ችግር፦ ${v.job}`,
+        body: (v) => `${v.job} ${v.kind === 'missed' ? 'በጊዜው አልሠራም' : `${v.failures} ጊዜ ተከታትሎ አልተሳካም`}። ${v.error ? `የመጨረሻ ስህተት፦ ${v.error}` : ''}`,
+      },
+    },
+  },
+  phone_code: {
+    sensitive: true,
+    text: {
+      // SMS carries only the code (PRD v2 NTF-02): no names, amounts or links.
+      en: { title: () => 'Verification code', body: (v) => `${v.code} is your UBOCE code. It expires in ${v.minutes} minutes. Never share it.` },
+      am: { title: () => 'የማረጋገጫ ኮድ', body: (v) => `${v.code} የUBOCE ኮድዎ ነው። በ${v.minutes} ደቂቃ ውስጥ ጊዜው ያልፋል። ለማንም አያጋሩ።` },
+    },
+  },
 } satisfies Record<string, Template>;
 
 export type TemplateKey = keyof typeof TEMPLATES;

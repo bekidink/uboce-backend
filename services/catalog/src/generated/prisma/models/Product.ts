@@ -41,6 +41,7 @@ export type ProductMinAggregateOutputType = {
   description: string | null
   categoryId: string | null
   unitOfMeasure: $Enums.UnitOfMeasure | null
+  taxClass: string | null
   status: $Enums.ProductStatus | null
   availableFrom: Date | null
   availableUntil: Date | null
@@ -60,6 +61,7 @@ export type ProductMaxAggregateOutputType = {
   description: string | null
   categoryId: string | null
   unitOfMeasure: $Enums.UnitOfMeasure | null
+  taxClass: string | null
   status: $Enums.ProductStatus | null
   availableFrom: Date | null
   availableUntil: Date | null
@@ -79,6 +81,7 @@ export type ProductCountAggregateOutputType = {
   description: number
   categoryId: number
   unitOfMeasure: number
+  taxClass: number
   attributes: number
   status: number
   availableFrom: number
@@ -109,6 +112,7 @@ export type ProductMinAggregateInputType = {
   description?: true
   categoryId?: true
   unitOfMeasure?: true
+  taxClass?: true
   status?: true
   availableFrom?: true
   availableUntil?: true
@@ -128,6 +132,7 @@ export type ProductMaxAggregateInputType = {
   description?: true
   categoryId?: true
   unitOfMeasure?: true
+  taxClass?: true
   status?: true
   availableFrom?: true
   availableUntil?: true
@@ -147,6 +152,7 @@ export type ProductCountAggregateInputType = {
   description?: true
   categoryId?: true
   unitOfMeasure?: true
+  taxClass?: true
   attributes?: true
   status?: true
   availableFrom?: true
@@ -254,6 +260,7 @@ export type ProductGroupByOutputType = {
   description: string | null
   categoryId: string
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass: string
   attributes: runtime.JsonValue
   status: $Enums.ProductStatus
   availableFrom: Date | null
@@ -297,6 +304,7 @@ export type ProductWhereInput = {
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   categoryId?: Prisma.UuidFilter<"Product"> | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFilter<"Product"> | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFilter<"Product"> | string
   attributes?: Prisma.JsonFilter<"Product">
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
   availableFrom?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
@@ -322,6 +330,7 @@ export type ProductOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   unitOfMeasure?: Prisma.SortOrder
+  taxClass?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   status?: Prisma.SortOrder
   availableFrom?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -350,6 +359,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   categoryId?: Prisma.UuidFilter<"Product"> | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFilter<"Product"> | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFilter<"Product"> | string
   attributes?: Prisma.JsonFilter<"Product">
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
   availableFrom?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
@@ -375,6 +385,7 @@ export type ProductOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   unitOfMeasure?: Prisma.SortOrder
+  taxClass?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   status?: Prisma.SortOrder
   availableFrom?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -403,6 +414,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   categoryId?: Prisma.UuidWithAggregatesFilter<"Product"> | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureWithAggregatesFilter<"Product"> | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringWithAggregatesFilter<"Product"> | string
   attributes?: Prisma.JsonWithAggregatesFilter<"Product">
   status?: Prisma.EnumProductStatusWithAggregatesFilter<"Product"> | $Enums.ProductStatus
   availableFrom?: Prisma.DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
@@ -422,6 +434,7 @@ export type ProductCreateInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -447,6 +460,7 @@ export type ProductUncheckedCreateInput = {
   description?: string | null
   categoryId: string
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -470,6 +484,7 @@ export type ProductUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -495,6 +510,7 @@ export type ProductUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -519,6 +535,7 @@ export type ProductCreateManyInput = {
   description?: string | null
   categoryId: string
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -538,6 +555,7 @@ export type ProductUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -558,6 +576,7 @@ export type ProductUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -588,6 +607,7 @@ export type ProductCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   unitOfMeasure?: Prisma.SortOrder
+  taxClass?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   status?: Prisma.SortOrder
   availableFrom?: Prisma.SortOrder
@@ -612,6 +632,7 @@ export type ProductMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   unitOfMeasure?: Prisma.SortOrder
+  taxClass?: Prisma.SortOrder
   status?: Prisma.SortOrder
   availableFrom?: Prisma.SortOrder
   availableUntil?: Prisma.SortOrder
@@ -631,6 +652,7 @@ export type ProductMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   unitOfMeasure?: Prisma.SortOrder
+  taxClass?: Prisma.SortOrder
   status?: Prisma.SortOrder
   availableFrom?: Prisma.SortOrder
   availableUntil?: Prisma.SortOrder
@@ -780,6 +802,7 @@ export type ProductCreateWithoutCategoryInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -803,6 +826,7 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -856,6 +880,7 @@ export type ProductScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   categoryId?: Prisma.UuidFilter<"Product"> | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFilter<"Product"> | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFilter<"Product"> | string
   attributes?: Prisma.JsonFilter<"Product">
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
   availableFrom?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
@@ -875,6 +900,7 @@ export type ProductCreateWithoutVariantsInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -899,6 +925,7 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   description?: string | null
   categoryId: string
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -937,6 +964,7 @@ export type ProductUpdateWithoutVariantsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -961,6 +989,7 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -983,6 +1012,7 @@ export type ProductCreateWithoutMediaInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -1007,6 +1037,7 @@ export type ProductUncheckedCreateWithoutMediaInput = {
   description?: string | null
   categoryId: string
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -1045,6 +1076,7 @@ export type ProductUpdateWithoutMediaInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1069,6 +1101,7 @@ export type ProductUncheckedUpdateWithoutMediaInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1091,6 +1124,7 @@ export type ProductCreateWithoutOptionGroupsInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -1115,6 +1149,7 @@ export type ProductUncheckedCreateWithoutOptionGroupsInput = {
   description?: string | null
   categoryId: string
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -1153,6 +1188,7 @@ export type ProductUpdateWithoutOptionGroupsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1177,6 +1213,7 @@ export type ProductUncheckedUpdateWithoutOptionGroupsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1199,6 +1236,7 @@ export type ProductCreateWithoutSavedByInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -1223,6 +1261,7 @@ export type ProductUncheckedCreateWithoutSavedByInput = {
   description?: string | null
   categoryId: string
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -1261,6 +1300,7 @@ export type ProductUpdateWithoutSavedByInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1285,6 +1325,7 @@ export type ProductUncheckedUpdateWithoutSavedByInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1307,6 +1348,7 @@ export type ProductCreateManyCategoryInput = {
   name: string
   description?: string | null
   unitOfMeasure: $Enums.UnitOfMeasure
+  taxClass?: string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   availableFrom?: Date | string | null
@@ -1326,6 +1368,7 @@ export type ProductUpdateWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1349,6 +1392,7 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1372,6 +1416,7 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   unitOfMeasure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  taxClass?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   availableFrom?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1450,6 +1495,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   description?: boolean
   categoryId?: boolean
   unitOfMeasure?: boolean
+  taxClass?: boolean
   attributes?: boolean
   status?: boolean
   availableFrom?: boolean
@@ -1476,6 +1522,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   categoryId?: boolean
   unitOfMeasure?: boolean
+  taxClass?: boolean
   attributes?: boolean
   status?: boolean
   availableFrom?: boolean
@@ -1497,6 +1544,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   categoryId?: boolean
   unitOfMeasure?: boolean
+  taxClass?: boolean
   attributes?: boolean
   status?: boolean
   availableFrom?: boolean
@@ -1518,6 +1566,7 @@ export type ProductSelectScalar = {
   description?: boolean
   categoryId?: boolean
   unitOfMeasure?: boolean
+  taxClass?: boolean
   attributes?: boolean
   status?: boolean
   availableFrom?: boolean
@@ -1531,7 +1580,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "name" | "description" | "categoryId" | "unitOfMeasure" | "attributes" | "status" | "availableFrom" | "availableUntil" | "allowPreorder" | "madeToOrder" | "leadTimeDays" | "publishedAt" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "name" | "description" | "categoryId" | "unitOfMeasure" | "taxClass" | "attributes" | "status" | "availableFrom" | "availableUntil" | "allowPreorder" | "madeToOrder" | "leadTimeDays" | "publishedAt" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   variants?: boolean | Prisma.Product$variantsArgs<ExtArgs>
@@ -1566,6 +1615,10 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     description: string | null
     categoryId: string
     unitOfMeasure: $Enums.UnitOfMeasure
+    /**
+     * standard, zero_rated, exempt or service — decides the tax rule (PRD v2 FIN-09).
+     */
+    taxClass: string
     /**
      * Category specification values, e.g. { "origin": "Yirgacheffe", "grade": "1" }.
      */
@@ -2020,6 +2073,7 @@ export interface ProductFieldRefs {
   readonly description: Prisma.FieldRef<"Product", 'String'>
   readonly categoryId: Prisma.FieldRef<"Product", 'String'>
   readonly unitOfMeasure: Prisma.FieldRef<"Product", 'UnitOfMeasure'>
+  readonly taxClass: Prisma.FieldRef<"Product", 'String'>
   readonly attributes: Prisma.FieldRef<"Product", 'Json'>
   readonly status: Prisma.FieldRef<"Product", 'ProductStatus'>
   readonly availableFrom: Prisma.FieldRef<"Product", 'DateTime'>

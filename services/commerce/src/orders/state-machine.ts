@@ -23,8 +23,8 @@ interface Transition {
 const TRANSITIONS: Record<OrderStatus, Transition[]> = {
   pending_confirmation: [
     { to: 'confirmed', by: ['supplier'] },
-    // The buyer withdraws, or the supplier declines.
-    { to: 'cancelled', by: ['buyer', 'supplier'] },
+    // The buyer withdraws, the supplier declines, or nobody confirmed in time.
+    { to: 'cancelled', by: ['buyer', 'supplier', 'system'] },
     { to: 'exception', by: ['system'] },
   ],
   confirmed: [
@@ -40,7 +40,8 @@ const TRANSITIONS: Record<OrderStatus, Transition[]> = {
   ready_for_pickup: [
     // Collected: the supplier hands the goods over.
     { to: 'fulfilled', by: ['supplier'] },
-    { to: 'uncollected', by: ['supplier'] },
+    // Recorded by the supplier, or by the pickup timer once the hold ends.
+    { to: 'uncollected', by: ['supplier', 'system'] },
     { to: 'cancelled', by: ['buyer'] },
   ],
   uncollected: [

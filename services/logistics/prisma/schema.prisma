@@ -293,3 +293,21 @@ model ProcessedEvent {
 
   @@map("processed_events")
 }
+
+/// A seller's delivery prices (PRD v2 LOG-06). Never edited: a change is a new version, and orders keep theirs.
+model RateCard {
+  id              String   @id @default(uuid()) @db.Uuid
+  organizationId  String   @map("organization_id") @db.Uuid
+  currency        String   @db.Char(3)
+  version         Int
+  active          Boolean  @default(true)
+  /// Orders worth at least this much (after discounts) ship free.
+  freeOverAmount  Decimal? @map("free_over_amount") @db.Decimal(18, 4)
+  /// [{ name, areas: [city or region | "*"], baseFee, perKgFee, maxWeightKg }]
+  zones           Json
+  createdByUserId String   @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([organizationId, currency, version])
+  @@map("rate_cards")
+}

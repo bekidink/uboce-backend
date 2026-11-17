@@ -24,3 +24,11 @@ export const TokenPurpose = {
 } as const
 
 export type TokenPurpose = (typeof TokenPurpose)[keyof typeof TokenPurpose]
+
+
+export const PhonePurpose = {
+  verify: 'verify',
+  login: 'login'
+} as const
+
+export type PhonePurpose = (typeof PhonePurpose)[keyof typeof PhonePurpose]

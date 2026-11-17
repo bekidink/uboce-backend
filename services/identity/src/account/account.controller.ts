@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, HttpCode, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { type AuthUser, CurrentUser, Public } from '@uboce/common';
 import type { Request } from 'express';
 
+import { requireHuman } from '../auth/auth.controller.js';
 import type { RequestMeta } from '../tokens/tokens.module.js';
 import {
   ChangePasswordDto,
@@ -47,7 +48,8 @@ export class AccountController {
   @UseGuards(ThrottlerGuard)
   @Post('password/forgot')
   @HttpCode(202)
-  async forgotPassword(@Body() dto: ForgotPasswordDto, @Req() req: Request) {
+  async forgotPassword(@Body() dto: ForgotPasswordDto, @Req() req: Request, @Headers('x-captcha-token') captcha?: string) {
+    await requireHuman(captcha, req);
     await this.account.forgotPassword(dto.email, metaOf(req));
   }
 

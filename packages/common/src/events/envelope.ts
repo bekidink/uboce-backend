@@ -41,7 +41,8 @@ export const toOutboxRow = (event: EventEnvelope) => ({
 });
 
 // Stream entries are capped; consumers that fall this far behind need a replay
-// from the producers' outbox tables, which keep every event.
+// from the producers' outbox tables, which keep published events for
+// OUTBOX_RETENTION_DAYS (default 30; see housekeeping in jobs.ts).
 const STREAM_MAX_LENGTH = '1000000';
 
 export async function publishToStream(redis: Redis, event: EventEnvelope, stream = EVENT_STREAM) {

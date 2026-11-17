@@ -55,6 +55,17 @@ export class CartCheckoutDto {
   @Length(0, 300)
   deliveryLocation?: string;
 
+  /** For the delivery fee: the destination city (e.g. "Addis Ababa") and region. */
+  @IsOptional()
+  @IsString()
+  @Length(0, 120)
+  deliveryCity?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(0, 120)
+  deliveryRegion?: string;
+
   @ApiPropertyOptional({ enum: FulfillmentMethod, default: FulfillmentMethod.delivery })
   @IsOptional()
   @IsEnum(FulfillmentMethod)
@@ -179,6 +190,8 @@ export class CartService {
       supplierOrganizationId: dto.supplierOrganizationId,
       currency: items[0]!.currency,
       deliveryLocation: dto.deliveryLocation,
+      deliveryCity: dto.deliveryCity,
+      deliveryRegion: dto.deliveryRegion,
       fulfillmentMethod: dto.fulfillmentMethod,
       fulfillmentBranchId: dto.fulfillmentBranchId,
       couponCode: dto.couponCode,

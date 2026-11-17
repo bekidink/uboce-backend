@@ -6,6 +6,7 @@ import { type BaseEnv, decodeBase64, type InternalCallsEnv, internalModuleOption
 import { REDIS, RedisModule } from './events/redis.module.js';
 import { HealthModule } from './health.js';
 import { InternalModule } from './internal/internal.module.js';
+import { JobsModule } from './jobs.js';
 import { createLoggerModule } from './logging.js';
 
 export interface CoreModulesOptions {
@@ -42,6 +43,7 @@ export function coreModules({ serviceName, env, prismaService, prismaModule }: C
       }),
       inject: [prismaService, REDIS],
     }),
+    JobsModule.forRoot(prismaService),
   ];
   if (env.SERVICE_CLIENT_ID && env.SERVICE_CLIENT_SECRET && env.IDENTITY_URL) {
     modules.push(InternalModule.forRoot(internalModuleOptions(env as InternalCallsEnv)));

@@ -1,9 +1,11 @@
 import type { EventEnvelope } from './envelope.js';
 import type * as Add from './events-addendum.js';
 import type * as Ops from './events-operations.js';
+import type * as V2 from './events-v2.js';
 
 export type * from './events-addendum.js';
 export type * from './events-operations.js';
+export type * from './events-v2.js';
 
 // Versioned event contracts. A breaking change to a payload means a new
 // schemaVersion, and consumers keep handling the old one until producers move.
@@ -173,14 +175,15 @@ export interface PurchaseOrderCreatedV1 {
 }
 
 export interface PurchaseOrderStatusChangedV1 {
-  /** Which side made the change. */
-  party: 'buyer' | 'supplier';
+  /** Which side made the change; system for timers (expiry, auto-close). */
+  party: 'buyer' | 'supplier' | 'system';
   orderId: string;
   orderNumber: string;
   buyerOrganizationId: string;
   supplierOrganizationId: string;
   status: string;
-  changedByUserId: string;
+  /** Null for system changes. */
+  changedByUserId: string | null;
   reason: string | null;
   /** Fee charged under the order's cancellation policy, if any. */
   cancellationFee?: string | null;
@@ -234,6 +237,12 @@ export interface EventCatalog {
   EntitlementChanged: Add.EntitlementChangedV1;
   OrganizationLocationsChanged: Add.OrganizationLocationsChangedV1;
   ShipmentCarrierChanged: Add.ShipmentCarrierChangedV1;
+  // ---- PRD v2.0 ----
+  InvoiceOverdue: V2.InvoiceOverdueV1;
+  PaymentAttemptUpdated: V2.PaymentAttemptUpdatedV1;
+  StockExpiring: V2.StockExpiringV1;
+  JobFailed: V2.JobFailedV1;
+  ManualPaymentRecorded: V2.ManualPaymentRecordedV1;
 }
 
 export type EventType = keyof EventCatalog;
@@ -281,6 +290,11 @@ export const EVENT_SCHEMA_VERSIONS: Record<EventType, number> = {
   EntitlementChanged: 1,
   OrganizationLocationsChanged: 1,
   ShipmentCarrierChanged: 1,
+  InvoiceOverdue: 1,
+  PaymentAttemptUpdated: 1,
+  StockExpiring: 1,
+  JobFailed: 1,
+  ManualPaymentRecorded: 1,
 };
 
 export type DomainEvent<T extends EventType = EventType> = EventEnvelope<T, EventCatalog[T]>;

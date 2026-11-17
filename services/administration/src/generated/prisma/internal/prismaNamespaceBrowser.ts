@@ -57,7 +57,9 @@ export const ModelName = {
   Entitlement: 'Entitlement',
   BusinessTypeModule: 'BusinessTypeModule',
   AuditEntry: 'AuditEntry',
-  OutboxEvent: 'OutboxEvent'
+  OutboxEvent: 'OutboxEvent',
+  JobDefinition: 'JobDefinition',
+  JobRun: 'JobRun'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -164,6 +166,44 @@ export const OutboxEventScalarFieldEnum = {
 } as const
 
 export type OutboxEventScalarFieldEnum = (typeof OutboxEventScalarFieldEnum)[keyof typeof OutboxEventScalarFieldEnum]
+
+
+export const JobDefinitionScalarFieldEnum = {
+  name: 'name',
+  service: 'service',
+  job: 'job',
+  description: 'description',
+  intervalSeconds: 'intervalSeconds',
+  timeoutSeconds: 'timeoutSeconds',
+  enabled: 'enabled',
+  nextRunAt: 'nextRunAt',
+  lockedUntil: 'lockedUntil',
+  lockedBy: 'lockedBy',
+  lastRunAt: 'lastRunAt',
+  lastStatus: 'lastStatus',
+  lastError: 'lastError',
+  consecutiveFailures: 'consecutiveFailures',
+  alertedAt: 'alertedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobDefinitionScalarFieldEnum = (typeof JobDefinitionScalarFieldEnum)[keyof typeof JobDefinitionScalarFieldEnum]
+
+
+export const JobRunScalarFieldEnum = {
+  id: 'id',
+  jobName: 'jobName',
+  instance: 'instance',
+  status: 'status',
+  processed: 'processed',
+  detail: 'detail',
+  error: 'error',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  durationMs: 'durationMs'
+} as const
+
+export type JobRunScalarFieldEnum = (typeof JobRunScalarFieldEnum)[keyof typeof JobRunScalarFieldEnum]
 
 
 export const SortOrder = {

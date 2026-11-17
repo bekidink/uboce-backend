@@ -16,6 +16,8 @@ enum RfqStatus {
   published
   awarded
   cancelled
+  /// Nobody awarded it within the award window after the deadline.
+  closed
 }
 
 enum RfqVisibility {
@@ -30,6 +32,8 @@ enum QuotationStatus {
   withdrawn
   accepted
   rejected
+  /// Past validUntil; revising it makes it live again.
+  expired
 }
 
 model Rfq {
@@ -108,6 +112,7 @@ model Quotation {
 
   @@unique([rfqId, supplierOrganizationId])
   @@index([supplierOrganizationId])
+  @@index([status, validUntil])
   @@map("quotations")
 }
 

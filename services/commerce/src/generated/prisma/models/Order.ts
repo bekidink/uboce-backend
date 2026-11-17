@@ -30,6 +30,10 @@ export type OrderAvgAggregateOutputType = {
   total: runtime.Decimal | null
   subtotal: runtime.Decimal | null
   discountTotal: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  deliveryTax: runtime.Decimal | null
+  deliveryTaxRatePct: runtime.Decimal | null
+  taxTotal: runtime.Decimal | null
   cancellationFee: runtime.Decimal | null
 }
 
@@ -37,6 +41,10 @@ export type OrderSumAggregateOutputType = {
   total: runtime.Decimal | null
   subtotal: runtime.Decimal | null
   discountTotal: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  deliveryTax: runtime.Decimal | null
+  deliveryTaxRatePct: runtime.Decimal | null
+  taxTotal: runtime.Decimal | null
   cancellationFee: runtime.Decimal | null
 }
 
@@ -60,6 +68,16 @@ export type OrderMinAggregateOutputType = {
   fulfillmentBranchId: string | null
   subtotal: runtime.Decimal | null
   discountTotal: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  deliveryTax: runtime.Decimal | null
+  deliveryTaxRatePct: runtime.Decimal | null
+  deliveryCity: string | null
+  deliveryRegion: string | null
+  taxTotal: runtime.Decimal | null
+  taxInclusive: boolean | null
+  taxCalculated: boolean | null
+  buyerLegalName: string | null
+  sellerLegalName: string | null
   promotionId: string | null
   promotionCode: string | null
   cancellationFee: runtime.Decimal | null
@@ -91,6 +109,16 @@ export type OrderMaxAggregateOutputType = {
   fulfillmentBranchId: string | null
   subtotal: runtime.Decimal | null
   discountTotal: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  deliveryTax: runtime.Decimal | null
+  deliveryTaxRatePct: runtime.Decimal | null
+  deliveryCity: string | null
+  deliveryRegion: string | null
+  taxTotal: runtime.Decimal | null
+  taxInclusive: boolean | null
+  taxCalculated: boolean | null
+  buyerLegalName: string | null
+  sellerLegalName: string | null
   promotionId: string | null
   promotionCode: string | null
   cancellationFee: runtime.Decimal | null
@@ -122,6 +150,18 @@ export type OrderCountAggregateOutputType = {
   fulfillmentBranchId: number
   subtotal: number
   discountTotal: number
+  deliveryFee: number
+  deliveryTax: number
+  deliveryTaxRatePct: number
+  deliveryQuote: number
+  deliveryCity: number
+  deliveryRegion: number
+  taxTotal: number
+  taxInclusive: number
+  taxCalculated: number
+  taxBreakdown: number
+  buyerLegalName: number
+  sellerLegalName: number
   promotionId: number
   promotionCode: number
   cancellationPolicy: number
@@ -140,6 +180,10 @@ export type OrderAvgAggregateInputType = {
   total?: true
   subtotal?: true
   discountTotal?: true
+  deliveryFee?: true
+  deliveryTax?: true
+  deliveryTaxRatePct?: true
+  taxTotal?: true
   cancellationFee?: true
 }
 
@@ -147,6 +191,10 @@ export type OrderSumAggregateInputType = {
   total?: true
   subtotal?: true
   discountTotal?: true
+  deliveryFee?: true
+  deliveryTax?: true
+  deliveryTaxRatePct?: true
+  taxTotal?: true
   cancellationFee?: true
 }
 
@@ -170,6 +218,16 @@ export type OrderMinAggregateInputType = {
   fulfillmentBranchId?: true
   subtotal?: true
   discountTotal?: true
+  deliveryFee?: true
+  deliveryTax?: true
+  deliveryTaxRatePct?: true
+  deliveryCity?: true
+  deliveryRegion?: true
+  taxTotal?: true
+  taxInclusive?: true
+  taxCalculated?: true
+  buyerLegalName?: true
+  sellerLegalName?: true
   promotionId?: true
   promotionCode?: true
   cancellationFee?: true
@@ -201,6 +259,16 @@ export type OrderMaxAggregateInputType = {
   fulfillmentBranchId?: true
   subtotal?: true
   discountTotal?: true
+  deliveryFee?: true
+  deliveryTax?: true
+  deliveryTaxRatePct?: true
+  deliveryCity?: true
+  deliveryRegion?: true
+  taxTotal?: true
+  taxInclusive?: true
+  taxCalculated?: true
+  buyerLegalName?: true
+  sellerLegalName?: true
   promotionId?: true
   promotionCode?: true
   cancellationFee?: true
@@ -232,6 +300,18 @@ export type OrderCountAggregateInputType = {
   fulfillmentBranchId?: true
   subtotal?: true
   discountTotal?: true
+  deliveryFee?: true
+  deliveryTax?: true
+  deliveryTaxRatePct?: true
+  deliveryQuote?: true
+  deliveryCity?: true
+  deliveryRegion?: true
+  taxTotal?: true
+  taxInclusive?: true
+  taxCalculated?: true
+  taxBreakdown?: true
+  buyerLegalName?: true
+  sellerLegalName?: true
   promotionId?: true
   promotionCode?: true
   cancellationPolicy?: true
@@ -351,6 +431,18 @@ export type OrderGroupByOutputType = {
   fulfillmentBranchId: string | null
   subtotal: runtime.Decimal
   discountTotal: runtime.Decimal
+  deliveryFee: runtime.Decimal
+  deliveryTax: runtime.Decimal
+  deliveryTaxRatePct: runtime.Decimal | null
+  deliveryQuote: runtime.JsonValue | null
+  deliveryCity: string | null
+  deliveryRegion: string | null
+  taxTotal: runtime.Decimal
+  taxInclusive: boolean
+  taxCalculated: boolean
+  taxBreakdown: runtime.JsonValue | null
+  buyerLegalName: string | null
+  sellerLegalName: string | null
   promotionId: string | null
   promotionCode: string | null
   cancellationPolicy: runtime.JsonValue | null
@@ -406,6 +498,18 @@ export type OrderWhereInput = {
   fulfillmentBranchId?: Prisma.UuidNullableFilter<"Order"> | string | null
   subtotal?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.JsonNullableFilter<"Order">
+  deliveryCity?: Prisma.StringNullableFilter<"Order"> | string | null
+  deliveryRegion?: Prisma.StringNullableFilter<"Order"> | string | null
+  taxTotal?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFilter<"Order"> | boolean
+  taxCalculated?: Prisma.BoolFilter<"Order"> | boolean
+  taxBreakdown?: Prisma.JsonNullableFilter<"Order">
+  buyerLegalName?: Prisma.StringNullableFilter<"Order"> | string | null
+  sellerLegalName?: Prisma.StringNullableFilter<"Order"> | string | null
   promotionId?: Prisma.UuidNullableFilter<"Order"> | string | null
   promotionCode?: Prisma.StringNullableFilter<"Order"> | string | null
   cancellationPolicy?: Prisma.JsonNullableFilter<"Order">
@@ -442,6 +546,18 @@ export type OrderOrderByWithRelationInput = {
   fulfillmentBranchId?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discountTotal?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  deliveryTax?: Prisma.SortOrder
+  deliveryTaxRatePct?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryQuote?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryCity?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryRegion?: Prisma.SortOrderInput | Prisma.SortOrder
+  taxTotal?: Prisma.SortOrder
+  taxInclusive?: Prisma.SortOrder
+  taxCalculated?: Prisma.SortOrder
+  taxBreakdown?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
   promotionId?: Prisma.SortOrderInput | Prisma.SortOrder
   promotionCode?: Prisma.SortOrderInput | Prisma.SortOrder
   cancellationPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -482,6 +598,18 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   fulfillmentBranchId?: Prisma.UuidNullableFilter<"Order"> | string | null
   subtotal?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.JsonNullableFilter<"Order">
+  deliveryCity?: Prisma.StringNullableFilter<"Order"> | string | null
+  deliveryRegion?: Prisma.StringNullableFilter<"Order"> | string | null
+  taxTotal?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFilter<"Order"> | boolean
+  taxCalculated?: Prisma.BoolFilter<"Order"> | boolean
+  taxBreakdown?: Prisma.JsonNullableFilter<"Order">
+  buyerLegalName?: Prisma.StringNullableFilter<"Order"> | string | null
+  sellerLegalName?: Prisma.StringNullableFilter<"Order"> | string | null
   promotionId?: Prisma.UuidNullableFilter<"Order"> | string | null
   promotionCode?: Prisma.StringNullableFilter<"Order"> | string | null
   cancellationPolicy?: Prisma.JsonNullableFilter<"Order">
@@ -518,6 +646,18 @@ export type OrderOrderByWithAggregationInput = {
   fulfillmentBranchId?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discountTotal?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  deliveryTax?: Prisma.SortOrder
+  deliveryTaxRatePct?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryQuote?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryCity?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryRegion?: Prisma.SortOrderInput | Prisma.SortOrder
+  taxTotal?: Prisma.SortOrder
+  taxInclusive?: Prisma.SortOrder
+  taxCalculated?: Prisma.SortOrder
+  taxBreakdown?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
   promotionId?: Prisma.SortOrderInput | Prisma.SortOrder
   promotionCode?: Prisma.SortOrderInput | Prisma.SortOrder
   cancellationPolicy?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -558,6 +698,18 @@ export type OrderScalarWhereWithAggregatesInput = {
   fulfillmentBranchId?: Prisma.UuidNullableWithAggregatesFilter<"Order"> | string | null
   subtotal?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.DecimalNullableWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.JsonNullableWithAggregatesFilter<"Order">
+  deliveryCity?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  deliveryRegion?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  taxTotal?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolWithAggregatesFilter<"Order"> | boolean
+  taxCalculated?: Prisma.BoolWithAggregatesFilter<"Order"> | boolean
+  taxBreakdown?: Prisma.JsonNullableWithAggregatesFilter<"Order">
+  buyerLegalName?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  sellerLegalName?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   promotionId?: Prisma.UuidNullableWithAggregatesFilter<"Order"> | string | null
   promotionCode?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   cancellationPolicy?: Prisma.JsonNullableWithAggregatesFilter<"Order">
@@ -590,6 +742,18 @@ export type OrderCreateInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -626,6 +790,18 @@ export type OrderUncheckedCreateInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -662,6 +838,18 @@ export type OrderUpdateInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -698,6 +886,18 @@ export type OrderUncheckedUpdateInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -734,6 +934,18 @@ export type OrderCreateManyInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -766,6 +978,18 @@ export type OrderUpdateManyMutationInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -798,6 +1022,18 @@ export type OrderUncheckedUpdateManyInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -835,6 +1071,18 @@ export type OrderCountOrderByAggregateInput = {
   fulfillmentBranchId?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discountTotal?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  deliveryTax?: Prisma.SortOrder
+  deliveryTaxRatePct?: Prisma.SortOrder
+  deliveryQuote?: Prisma.SortOrder
+  deliveryCity?: Prisma.SortOrder
+  deliveryRegion?: Prisma.SortOrder
+  taxTotal?: Prisma.SortOrder
+  taxInclusive?: Prisma.SortOrder
+  taxCalculated?: Prisma.SortOrder
+  taxBreakdown?: Prisma.SortOrder
+  buyerLegalName?: Prisma.SortOrder
+  sellerLegalName?: Prisma.SortOrder
   promotionId?: Prisma.SortOrder
   promotionCode?: Prisma.SortOrder
   cancellationPolicy?: Prisma.SortOrder
@@ -851,6 +1099,10 @@ export type OrderAvgOrderByAggregateInput = {
   total?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discountTotal?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  deliveryTax?: Prisma.SortOrder
+  deliveryTaxRatePct?: Prisma.SortOrder
+  taxTotal?: Prisma.SortOrder
   cancellationFee?: Prisma.SortOrder
 }
 
@@ -874,6 +1126,16 @@ export type OrderMaxOrderByAggregateInput = {
   fulfillmentBranchId?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discountTotal?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  deliveryTax?: Prisma.SortOrder
+  deliveryTaxRatePct?: Prisma.SortOrder
+  deliveryCity?: Prisma.SortOrder
+  deliveryRegion?: Prisma.SortOrder
+  taxTotal?: Prisma.SortOrder
+  taxInclusive?: Prisma.SortOrder
+  taxCalculated?: Prisma.SortOrder
+  buyerLegalName?: Prisma.SortOrder
+  sellerLegalName?: Prisma.SortOrder
   promotionId?: Prisma.SortOrder
   promotionCode?: Prisma.SortOrder
   cancellationFee?: Prisma.SortOrder
@@ -905,6 +1167,16 @@ export type OrderMinOrderByAggregateInput = {
   fulfillmentBranchId?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discountTotal?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  deliveryTax?: Prisma.SortOrder
+  deliveryTaxRatePct?: Prisma.SortOrder
+  deliveryCity?: Prisma.SortOrder
+  deliveryRegion?: Prisma.SortOrder
+  taxTotal?: Prisma.SortOrder
+  taxInclusive?: Prisma.SortOrder
+  taxCalculated?: Prisma.SortOrder
+  buyerLegalName?: Prisma.SortOrder
+  sellerLegalName?: Prisma.SortOrder
   promotionId?: Prisma.SortOrder
   promotionCode?: Prisma.SortOrder
   cancellationFee?: Prisma.SortOrder
@@ -920,6 +1192,10 @@ export type OrderSumOrderByAggregateInput = {
   total?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discountTotal?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  deliveryTax?: Prisma.SortOrder
+  deliveryTaxRatePct?: Prisma.SortOrder
+  taxTotal?: Prisma.SortOrder
   cancellationFee?: Prisma.SortOrder
 }
 
@@ -1052,6 +1328,18 @@ export type OrderCreateWithoutLinesInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1087,6 +1375,18 @@ export type OrderUncheckedCreateWithoutLinesInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1138,6 +1438,18 @@ export type OrderUpdateWithoutLinesInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1173,6 +1485,18 @@ export type OrderUncheckedUpdateWithoutLinesInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1208,6 +1532,18 @@ export type OrderCreateWithoutHistoryInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1243,6 +1579,18 @@ export type OrderUncheckedCreateWithoutHistoryInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1294,6 +1642,18 @@ export type OrderUpdateWithoutHistoryInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1329,6 +1689,18 @@ export type OrderUncheckedUpdateWithoutHistoryInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1364,6 +1736,18 @@ export type OrderCreateWithoutFulfillmentChangesInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1399,6 +1783,18 @@ export type OrderUncheckedCreateWithoutFulfillmentChangesInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1450,6 +1846,18 @@ export type OrderUpdateWithoutFulfillmentChangesInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1485,6 +1893,18 @@ export type OrderUncheckedUpdateWithoutFulfillmentChangesInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1520,6 +1940,18 @@ export type OrderCreateWithoutReturnsInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1555,6 +1987,18 @@ export type OrderUncheckedCreateWithoutReturnsInput = {
   fulfillmentBranchId?: string | null
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: string | null
+  deliveryRegion?: string | null
+  taxTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: string | null
+  sellerLegalName?: string | null
   promotionId?: string | null
   promotionCode?: string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1606,6 +2050,18 @@ export type OrderUpdateWithoutReturnsInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1641,6 +2097,18 @@ export type OrderUncheckedUpdateWithoutReturnsInput = {
   fulfillmentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryFee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTax?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deliveryTaxRatePct?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryQuote?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  deliveryCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxInclusive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxCalculated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  taxBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  buyerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   promotionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancellationPolicy?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1734,6 +2202,18 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   fulfillmentBranchId?: boolean
   subtotal?: boolean
   discountTotal?: boolean
+  deliveryFee?: boolean
+  deliveryTax?: boolean
+  deliveryTaxRatePct?: boolean
+  deliveryQuote?: boolean
+  deliveryCity?: boolean
+  deliveryRegion?: boolean
+  taxTotal?: boolean
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: boolean
+  buyerLegalName?: boolean
+  sellerLegalName?: boolean
   promotionId?: boolean
   promotionCode?: boolean
   cancellationPolicy?: boolean
@@ -1771,6 +2251,18 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   fulfillmentBranchId?: boolean
   subtotal?: boolean
   discountTotal?: boolean
+  deliveryFee?: boolean
+  deliveryTax?: boolean
+  deliveryTaxRatePct?: boolean
+  deliveryQuote?: boolean
+  deliveryCity?: boolean
+  deliveryRegion?: boolean
+  taxTotal?: boolean
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: boolean
+  buyerLegalName?: boolean
+  sellerLegalName?: boolean
   promotionId?: boolean
   promotionCode?: boolean
   cancellationPolicy?: boolean
@@ -1803,6 +2295,18 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   fulfillmentBranchId?: boolean
   subtotal?: boolean
   discountTotal?: boolean
+  deliveryFee?: boolean
+  deliveryTax?: boolean
+  deliveryTaxRatePct?: boolean
+  deliveryQuote?: boolean
+  deliveryCity?: boolean
+  deliveryRegion?: boolean
+  taxTotal?: boolean
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: boolean
+  buyerLegalName?: boolean
+  sellerLegalName?: boolean
   promotionId?: boolean
   promotionCode?: boolean
   cancellationPolicy?: boolean
@@ -1835,6 +2339,18 @@ export type OrderSelectScalar = {
   fulfillmentBranchId?: boolean
   subtotal?: boolean
   discountTotal?: boolean
+  deliveryFee?: boolean
+  deliveryTax?: boolean
+  deliveryTaxRatePct?: boolean
+  deliveryQuote?: boolean
+  deliveryCity?: boolean
+  deliveryRegion?: boolean
+  taxTotal?: boolean
+  taxInclusive?: boolean
+  taxCalculated?: boolean
+  taxBreakdown?: boolean
+  buyerLegalName?: boolean
+  sellerLegalName?: boolean
   promotionId?: boolean
   promotionCode?: boolean
   cancellationPolicy?: boolean
@@ -1847,7 +2363,7 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "buyerOrganizationId" | "supplierOrganizationId" | "source" | "sourceQuotationId" | "rfqId" | "idempotencyKey" | "requestHash" | "title" | "currency" | "total" | "deliveryTerms" | "deliveryLocation" | "status" | "fulfillmentMethod" | "fulfillmentBranchId" | "subtotal" | "discountTotal" | "promotionId" | "promotionCode" | "cancellationPolicy" | "cancellationFee" | "preorder" | "confirmedAt" | "fulfilledAt" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "buyerOrganizationId" | "supplierOrganizationId" | "source" | "sourceQuotationId" | "rfqId" | "idempotencyKey" | "requestHash" | "title" | "currency" | "total" | "deliveryTerms" | "deliveryLocation" | "status" | "fulfillmentMethod" | "fulfillmentBranchId" | "subtotal" | "discountTotal" | "deliveryFee" | "deliveryTax" | "deliveryTaxRatePct" | "deliveryQuote" | "deliveryCity" | "deliveryRegion" | "taxTotal" | "taxInclusive" | "taxCalculated" | "taxBreakdown" | "buyerLegalName" | "sellerLegalName" | "promotionId" | "promotionCode" | "cancellationPolicy" | "cancellationFee" | "preorder" | "confirmedAt" | "fulfilledAt" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lines?: boolean | Prisma.Order$linesArgs<ExtArgs>
   history?: boolean | Prisma.Order$historyArgs<ExtArgs>
@@ -1904,6 +2420,33 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
      */
     subtotal: runtime.Decimal
     discountTotal: runtime.Decimal
+    /**
+     * PRD v2 ORD-06: delivery fee and tax, calculated by the server at checkout and never recalculated.
+     */
+    deliveryFee: runtime.Decimal
+    deliveryTax: runtime.Decimal
+    deliveryTaxRatePct: runtime.Decimal | null
+    /**
+     * Rate card ID, version and zone the fee came from.
+     */
+    deliveryQuote: runtime.JsonValue | null
+    deliveryCity: string | null
+    deliveryRegion: string | null
+    taxTotal: runtime.Decimal
+    taxInclusive: boolean
+    /**
+     * False for orders placed before the tax engine, or where it wasn't configured.
+     */
+    taxCalculated: boolean
+    /**
+     * Regime, exemption, rule IDs and seller TIN used (CAT-11).
+     */
+    taxBreakdown: runtime.JsonValue | null
+    /**
+     * Legal names of the parties as they were at purchase (CAT-11).
+     */
+    buyerLegalName: string | null
+    sellerLegalName: string | null
     promotionId: string | null
     promotionCode: string | null
     /**
@@ -2363,6 +2906,18 @@ export interface OrderFieldRefs {
   readonly fulfillmentBranchId: Prisma.FieldRef<"Order", 'String'>
   readonly subtotal: Prisma.FieldRef<"Order", 'Decimal'>
   readonly discountTotal: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly deliveryFee: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly deliveryTax: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly deliveryTaxRatePct: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly deliveryQuote: Prisma.FieldRef<"Order", 'Json'>
+  readonly deliveryCity: Prisma.FieldRef<"Order", 'String'>
+  readonly deliveryRegion: Prisma.FieldRef<"Order", 'String'>
+  readonly taxTotal: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly taxInclusive: Prisma.FieldRef<"Order", 'Boolean'>
+  readonly taxCalculated: Prisma.FieldRef<"Order", 'Boolean'>
+  readonly taxBreakdown: Prisma.FieldRef<"Order", 'Json'>
+  readonly buyerLegalName: Prisma.FieldRef<"Order", 'String'>
+  readonly sellerLegalName: Prisma.FieldRef<"Order", 'String'>
   readonly promotionId: Prisma.FieldRef<"Order", 'String'>
   readonly promotionCode: Prisma.FieldRef<"Order", 'String'>
   readonly cancellationPolicy: Prisma.FieldRef<"Order", 'Json'>

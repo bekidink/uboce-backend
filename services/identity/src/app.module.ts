@@ -10,6 +10,9 @@ import { AuthController } from './auth/auth.controller.js';
 import { AuthService } from './auth/auth.service.js';
 import { env, SERVICE_NAME } from './config.js';
 import { InternalController } from './internal/internal.controller.js';
+import { IdentityJobs } from './phone/jobs.js';
+import { PhoneController } from './phone/phone.controller.js';
+import { PhoneService } from './phone/phone.service.js';
 import { PrismaModule, PrismaService } from './prisma.service.js';
 import { TokensModule } from './tokens/tokens.module.js';
 
@@ -27,7 +30,7 @@ import { TokensModule } from './tokens/tokens.module.js';
       inject: [REDIS],
     }),
   ],
-  controllers: [AuthController, AccountController, InternalController],
-  providers: [AuthService, AccountService, AccountMailer, OutboxRelayHost(PrismaService)],
+  controllers: [AuthController, AccountController, PhoneController, InternalController],
+  providers: [AuthService, AccountService, AccountMailer, PhoneService, IdentityJobs, OutboxRelayHost(PrismaService)],
 })
 export class AppModule {}

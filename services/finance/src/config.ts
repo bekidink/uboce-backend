@@ -20,5 +20,10 @@ export const env = loadEnv(
     STRIPE_API_URL: z.string().default('https://api.stripe.com/v1'),
     /** Fee percentages per provider when the provider doesn't report one, e.g. "chapa:3.5,stripe:2.9,sandbox:1.5". */
     PAYMENT_FEES_PCT: z.string().default('sandbox:1.5,chapa:3.5,stripe:2.9'),
+    /** Unfinished checkout attempts expire after this long (PRD v2 FIN-05). */
+    PAYMENT_ATTEMPT_TTL_MINUTES: z.coerce.number().int().positive().default(60),
+    /** Days between overdue reminders, and how many to send (PLT-03). */
+    INVOICE_REMINDER_DAYS: z.coerce.number().int().positive().default(7),
+    INVOICE_MAX_REMINDERS: z.coerce.number().int().min(1).default(3),
   }),
 );

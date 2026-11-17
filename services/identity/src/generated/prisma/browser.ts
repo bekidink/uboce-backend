@@ -48,3 +48,8 @@ export type VerificationToken = Prisma.VerificationTokenModel
  * Transactional outbox (PRD 8.3): written with the state change, relayed to the event stream.
  */
 export type OutboxEvent = Prisma.OutboxEventModel
+/**
+ * Model PhoneVerification
+ * One SMS code: only its HMAC is stored. A newer code for the same number and purpose replaces it.
+ */
+export type PhoneVerification = Prisma.PhoneVerificationModel

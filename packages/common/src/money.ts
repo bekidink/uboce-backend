@@ -47,3 +47,25 @@ export function fromMinorUnits(minor: number | string, currency: string): string
   const s = BigInt(minor).toString().padStart(digits + 1, '0');
   return digits === 0 ? s : `${s.slice(0, -digits)}.${s.slice(-digits)}`;
 }
+
+/**
+ * Splits `amount` across `weights` in proportion, in cents, so the parts always
+ * add up to exactly `amount` (largest remainders get the leftover cents).
+ * Used to spread an order discount over its lines before tax (PRD v2 FIN-09).
+ */
+export function allocateProRata(amount: string, weights: string[]): string[] {
+  const cents = (v: string) => BigInt(toMinorUnits(v, 'ETB'));
+  const total = cents(amount);
+  const w = weights.map((x) => (Number(x) > 0 ? cents(x) : 0n));
+  const sum = w.reduce((a, b) => a + b, 0n);
+  if (sum === 0n || w.length === 0) return weights.map((_, i) => (i === 0 ? fromMinorUnits(total.toString(), 'ETB') : '0.00'));
+  const base = w.map((x) => (total * x) / sum);
+  let left = total - base.reduce((a, b) => a + b, 0n);
+  const order = w.map((x, i) => ({ i, rem: (total * x) % sum })).sort((a, b) => (b.rem > a.rem ? 1 : b.rem < a.rem ? -1 : a.i - b.i));
+  for (const { i } of order) {
+    if (left <= 0n) break;
+    base[i]! += 1n;
+    left -= 1n;
+  }
+  return base.map((c) => fromMinorUnits(c.toString(), 'ETB'));
+}

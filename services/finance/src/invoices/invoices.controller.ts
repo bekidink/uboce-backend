@@ -23,9 +23,13 @@ class FromOrderDto {
   @IsUUID()
   orderId: string;
 
-  /** Applied to every line, e.g. "15" for 15% VAT. */
+  /**
+   * Only for orders placed before automatic tax (PRD v2): applied to every line, e.g. "15".
+   * Newer orders carry their own tax and delivery, and this is ignored.
+   */
+  @IsOptional()
   @Matches(TAX_RATE)
-  taxRatePct: string;
+  taxRatePct?: string;
 
   @IsInt()
   @Min(0)

@@ -391,6 +391,12 @@ services:
         value: https://uboce-organization.onrender.com
       - key: NOTIFICATION_URL
         value: https://uboce-notification.onrender.com
+      - key: CATALOG_URL
+        value: https://uboce-catalog.onrender.com
+      - key: FINANCE_URL
+        value: https://uboce-finance.onrender.com
+      - key: LOGISTICS_URL
+        value: https://uboce-logistics.onrender.com
       - key: MIGRATE_DATABASE_URL
         sync: false
       - key: DATABASE_POOL_MAX
@@ -438,6 +444,8 @@ services:
         value: https://uboce-organization.onrender.com
       - key: NOTIFICATION_URL
         value: https://uboce-notification.onrender.com
+      - key: COMMERCE_URL
+        value: https://uboce-commerce.onrender.com
       - key: WAREHOUSE_URL
         value: https://uboce-warehouse.onrender.com
       - key: MIGRATE_DATABASE_URL
@@ -1123,6 +1131,40 @@ services:
         value: https://uboce-organization.onrender.com
       - key: NOTIFICATION_URL
         value: https://uboce-notification.onrender.com
+      - key: CATALOG_URL
+        value: https://uboce-catalog.onrender.com
+      - key: DISCOVERY_URL
+        value: https://uboce-discovery.onrender.com
+      - key: PROCUREMENT_URL
+        value: https://uboce-procurement.onrender.com
+      - key: COMMERCE_URL
+        value: https://uboce-commerce.onrender.com
+      - key: INVENTORY_URL
+        value: https://uboce-inventory.onrender.com
+      - key: WAREHOUSE_URL
+        value: https://uboce-warehouse.onrender.com
+      - key: LOGISTICS_URL
+        value: https://uboce-logistics.onrender.com
+      - key: QUALITY_URL
+        value: https://uboce-quality.onrender.com
+      - key: AGRICULTURE_URL
+        value: https://uboce-agriculture.onrender.com
+      - key: MANUFACTURING_URL
+        value: https://uboce-manufacturing.onrender.com
+      - key: KYC_URL
+        value: https://uboce-kyc.onrender.com
+      - key: KYB_URL
+        value: https://uboce-kyb.onrender.com
+      - key: FINANCE_URL
+        value: https://uboce-finance.onrender.com
+      - key: DOCUMENT_URL
+        value: https://uboce-document.onrender.com
+      - key: DISPUTE_URL
+        value: https://uboce-dispute.onrender.com
+      - key: INTEGRATION_URL
+        value: https://uboce-integration.onrender.com
+      - key: ANALYTICS_URL
+        value: https://uboce-analytics.onrender.com
       - key: ADMIN_BOOTSTRAP_EMAILS
         sync: false
       - key: REQUIRE_STAFF_MFA

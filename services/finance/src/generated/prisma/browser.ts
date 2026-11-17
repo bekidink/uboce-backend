@@ -72,3 +72,38 @@ export type OutboxEvent = Prisma.OutboxEventModel
  * Inbox for idempotent event consumption.
  */
 export type ProcessedEvent = Prisma.ProcessedEventModel
+/**
+ * Model CashSession
+ * A till: opened with a float, closed with a count; the difference is the variance.
+ */
+export type CashSession = Prisma.CashSessionModel
+/**
+ * Model CashReceipt
+ * Money a seller's staff received outside a provider, with a receipt number (FIN-04).
+ */
+export type CashReceipt = Prisma.CashReceiptModel
+/**
+ * Model BankStatementImport
+ * 
+ */
+export type BankStatementImport = Prisma.BankStatementImportModel
+/**
+ * Model StatementLine
+ * One credit on the seller's bank statement, matched to an invoice automatically or by hand.
+ */
+export type StatementLine = Prisma.StatementLineModel
+/**
+ * Model TaxRule
+ * A tax rate as data. Rates change by adding a rule with a new effective date, never by editing one.
+ */
+export type TaxRule = Prisma.TaxRuleModel
+/**
+ * Model SellerTaxProfile
+ * How a seller is registered for tax, which decides what its orders and invoices charge.
+ */
+export type SellerTaxProfile = Prisma.SellerTaxProfileModel
+/**
+ * Model TaxExemption
+ * A buyer's tax exemption certificate, with evidence; only approved, current ones apply.
+ */
+export type TaxExemption = Prisma.TaxExemptionModel

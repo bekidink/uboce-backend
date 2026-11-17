@@ -240,6 +240,8 @@ export class PricingService {
           options: picked,
           imageDocumentId: product.media[0]?.documentId ?? null,
           packSize: v.packSize?.toString() ?? null,
+          weightKg: v.weightKg?.toString() ?? null,
+          taxClass: product.taxClass,
           preorder: season.preorder,
           capturedAt: now.toISOString(),
         },

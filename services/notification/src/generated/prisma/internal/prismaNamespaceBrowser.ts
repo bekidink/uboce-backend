@@ -126,6 +126,11 @@ export const DeliveryAttemptScalarFieldEnum = {
   provider: 'provider',
   success: 'success',
   error: 'error',
+  providerMessageId: 'providerMessageId',
+  segments: 'segments',
+  cost: 'cost',
+  receiptStatus: 'receiptStatus',
+  receiptAt: 'receiptAt',
   createdAt: 'createdAt'
 } as const
 

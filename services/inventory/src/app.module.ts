@@ -8,11 +8,12 @@ import { LedgerService } from './ledger/ledger.service.js';
 import { StockControlController } from './ledger/stock-control.controller.js';
 import { StockControlService } from './ledger/stock-control.service.js';
 import { WarehouseScope } from './ledger/scope.js';
+import { InventoryJobs } from './ledger/jobs.js';
 import { PrismaModule, PrismaService } from './prisma.service.js';
 
 @Module({
   imports: coreModules({ serviceName: SERVICE_NAME, env, prismaService: PrismaService, prismaModule: PrismaModule }),
   controllers: [StockControlController, InventoryController, InternalInventoryController],
-  providers: [LedgerService, StockControlService, WarehouseScope, InventoryEvents, OutboxRelayHost(PrismaService)],
+  providers: [InventoryJobs, LedgerService, StockControlService, WarehouseScope, InventoryEvents, OutboxRelayHost(PrismaService)],
 })
 export class AppModule {}

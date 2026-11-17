@@ -132,6 +132,18 @@ export class PaymentsService {
       await tx.paymentIntent.update({ where: { id: intent.id }, data: { status: 'succeeded', fee: providerFee } });
     } else if (status === 'failed') {
       await tx.paymentIntent.update({ where: { id: intent.id }, data: { status: 'failed', failureReason: 'declined by the provider' } });
+      // Tell the buyer so they can try again or use another method (FIN-05).
+      const inv = await tx.invoice.findUniqueOrThrow({ where: { id: intent.invoiceId }, select: { number: true, buyerOrganizationId: true, sellerOrganizationId: true } });
+      await emitEvent(tx, SERVICE_NAME, 'PaymentAttemptUpdated', intent.id, {
+        intentId: intent.id,
+        invoiceId: intent.invoiceId,
+        invoiceNumber: inv.number,
+        buyerOrganizationId: inv.buyerOrganizationId,
+        sellerOrganizationId: inv.sellerOrganizationId,
+        provider,
+        status: 'failed',
+        reason: 'declined by the provider',
+      });
     }
   }
 

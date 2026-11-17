@@ -409,7 +409,8 @@ export const ModelName = {
   DeliveryEvidence: 'DeliveryEvidence',
   DeliveryException: 'DeliveryException',
   OutboxEvent: 'OutboxEvent',
-  ProcessedEvent: 'ProcessedEvent'
+  ProcessedEvent: 'ProcessedEvent',
+  RateCard: 'RateCard'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "shipment" | "shipmentItem" | "shipmentOrder" | "shipmentPackage" | "carrier" | "vehicle" | "driver" | "driverAssignment" | "trackingEvent" | "deliveryEvidence" | "deliveryException" | "outboxEvent" | "processedEvent"
+    modelProps: "shipment" | "shipmentItem" | "shipmentOrder" | "shipmentPackage" | "carrier" | "vehicle" | "driver" | "driverAssignment" | "trackingEvent" | "deliveryEvidence" | "deliveryException" | "outboxEvent" | "processedEvent" | "rateCard"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1391,6 +1392,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RateCard: {
+      payload: Prisma.$RateCardPayload<ExtArgs>
+      fields: Prisma.RateCardFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RateCardFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RateCardFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>
+        }
+        findFirst: {
+          args: Prisma.RateCardFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RateCardFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>
+        }
+        findMany: {
+          args: Prisma.RateCardFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>[]
+        }
+        create: {
+          args: Prisma.RateCardCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>
+        }
+        createMany: {
+          args: Prisma.RateCardCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RateCardCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>[]
+        }
+        delete: {
+          args: Prisma.RateCardDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>
+        }
+        update: {
+          args: Prisma.RateCardUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>
+        }
+        deleteMany: {
+          args: Prisma.RateCardDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RateCardUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RateCardUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>[]
+        }
+        upsert: {
+          args: Prisma.RateCardUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateCardPayload>
+        }
+        aggregate: {
+          args: Prisma.RateCardAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRateCard>
+        }
+        groupBy: {
+          args: Prisma.RateCardGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RateCardGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RateCardCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RateCardCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1616,6 +1691,21 @@ export const ProcessedEventScalarFieldEnum = {
 } as const
 
 export type ProcessedEventScalarFieldEnum = (typeof ProcessedEventScalarFieldEnum)[keyof typeof ProcessedEventScalarFieldEnum]
+
+
+export const RateCardScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  currency: 'currency',
+  version: 'version',
+  active: 'active',
+  freeOverAmount: 'freeOverAmount',
+  zones: 'zones',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type RateCardScalarFieldEnum = (typeof RateCardScalarFieldEnum)[keyof typeof RateCardScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1974,6 +2064,7 @@ export type GlobalOmitConfig = {
   deliveryException?: Prisma.DeliveryExceptionOmit
   outboxEvent?: Prisma.OutboxEventOmit
   processedEvent?: Prisma.ProcessedEventOmit
+  rateCard?: Prisma.RateCardOmit
 }
 
 /* Types for Logging */

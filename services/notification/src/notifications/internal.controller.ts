@@ -34,7 +34,7 @@ export class InternalMessagesController {
   constructor(private readonly notifications: NotificationsService) {}
 
   /** Immediate email/SMS for messages with one-time links (reset, verification, invitations). */
-  @Internal('identity', 'organization')
+  @Internal('identity', 'organization', 'administration')
   @Post()
   @HttpCode(200)
   send(@Body() dto: SendMessageDto) {

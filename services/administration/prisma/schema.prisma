@@ -116,3 +116,59 @@ model OutboxEvent {
   @@index([publishedAt, createdAt])
   @@map("outbox_events")
 }
+
+// ---- Scheduler (PRD v2 PLT-02, PLT-03) ------------------------------------------------------
+
+/// One scheduled job: which service owns it, how often it runs, and its last outcome.
+model JobDefinition {
+  /// "<service>:<job>", e.g. commerce:orders.expire-unconfirmed
+  name                String    @id
+  service             String
+  job                 String
+  description         String
+  intervalSeconds     Int       @map("interval_seconds")
+  timeoutSeconds      Int       @default(120) @map("timeout_seconds")
+  enabled             Boolean   @default(true)
+  nextRunAt           DateTime  @map("next_run_at") @db.Timestamptz(3)
+  /// The claim: only the instance holding an unexpired lock runs the job.
+  lockedUntil         DateTime? @map("locked_until") @db.Timestamptz(3)
+  lockedBy            String?   @map("locked_by")
+  lastRunAt           DateTime? @map("last_run_at") @db.Timestamptz(3)
+  lastStatus          String?   @map("last_status")
+  lastError           String?   @map("last_error")
+  consecutiveFailures Int       @default(0) @map("consecutive_failures")
+  alertedAt           DateTime? @map("alerted_at") @db.Timestamptz(3)
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  runs JobRun[]
+
+  @@index([enabled, nextRunAt])
+  @@map("job_definitions")
+}
+
+enum JobRunStatus {
+  running
+  succeeded
+  failed
+  skipped
+  abandoned
+}
+
+model JobRun {
+  id         String       @id @default(uuid()) @db.Uuid
+  jobName    String       @map("job_name")
+  instance   String
+  status     JobRunStatus @default(running)
+  processed  Int?
+  detail     Json?
+  error      String?
+  startedAt  DateTime     @default(now()) @map("started_at") @db.Timestamptz(3)
+  finishedAt DateTime?    @map("finished_at") @db.Timestamptz(3)
+  durationMs Int?         @map("duration_ms")
+
+  definition JobDefinition @relation(fields: [jobName], references: [name], onDelete: Cascade)
+
+  @@index([jobName, startedAt])
+  @@index([startedAt])
+  @@map("job_runs")
+}

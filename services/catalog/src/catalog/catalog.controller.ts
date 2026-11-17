@@ -34,8 +34,8 @@ export class CatalogController {
     return this.catalog.listCategories();
   }
 
-  /** A published product, as any buyer sees it. */
-  @ApiBearerAuth()
+  /** A published product, as any buyer sees it. Public: the storefront shows it before sign-in. */
+  @Public()
   @Get('published/:productId')
   published(@ProductId() productId: string) {
     return this.catalog.getPublished(productId);

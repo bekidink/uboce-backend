@@ -13,7 +13,8 @@ export const RfqStatus = {
   draft: 'draft',
   published: 'published',
   awarded: 'awarded',
-  cancelled: 'cancelled'
+  cancelled: 'cancelled',
+  closed: 'closed'
 } as const
 
 export type RfqStatus = (typeof RfqStatus)[keyof typeof RfqStatus]
@@ -31,7 +32,8 @@ export const QuotationStatus = {
   submitted: 'submitted',
   withdrawn: 'withdrawn',
   accepted: 'accepted',
-  rejected: 'rejected'
+  rejected: 'rejected',
+  expired: 'expired'
 } as const
 
 export type QuotationStatus = (typeof QuotationStatus)[keyof typeof QuotationStatus]

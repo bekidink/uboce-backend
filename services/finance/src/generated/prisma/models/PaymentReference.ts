@@ -44,6 +44,8 @@ export type PaymentReferenceMinAggregateOutputType = {
   status: $Enums.PaymentStatus | null
   source: string | null
   recordedByUserId: string | null
+  proofDocumentId: string | null
+  reviewNote: string | null
   occurredAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -59,6 +61,8 @@ export type PaymentReferenceMaxAggregateOutputType = {
   status: $Enums.PaymentStatus | null
   source: string | null
   recordedByUserId: string | null
+  proofDocumentId: string | null
+  reviewNote: string | null
   occurredAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -74,6 +78,8 @@ export type PaymentReferenceCountAggregateOutputType = {
   status: number
   source: number
   recordedByUserId: number
+  proofDocumentId: number
+  reviewNote: number
   occurredAt: number
   createdAt: number
   updatedAt: number
@@ -99,6 +105,8 @@ export type PaymentReferenceMinAggregateInputType = {
   status?: true
   source?: true
   recordedByUserId?: true
+  proofDocumentId?: true
+  reviewNote?: true
   occurredAt?: true
   createdAt?: true
   updatedAt?: true
@@ -114,6 +122,8 @@ export type PaymentReferenceMaxAggregateInputType = {
   status?: true
   source?: true
   recordedByUserId?: true
+  proofDocumentId?: true
+  reviewNote?: true
   occurredAt?: true
   createdAt?: true
   updatedAt?: true
@@ -129,6 +139,8 @@ export type PaymentReferenceCountAggregateInputType = {
   status?: true
   source?: true
   recordedByUserId?: true
+  proofDocumentId?: true
+  reviewNote?: true
   occurredAt?: true
   createdAt?: true
   updatedAt?: true
@@ -231,6 +243,8 @@ export type PaymentReferenceGroupByOutputType = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId: string | null
+  proofDocumentId: string | null
+  reviewNote: string | null
   occurredAt: Date
   createdAt: Date
   updatedAt: Date
@@ -269,6 +283,8 @@ export type PaymentReferenceWhereInput = {
   status?: Prisma.EnumPaymentStatusFilter<"PaymentReference"> | $Enums.PaymentStatus
   source?: Prisma.StringFilter<"PaymentReference"> | string
   recordedByUserId?: Prisma.UuidNullableFilter<"PaymentReference"> | string | null
+  proofDocumentId?: Prisma.UuidNullableFilter<"PaymentReference"> | string | null
+  reviewNote?: Prisma.StringNullableFilter<"PaymentReference"> | string | null
   occurredAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
@@ -286,6 +302,8 @@ export type PaymentReferenceOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   source?: Prisma.SortOrder
   recordedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  proofDocumentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewNote?: Prisma.SortOrderInput | Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -307,6 +325,8 @@ export type PaymentReferenceWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumPaymentStatusFilter<"PaymentReference"> | $Enums.PaymentStatus
   source?: Prisma.StringFilter<"PaymentReference"> | string
   recordedByUserId?: Prisma.UuidNullableFilter<"PaymentReference"> | string | null
+  proofDocumentId?: Prisma.UuidNullableFilter<"PaymentReference"> | string | null
+  reviewNote?: Prisma.StringNullableFilter<"PaymentReference"> | string | null
   occurredAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
@@ -324,6 +344,8 @@ export type PaymentReferenceOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   source?: Prisma.SortOrder
   recordedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  proofDocumentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewNote?: Prisma.SortOrderInput | Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -347,6 +369,8 @@ export type PaymentReferenceScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumPaymentStatusWithAggregatesFilter<"PaymentReference"> | $Enums.PaymentStatus
   source?: Prisma.StringWithAggregatesFilter<"PaymentReference"> | string
   recordedByUserId?: Prisma.UuidNullableWithAggregatesFilter<"PaymentReference"> | string | null
+  proofDocumentId?: Prisma.UuidNullableWithAggregatesFilter<"PaymentReference"> | string | null
+  reviewNote?: Prisma.StringNullableWithAggregatesFilter<"PaymentReference"> | string | null
   occurredAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentReference"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentReference"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentReference"> | Date | string
@@ -361,6 +385,8 @@ export type PaymentReferenceCreateInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -378,6 +404,8 @@ export type PaymentReferenceUncheckedCreateInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -393,6 +421,8 @@ export type PaymentReferenceUpdateInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,6 +440,8 @@ export type PaymentReferenceUncheckedUpdateInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -426,6 +458,8 @@ export type PaymentReferenceCreateManyInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -440,6 +474,8 @@ export type PaymentReferenceUpdateManyMutationInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -455,6 +491,8 @@ export type PaymentReferenceUncheckedUpdateManyInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -485,6 +523,8 @@ export type PaymentReferenceCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   source?: Prisma.SortOrder
   recordedByUserId?: Prisma.SortOrder
+  proofDocumentId?: Prisma.SortOrder
+  reviewNote?: Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -504,6 +544,8 @@ export type PaymentReferenceMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   source?: Prisma.SortOrder
   recordedByUserId?: Prisma.SortOrder
+  proofDocumentId?: Prisma.SortOrder
+  reviewNote?: Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -519,6 +561,8 @@ export type PaymentReferenceMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   source?: Prisma.SortOrder
   recordedByUserId?: Prisma.SortOrder
+  proofDocumentId?: Prisma.SortOrder
+  reviewNote?: Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -602,6 +646,8 @@ export type PaymentReferenceCreateWithoutInvoiceInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -617,6 +663,8 @@ export type PaymentReferenceUncheckedCreateWithoutInvoiceInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -662,6 +710,8 @@ export type PaymentReferenceScalarWhereInput = {
   status?: Prisma.EnumPaymentStatusFilter<"PaymentReference"> | $Enums.PaymentStatus
   source?: Prisma.StringFilter<"PaymentReference"> | string
   recordedByUserId?: Prisma.UuidNullableFilter<"PaymentReference"> | string | null
+  proofDocumentId?: Prisma.UuidNullableFilter<"PaymentReference"> | string | null
+  reviewNote?: Prisma.StringNullableFilter<"PaymentReference"> | string | null
   occurredAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentReference"> | Date | string
@@ -676,6 +726,8 @@ export type PaymentReferenceCreateWithoutReconciliationsInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -692,6 +744,8 @@ export type PaymentReferenceUncheckedCreateWithoutReconciliationsInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -722,6 +776,8 @@ export type PaymentReferenceUpdateWithoutReconciliationsInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -738,6 +794,8 @@ export type PaymentReferenceUncheckedUpdateWithoutReconciliationsInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -752,6 +810,8 @@ export type PaymentReferenceCreateManyInvoiceInput = {
   status: $Enums.PaymentStatus
   source: string
   recordedByUserId?: string | null
+  proofDocumentId?: string | null
+  reviewNote?: string | null
   occurredAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -766,6 +826,8 @@ export type PaymentReferenceUpdateWithoutInvoiceInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -781,6 +843,8 @@ export type PaymentReferenceUncheckedUpdateWithoutInvoiceInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -796,6 +860,8 @@ export type PaymentReferenceUncheckedUpdateManyWithoutInvoiceInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   source?: Prisma.StringFieldUpdateOperationsInput | string
   recordedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -842,6 +908,8 @@ export type PaymentReferenceSelect<ExtArgs extends runtime.Types.Extensions.Inte
   status?: boolean
   source?: boolean
   recordedByUserId?: boolean
+  proofDocumentId?: boolean
+  reviewNote?: boolean
   occurredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -860,6 +928,8 @@ export type PaymentReferenceSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   status?: boolean
   source?: boolean
   recordedByUserId?: boolean
+  proofDocumentId?: boolean
+  reviewNote?: boolean
   occurredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -876,6 +946,8 @@ export type PaymentReferenceSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   status?: boolean
   source?: boolean
   recordedByUserId?: boolean
+  proofDocumentId?: boolean
+  reviewNote?: boolean
   occurredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -892,12 +964,14 @@ export type PaymentReferenceSelectScalar = {
   status?: boolean
   source?: boolean
   recordedByUserId?: boolean
+  proofDocumentId?: boolean
+  reviewNote?: boolean
   occurredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PaymentReferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceId" | "provider" | "externalReference" | "amount" | "currency" | "status" | "source" | "recordedByUserId" | "occurredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentReference"]>
+export type PaymentReferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceId" | "provider" | "externalReference" | "amount" | "currency" | "status" | "source" | "recordedByUserId" | "proofDocumentId" | "reviewNote" | "occurredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentReference"]>
 export type PaymentReferenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoice?: boolean | Prisma.InvoiceDefaultArgs<ExtArgs>
   reconciliations?: boolean | Prisma.PaymentReference$reconciliationsArgs<ExtArgs>
@@ -932,6 +1006,11 @@ export type $PaymentReferencePayload<ExtArgs extends runtime.Types.Extensions.In
      */
     source: string
     recordedByUserId: string | null
+    /**
+     * Buyer-uploaded proof (receipt photo, bank slip) for the seller to review (FIN-06).
+     */
+    proofDocumentId: string | null
+    reviewNote: string | null
     occurredAt: Date
     createdAt: Date
     updatedAt: Date
@@ -1369,6 +1448,8 @@ export interface PaymentReferenceFieldRefs {
   readonly status: Prisma.FieldRef<"PaymentReference", 'PaymentStatus'>
   readonly source: Prisma.FieldRef<"PaymentReference", 'String'>
   readonly recordedByUserId: Prisma.FieldRef<"PaymentReference", 'String'>
+  readonly proofDocumentId: Prisma.FieldRef<"PaymentReference", 'String'>
+  readonly reviewNote: Prisma.FieldRef<"PaymentReference", 'String'>
   readonly occurredAt: Prisma.FieldRef<"PaymentReference", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"PaymentReference", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PaymentReference", 'DateTime'>

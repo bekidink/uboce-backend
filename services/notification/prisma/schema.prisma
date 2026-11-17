@@ -90,10 +90,17 @@ model DeliveryAttempt {
   success        Boolean
   /// Safe diagnostic only — never provider payloads with personal data.
   error          String?
+  /// SMS: the gateway's ID, parts billed, estimated cost and the delivery receipt (PRD v2 NTF-02).
+  providerMessageId String?   @map("provider_message_id")
+  segments          Int?
+  cost              Decimal?  @db.Decimal(12, 4)
+  receiptStatus     String?   @map("receipt_status")
+  receiptAt         DateTime? @map("receipt_at") @db.Timestamptz(3)
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
 
+  @@unique([provider, providerMessageId])
   @@index([notificationId])
   @@map("delivery_attempts")
 }

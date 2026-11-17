@@ -172,7 +172,32 @@ export interface InternalOrder {
   discountTotal: string;
   promotionCode: string | null;
   fulfillmentBranchId: string | null;
-  lines: { id: string; lineNumber: number; productId: string | null; description: string; quantity: string; unitOfMeasure: string; unitPrice: string; lineTotal: string; fulfilledQuantity: string }[];
+  /** PRD v2 ORD-06: delivery fee and tax as calculated and stored at checkout. */
+  deliveryFee?: string;
+  /** Tax on the delivery fee, and its rate. */
+  deliveryTax?: string;
+  deliveryTaxRatePct?: string | null;
+  taxTotal?: string;
+  taxInclusive?: boolean;
+  /** True when the order's tax was calculated by the tax engine (orders before v2 lack it). */
+  taxCalculated?: boolean;
+  lines: {
+    id: string;
+    lineNumber: number;
+    productId: string | null;
+    description: string;
+    quantity: string;
+    unitOfMeasure: string;
+    unitPrice: string;
+    lineTotal: string;
+    fulfilledQuantity: string;
+    discountAmount?: string;
+    /** Taxable amount of the line after its share of the discount, excluding tax. */
+    netAmount?: string;
+    taxCode?: string | null;
+    taxRatePct?: string | null;
+    taxAmount?: string;
+  }[];
 }
 
 /** Catalog: POST /internal/catalog/quote — server-side prices and snapshots for order lines (PRD addendum 2.3–2.4). */
@@ -201,6 +226,10 @@ export interface ProductSnapshot {
   packSize: string | null;
   preorder: boolean;
   capturedAt: string;
+  /** Tax class for the tax engine: standard, zero_rated, exempt or service (PRD v2 FIN-09). Older snapshots lack it. */
+  taxClass?: string;
+  /** Shipping weight of one unit, for delivery rate cards (LOG-06). */
+  weightKg?: string | null;
 }
 
 export interface CatalogQuoteLine {
@@ -242,4 +271,54 @@ export interface InternalShipment {
   consigneeOrganizationId: string;
   carrierOrganizationId: string | null;
   status: string;
+}
+
+/** Any service: POST /internal/jobs/:job, called only by the scheduler (PRD v2 PLT-02). */
+export interface JobRunResult {
+  /** How many records the run changed; 0 when there was nothing to do. */
+  processed: number;
+  detail?: Record<string, unknown>;
+}
+
+/** Finance: POST /internal/tax/quote — tax for an order's lines and delivery (PRD v2 FIN-09). */
+export interface TaxQuoteRequest {
+  sellerOrganizationId: string;
+  buyerOrganizationId: string;
+  currency: string;
+  /** Amounts net of discounts; tax-inclusive when the seller prices that way. */
+  lines: { key: string; amount: string; taxClass?: string | null }[];
+}
+
+export interface TaxQuote {
+  regime: 'vat' | 'tot' | 'none';
+  inclusive: boolean;
+  exemption: string | null;
+  lines: { key: string; taxCode: string; ratePct: string; ruleId: string | null; net: string; tax: string; gross: string }[];
+  net: string;
+  tax: string;
+  gross: string;
+  sellerLegalName: string | null;
+  sellerTin: string | null;
+  calculatedAt: string;
+}
+
+/** Logistics: POST /internal/delivery-quotes — the seller's delivery fee from its rate card (PRD v2 LOG-06). */
+export interface DeliveryQuoteRequest {
+  sellerOrganizationId: string;
+  currency: string;
+  /** Goods value after discounts, for free-delivery thresholds. */
+  goodsAmount: string;
+  weightKg: string;
+  city?: string | null;
+  region?: string | null;
+}
+
+export interface DeliveryQuote {
+  fee: string;
+  currency: string;
+  /** Null when the seller has no rate card: delivery is arranged and charged outside the order. */
+  rateCardId: string | null;
+  rateCardVersion: number | null;
+  zone: string | null;
+  freeDelivery: boolean;
 }

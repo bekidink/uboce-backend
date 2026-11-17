@@ -1104,6 +1104,11 @@ export const DeliveryAttemptScalarFieldEnum = {
   provider: 'provider',
   success: 'success',
   error: 'error',
+  providerMessageId: 'providerMessageId',
+  segments: 'segments',
+  cost: 'cost',
+  receiptStatus: 'receiptStatus',
+  receiptAt: 'receiptAt',
   createdAt: 'createdAt'
 } as const
 
@@ -1307,6 +1312,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 

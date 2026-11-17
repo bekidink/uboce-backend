@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { type AuthUser, CurrentUser, Public } from '@uboce/common';
+import { AppError, type AuthUser, CurrentUser, Public, verifyHuman } from '@uboce/common';
 import type { Request } from 'express';
 
 import type { RequestMeta, TokenResponse } from '../tokens/tokens.module.js';
@@ -18,6 +18,11 @@ import { AuthService } from './auth.service.js';
 
 const metaOf = (req: Request): RequestMeta => ({ ipAddress: req.ip, userAgent: req.headers['user-agent'] });
 
+/** Bot protection (PRD v2 PLT-09): a Turnstile token in X-Captcha-Token, when TURNSTILE_SECRET_KEY is set. */
+export async function requireHuman(token: string | undefined, req: Request) {
+  if (!(await verifyHuman(token, req.ip))) throw new AppError(403, 'captcha_failed', 'Complete the check that you are not a robot');
+}
+
 @ApiTags('auth')
 @ApiExtraModels(TokenResponseDto, MfaChallengeDto)
 @Controller('auth')
@@ -27,7 +32,8 @@ export class AuthController {
   @Public()
   @UseGuards(ThrottlerGuard)
   @Post('register')
-  register(@Body() dto: RegisterDto, @Req() req: Request): Promise<TokenResponse> {
+  async register(@Body() dto: RegisterDto, @Req() req: Request, @Headers('x-captcha-token') captcha?: string): Promise<TokenResponse> {
+    await requireHuman(captcha, req);
     return this.auth.register(dto, metaOf(req));
   }
 
@@ -37,7 +43,8 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiOkResponse({ schema: { oneOf: [{ $ref: getSchemaPath(TokenResponseDto) }, { $ref: getSchemaPath(MfaChallengeDto) }] } })
-  login(@Body() dto: LoginDto, @Req() req: Request) {
+  async login(@Body() dto: LoginDto, @Req() req: Request, @Headers('x-captcha-token') captcha?: string) {
+    await requireHuman(captcha, req);
     return this.auth.login(dto, metaOf(req));
   }
 

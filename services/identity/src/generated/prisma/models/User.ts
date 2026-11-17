@@ -28,6 +28,7 @@ export type UserMinAggregateOutputType = {
   id: string | null
   email: string | null
   phone: string | null
+  phoneVerifiedAt: Date | null
   passwordHash: string | null
   displayName: string | null
   locale: string | null
@@ -43,6 +44,7 @@ export type UserMaxAggregateOutputType = {
   id: string | null
   email: string | null
   phone: string | null
+  phoneVerifiedAt: Date | null
   passwordHash: string | null
   displayName: string | null
   locale: string | null
@@ -58,6 +60,7 @@ export type UserCountAggregateOutputType = {
   id: number
   email: number
   phone: number
+  phoneVerifiedAt: number
   passwordHash: number
   displayName: number
   locale: number
@@ -75,6 +78,7 @@ export type UserMinAggregateInputType = {
   id?: true
   email?: true
   phone?: true
+  phoneVerifiedAt?: true
   passwordHash?: true
   displayName?: true
   locale?: true
@@ -90,6 +94,7 @@ export type UserMaxAggregateInputType = {
   id?: true
   email?: true
   phone?: true
+  phoneVerifiedAt?: true
   passwordHash?: true
   displayName?: true
   locale?: true
@@ -105,6 +110,7 @@ export type UserCountAggregateInputType = {
   id?: true
   email?: true
   phone?: true
+  phoneVerifiedAt?: true
   passwordHash?: true
   displayName?: true
   locale?: true
@@ -193,6 +199,7 @@ export type UserGroupByOutputType = {
   id: string
   email: string
   phone: string | null
+  phoneVerifiedAt: Date | null
   passwordHash: string
   displayName: string
   locale: string
@@ -229,6 +236,7 @@ export type UserWhereInput = {
   id?: Prisma.UuidFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   phone?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   passwordHash?: Prisma.StringFilter<"User"> | string
   displayName?: Prisma.StringFilter<"User"> | string
   locale?: Prisma.StringFilter<"User"> | string
@@ -242,12 +250,14 @@ export type UserWhereInput = {
   securityEvents?: Prisma.SecurityEventListRelationFilter
   recoveryCodes?: Prisma.RecoveryCodeListRelationFilter
   verificationTokens?: Prisma.VerificationTokenListRelationFilter
+  phoneVerifications?: Prisma.PhoneVerificationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   locale?: Prisma.SortOrder
@@ -261,6 +271,7 @@ export type UserOrderByWithRelationInput = {
   securityEvents?: Prisma.SecurityEventOrderByRelationAggregateInput
   recoveryCodes?: Prisma.RecoveryCodeOrderByRelationAggregateInput
   verificationTokens?: Prisma.VerificationTokenOrderByRelationAggregateInput
+  phoneVerifications?: Prisma.PhoneVerificationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -270,6 +281,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   passwordHash?: Prisma.StringFilter<"User"> | string
   displayName?: Prisma.StringFilter<"User"> | string
   locale?: Prisma.StringFilter<"User"> | string
@@ -283,12 +295,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   securityEvents?: Prisma.SecurityEventListRelationFilter
   recoveryCodes?: Prisma.RecoveryCodeListRelationFilter
   verificationTokens?: Prisma.VerificationTokenListRelationFilter
+  phoneVerifications?: Prisma.PhoneVerificationListRelationFilter
 }, "id" | "email" | "phone">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   locale?: Prisma.SortOrder
@@ -310,6 +324,7 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   displayName?: Prisma.StringWithAggregatesFilter<"User"> | string
   locale?: Prisma.StringWithAggregatesFilter<"User"> | string
@@ -325,6 +340,7 @@ export type UserCreateInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -338,12 +354,14 @@ export type UserCreateInput = {
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -357,12 +375,14 @@ export type UserUncheckedCreateInput = {
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -376,12 +396,14 @@ export type UserUpdateInput = {
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -395,12 +417,14 @@ export type UserUncheckedUpdateInput = {
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -416,6 +440,7 @@ export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -431,6 +456,7 @@ export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -446,6 +472,7 @@ export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   locale?: Prisma.SortOrder
@@ -461,6 +488,7 @@ export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   locale?: Prisma.SortOrder
@@ -476,6 +504,7 @@ export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   locale?: Prisma.SortOrder
@@ -575,10 +604,27 @@ export type UserUpdateOneRequiredWithoutVerificationTokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVerificationTokensInput, Prisma.UserUpdateWithoutVerificationTokensInput>, Prisma.UserUncheckedUpdateWithoutVerificationTokensInput>
 }
 
+export type UserCreateNestedOneWithoutPhoneVerificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPhoneVerificationsInput, Prisma.UserUncheckedCreateWithoutPhoneVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPhoneVerificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutPhoneVerificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPhoneVerificationsInput, Prisma.UserUncheckedCreateWithoutPhoneVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPhoneVerificationsInput
+  upsert?: Prisma.UserUpsertWithoutPhoneVerificationsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPhoneVerificationsInput, Prisma.UserUpdateWithoutPhoneVerificationsInput>, Prisma.UserUncheckedUpdateWithoutPhoneVerificationsInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -591,12 +637,14 @@ export type UserCreateWithoutSessionsInput = {
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -609,6 +657,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -631,6 +680,7 @@ export type UserUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -643,12 +693,14 @@ export type UserUpdateWithoutSessionsInput = {
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -661,12 +713,14 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSecurityEventsInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -679,12 +733,14 @@ export type UserCreateWithoutSecurityEventsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSecurityEventsInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -697,6 +753,7 @@ export type UserUncheckedCreateWithoutSecurityEventsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSecurityEventsInput = {
@@ -719,6 +776,7 @@ export type UserUpdateWithoutSecurityEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -731,12 +789,14 @@ export type UserUpdateWithoutSecurityEventsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSecurityEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -749,12 +809,14 @@ export type UserUncheckedUpdateWithoutSecurityEventsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRecoveryCodesInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -767,12 +829,14 @@ export type UserCreateWithoutRecoveryCodesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRecoveryCodesInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -785,6 +849,7 @@ export type UserUncheckedCreateWithoutRecoveryCodesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRecoveryCodesInput = {
@@ -807,6 +872,7 @@ export type UserUpdateWithoutRecoveryCodesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -819,12 +885,14 @@ export type UserUpdateWithoutRecoveryCodesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecoveryCodesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -837,12 +905,14 @@ export type UserUncheckedUpdateWithoutRecoveryCodesInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVerificationTokensInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -855,12 +925,14 @@ export type UserCreateWithoutVerificationTokensInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVerificationTokensInput = {
   id?: string
   email: string
   phone?: string | null
+  phoneVerifiedAt?: Date | string | null
   passwordHash: string
   displayName: string
   locale?: string
@@ -873,6 +945,7 @@ export type UserUncheckedCreateWithoutVerificationTokensInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVerificationTokensInput = {
@@ -895,6 +968,7 @@ export type UserUpdateWithoutVerificationTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -907,12 +981,14 @@ export type UserUpdateWithoutVerificationTokensInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVerificationTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   locale?: Prisma.StringFieldUpdateOperationsInput | string
@@ -925,6 +1001,103 @@ export type UserUncheckedUpdateWithoutVerificationTokensInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
   recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+  phoneVerifications?: Prisma.PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPhoneVerificationsInput = {
+  id?: string
+  email: string
+  phone?: string | null
+  phoneVerifiedAt?: Date | string | null
+  passwordHash: string
+  displayName: string
+  locale?: string
+  emailVerifiedAt?: Date | string | null
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPhoneVerificationsInput = {
+  id?: string
+  email: string
+  phone?: string | null
+  phoneVerifiedAt?: Date | string | null
+  passwordHash: string
+  displayName: string
+  locale?: string
+  emailVerifiedAt?: Date | string | null
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPhoneVerificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPhoneVerificationsInput, Prisma.UserUncheckedCreateWithoutPhoneVerificationsInput>
+}
+
+export type UserUpsertWithoutPhoneVerificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPhoneVerificationsInput, Prisma.UserUncheckedUpdateWithoutPhoneVerificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPhoneVerificationsInput, Prisma.UserUncheckedCreateWithoutPhoneVerificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPhoneVerificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPhoneVerificationsInput, Prisma.UserUncheckedUpdateWithoutPhoneVerificationsInput>
+}
+
+export type UserUpdateWithoutPhoneVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  locale?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPhoneVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  locale?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -937,6 +1110,7 @@ export type UserCountOutputType = {
   securityEvents: number
   recoveryCodes: number
   verificationTokens: number
+  phoneVerifications: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -944,6 +1118,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   securityEvents?: boolean | UserCountOutputTypeCountSecurityEventsArgs
   recoveryCodes?: boolean | UserCountOutputTypeCountRecoveryCodesArgs
   verificationTokens?: boolean | UserCountOutputTypeCountVerificationTokensArgs
+  phoneVerifications?: boolean | UserCountOutputTypeCountPhoneVerificationsArgs
 }
 
 /**
@@ -984,11 +1159,19 @@ export type UserCountOutputTypeCountVerificationTokensArgs<ExtArgs extends runti
   where?: Prisma.VerificationTokenWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPhoneVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PhoneVerificationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   email?: boolean
   phone?: boolean
+  phoneVerifiedAt?: boolean
   passwordHash?: boolean
   displayName?: boolean
   locale?: boolean
@@ -1002,6 +1185,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   securityEvents?: boolean | Prisma.User$securityEventsArgs<ExtArgs>
   recoveryCodes?: boolean | Prisma.User$recoveryCodesArgs<ExtArgs>
   verificationTokens?: boolean | Prisma.User$verificationTokensArgs<ExtArgs>
+  phoneVerifications?: boolean | Prisma.User$phoneVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1009,6 +1193,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   phone?: boolean
+  phoneVerifiedAt?: boolean
   passwordHash?: boolean
   displayName?: boolean
   locale?: boolean
@@ -1024,6 +1209,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   phone?: boolean
+  phoneVerifiedAt?: boolean
   passwordHash?: boolean
   displayName?: boolean
   locale?: boolean
@@ -1039,6 +1225,7 @@ export type UserSelectScalar = {
   id?: boolean
   email?: boolean
   phone?: boolean
+  phoneVerifiedAt?: boolean
   passwordHash?: boolean
   displayName?: boolean
   locale?: boolean
@@ -1050,12 +1237,13 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "passwordHash" | "displayName" | "locale" | "emailVerifiedAt" | "mfaSecret" | "mfaEnabledAt" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "phoneVerifiedAt" | "passwordHash" | "displayName" | "locale" | "emailVerifiedAt" | "mfaSecret" | "mfaEnabledAt" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   securityEvents?: boolean | Prisma.User$securityEventsArgs<ExtArgs>
   recoveryCodes?: boolean | Prisma.User$recoveryCodesArgs<ExtArgs>
   verificationTokens?: boolean | Prisma.User$verificationTokensArgs<ExtArgs>
+  phoneVerifications?: boolean | Prisma.User$phoneVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1068,6 +1256,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     securityEvents: Prisma.$SecurityEventPayload<ExtArgs>[]
     recoveryCodes: Prisma.$RecoveryCodePayload<ExtArgs>[]
     verificationTokens: Prisma.$VerificationTokenPayload<ExtArgs>[]
+    phoneVerifications: Prisma.$PhoneVerificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1076,6 +1265,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
      */
     email: string
     phone: string | null
+    /**
+     * Set once the user proves the number with an SMS code; only verified numbers sign in (PRD v2 ORG-01).
+     */
+    phoneVerifiedAt: Date | null
     passwordHash: string
     displayName: string
     locale: string
@@ -1486,6 +1679,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   securityEvents<T extends Prisma.User$securityEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$securityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SecurityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recoveryCodes<T extends Prisma.User$recoveryCodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$recoveryCodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verificationTokens<T extends Prisma.User$verificationTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  phoneVerifications<T extends Prisma.User$phoneVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$phoneVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhoneVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1518,6 +1712,7 @@ export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly phone: Prisma.FieldRef<"User", 'String'>
+  readonly phoneVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly displayName: Prisma.FieldRef<"User", 'String'>
   readonly locale: Prisma.FieldRef<"User", 'String'>
@@ -2013,6 +2208,30 @@ export type User$verificationTokensArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.VerificationTokenScalarFieldEnum | Prisma.VerificationTokenScalarFieldEnum[]
+}
+
+/**
+ * User.phoneVerifications
+ */
+export type User$phoneVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PhoneVerification
+   */
+  select?: Prisma.PhoneVerificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PhoneVerification
+   */
+  omit?: Prisma.PhoneVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PhoneVerificationInclude<ExtArgs> | null
+  where?: Prisma.PhoneVerificationWhereInput
+  orderBy?: Prisma.PhoneVerificationOrderByWithRelationInput | Prisma.PhoneVerificationOrderByWithRelationInput[]
+  cursor?: Prisma.PhoneVerificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PhoneVerificationScalarFieldEnum | Prisma.PhoneVerificationScalarFieldEnum[]
 }
 
 /**

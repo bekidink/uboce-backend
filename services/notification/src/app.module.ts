@@ -2,7 +2,8 @@ import { Logger, Module } from '@nestjs/common';
 import { coreModules } from '@uboce/common';
 
 import { EMAIL_PROVIDER, LogEmailProvider, SmtpEmailProvider } from './channels/email.provider.js';
-import { LogSmsProvider, SMS_PROVIDER } from './channels/sms.provider.js';
+import { AfroMessageSmsProvider, HttpSmsProvider, LogSmsProvider, SMS_PROVIDER } from './channels/sms.provider.js';
+import { SmsController } from './channels/sms.controller.js';
 import { env, SERVICE_NAME } from './config.js';
 import { ChatController } from './chat/chat.controller.js';
 import { ChatService } from './chat/chat.service.js';
@@ -19,7 +20,7 @@ const logger = new Logger('Channels');
 
 @Module({
   imports: coreModules({ serviceName: SERVICE_NAME, env, prismaService: PrismaService, prismaModule: PrismaModule }),
-  controllers: [NotificationsController, InternalMessagesController, ChatController],
+  controllers: [NotificationsController, InternalMessagesController, ChatController, SmsController],
   providers: [
     NotificationsService,
     ChatService,
@@ -41,7 +42,22 @@ const logger = new Logger('Channels');
         return new LogEmailProvider();
       },
     },
-    { provide: SMS_PROVIDER, useFactory: () => new LogSmsProvider() },
+    {
+      provide: SMS_PROVIDER,
+      useFactory: () => {
+        const callbackUrl = env.SMS_CALLBACK_TOKEN ? `${env.PUBLIC_API_URL}/api/v1/notifications/sms/receipts/${env.SMS_PROVIDER}?token=${env.SMS_CALLBACK_TOKEN}` : undefined;
+        if (env.SMS_PROVIDER === 'afromessage') {
+          if (!env.SMS_API_TOKEN) throw new Error('SMS_PROVIDER=afromessage needs SMS_API_TOKEN');
+          return new AfroMessageSmsProvider({ token: env.SMS_API_TOKEN, identifierId: env.SMS_IDENTIFIER_ID, sender: env.SMS_SENDER, callbackUrl, apiUrl: env.SMS_API_URL });
+        }
+        if (env.SMS_PROVIDER === 'http') {
+          if (!env.SMS_HTTP_URL) throw new Error('SMS_PROVIDER=http needs SMS_HTTP_URL');
+          return new HttpSmsProvider({ url: env.SMS_HTTP_URL, token: env.SMS_API_TOKEN, sender: env.SMS_SENDER, callbackUrl });
+        }
+        logger.warn('SMS_PROVIDER=log — SMS (including sign-in codes) will be logged, not sent');
+        return new LogSmsProvider();
+      },
+    },
   ],
 })
 export class AppModule {}

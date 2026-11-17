@@ -101,6 +101,18 @@ export const OrderScalarFieldEnum = {
   fulfillmentBranchId: 'fulfillmentBranchId',
   subtotal: 'subtotal',
   discountTotal: 'discountTotal',
+  deliveryFee: 'deliveryFee',
+  deliveryTax: 'deliveryTax',
+  deliveryTaxRatePct: 'deliveryTaxRatePct',
+  deliveryQuote: 'deliveryQuote',
+  deliveryCity: 'deliveryCity',
+  deliveryRegion: 'deliveryRegion',
+  taxTotal: 'taxTotal',
+  taxInclusive: 'taxInclusive',
+  taxCalculated: 'taxCalculated',
+  taxBreakdown: 'taxBreakdown',
+  buyerLegalName: 'buyerLegalName',
+  sellerLegalName: 'sellerLegalName',
   promotionId: 'promotionId',
   promotionCode: 'promotionCode',
   cancellationPolicy: 'cancellationPolicy',
@@ -133,7 +145,12 @@ export const OrderLineScalarFieldEnum = {
   priceSource: 'priceSource',
   listPrice: 'listPrice',
   snapshot: 'snapshot',
-  returnedQuantity: 'returnedQuantity'
+  returnedQuantity: 'returnedQuantity',
+  discountAmount: 'discountAmount',
+  netAmount: 'netAmount',
+  taxAmount: 'taxAmount',
+  taxRatePct: 'taxRatePct',
+  taxCode: 'taxCode'
 } as const
 
 export type OrderLineScalarFieldEnum = (typeof OrderLineScalarFieldEnum)[keyof typeof OrderLineScalarFieldEnum]

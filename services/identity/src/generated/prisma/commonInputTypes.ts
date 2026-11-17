@@ -352,6 +352,23 @@ export type IntWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntFilter<$PrismaModel>
 }
 
+export type EnumPhonePurposeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhonePurpose | Prisma.EnumPhonePurposeFieldRefInput<$PrismaModel>
+  in?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPhonePurposeFilter<$PrismaModel> | $Enums.PhonePurpose
+}
+
+export type EnumPhonePurposeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhonePurpose | Prisma.EnumPhonePurposeFieldRefInput<$PrismaModel>
+  in?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPhonePurposeWithAggregatesFilter<$PrismaModel> | $Enums.PhonePurpose
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPhonePurposeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPhonePurposeFilter<$PrismaModel>
+}
+
 export type NestedUuidFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -643,6 +660,23 @@ export type NestedFloatFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
+}
+
+export type NestedEnumPhonePurposeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhonePurpose | Prisma.EnumPhonePurposeFieldRefInput<$PrismaModel>
+  in?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPhonePurposeFilter<$PrismaModel> | $Enums.PhonePurpose
+}
+
+export type NestedEnumPhonePurposeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhonePurpose | Prisma.EnumPhonePurposeFieldRefInput<$PrismaModel>
+  in?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PhonePurpose[] | Prisma.ListEnumPhonePurposeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPhonePurposeWithAggregatesFilter<$PrismaModel> | $Enums.PhonePurpose
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPhonePurposeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPhonePurposeFilter<$PrismaModel>
 }
 
 

@@ -13,5 +13,7 @@ export const env = loadEnv(
       .enum(['true', 'false'])
       .default('false')
       .transform((v) => v === 'true'),
+    /** Days after the response deadline a buyer has to award before the RFQ closes (PRD v2 ORD-03). */
+    RFQ_AWARD_WINDOW_DAYS: z.coerce.number().int().positive().default(30),
   }),
 );

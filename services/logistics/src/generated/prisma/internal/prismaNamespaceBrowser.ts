@@ -63,7 +63,8 @@ export const ModelName = {
   DeliveryEvidence: 'DeliveryEvidence',
   DeliveryException: 'DeliveryException',
   OutboxEvent: 'OutboxEvent',
-  ProcessedEvent: 'ProcessedEvent'
+  ProcessedEvent: 'ProcessedEvent',
+  RateCard: 'RateCard'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -268,6 +269,21 @@ export const ProcessedEventScalarFieldEnum = {
 } as const
 
 export type ProcessedEventScalarFieldEnum = (typeof ProcessedEventScalarFieldEnum)[keyof typeof ProcessedEventScalarFieldEnum]
+
+
+export const RateCardScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  currency: 'currency',
+  version: 'version',
+  active: 'active',
+  freeOverAmount: 'freeOverAmount',
+  zones: 'zones',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type RateCardScalarFieldEnum = (typeof RateCardScalarFieldEnum)[keyof typeof RateCardScalarFieldEnum]
 
 
 export const SortOrder = {

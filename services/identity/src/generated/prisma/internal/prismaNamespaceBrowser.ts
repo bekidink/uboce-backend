@@ -56,7 +56,8 @@ export const ModelName = {
   SecurityEvent: 'SecurityEvent',
   RecoveryCode: 'RecoveryCode',
   VerificationToken: 'VerificationToken',
-  OutboxEvent: 'OutboxEvent'
+  OutboxEvent: 'OutboxEvent',
+  PhoneVerification: 'PhoneVerification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -79,6 +80,7 @@ export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   phone: 'phone',
+  phoneVerifiedAt: 'phoneVerifiedAt',
   passwordHash: 'passwordHash',
   displayName: 'displayName',
   locale: 'locale',
@@ -157,6 +159,22 @@ export const OutboxEventScalarFieldEnum = {
 } as const
 
 export type OutboxEventScalarFieldEnum = (typeof OutboxEventScalarFieldEnum)[keyof typeof OutboxEventScalarFieldEnum]
+
+
+export const PhoneVerificationScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  purpose: 'purpose',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  attempts: 'attempts',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+} as const
+
+export type PhoneVerificationScalarFieldEnum = (typeof PhoneVerificationScalarFieldEnum)[keyof typeof PhoneVerificationScalarFieldEnum]
 
 
 export const SortOrder = {

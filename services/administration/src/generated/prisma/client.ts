@@ -76,3 +76,13 @@ export type AuditEntry = Prisma.AuditEntryModel
  * Transactional outbox (PRD 8.3).
  */
 export type OutboxEvent = Prisma.OutboxEventModel
+/**
+ * Model JobDefinition
+ * One scheduled job: which service owns it, how often it runs, and its last outcome.
+ */
+export type JobDefinition = Prisma.JobDefinitionModel
+/**
+ * Model JobRun
+ * 
+ */
+export type JobRun = Prisma.JobRunModel

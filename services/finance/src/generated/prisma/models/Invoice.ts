@@ -32,6 +32,7 @@ export type InvoiceAvgAggregateOutputType = {
   total: runtime.Decimal | null
   paidAmount: runtime.Decimal | null
   creditedAmount: runtime.Decimal | null
+  remindersSent: number | null
 }
 
 export type InvoiceSumAggregateOutputType = {
@@ -40,6 +41,7 @@ export type InvoiceSumAggregateOutputType = {
   total: runtime.Decimal | null
   paidAmount: runtime.Decimal | null
   creditedAmount: runtime.Decimal | null
+  remindersSent: number | null
 }
 
 export type InvoiceMinAggregateOutputType = {
@@ -62,6 +64,10 @@ export type InvoiceMinAggregateOutputType = {
   issuedAt: Date | null
   voidedAt: Date | null
   voidReason: string | null
+  paymentCode: string | null
+  overdueAt: Date | null
+  remindersSent: number | null
+  lastReminderAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -86,6 +92,10 @@ export type InvoiceMaxAggregateOutputType = {
   issuedAt: Date | null
   voidedAt: Date | null
   voidReason: string | null
+  paymentCode: string | null
+  overdueAt: Date | null
+  remindersSent: number | null
+  lastReminderAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -110,6 +120,10 @@ export type InvoiceCountAggregateOutputType = {
   issuedAt: number
   voidedAt: number
   voidReason: number
+  paymentCode: number
+  overdueAt: number
+  remindersSent: number
+  lastReminderAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -122,6 +136,7 @@ export type InvoiceAvgAggregateInputType = {
   total?: true
   paidAmount?: true
   creditedAmount?: true
+  remindersSent?: true
 }
 
 export type InvoiceSumAggregateInputType = {
@@ -130,6 +145,7 @@ export type InvoiceSumAggregateInputType = {
   total?: true
   paidAmount?: true
   creditedAmount?: true
+  remindersSent?: true
 }
 
 export type InvoiceMinAggregateInputType = {
@@ -152,6 +168,10 @@ export type InvoiceMinAggregateInputType = {
   issuedAt?: true
   voidedAt?: true
   voidReason?: true
+  paymentCode?: true
+  overdueAt?: true
+  remindersSent?: true
+  lastReminderAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -176,6 +196,10 @@ export type InvoiceMaxAggregateInputType = {
   issuedAt?: true
   voidedAt?: true
   voidReason?: true
+  paymentCode?: true
+  overdueAt?: true
+  remindersSent?: true
+  lastReminderAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -200,6 +224,10 @@ export type InvoiceCountAggregateInputType = {
   issuedAt?: true
   voidedAt?: true
   voidReason?: true
+  paymentCode?: true
+  overdueAt?: true
+  remindersSent?: true
+  lastReminderAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -311,6 +339,10 @@ export type InvoiceGroupByOutputType = {
   issuedAt: Date | null
   voidedAt: Date | null
   voidReason: string | null
+  paymentCode: string | null
+  overdueAt: Date | null
+  remindersSent: number
+  lastReminderAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: InvoiceCountAggregateOutputType | null
@@ -358,6 +390,10 @@ export type InvoiceWhereInput = {
   issuedAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
   voidReason?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  paymentCode?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  overdueAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
+  remindersSent?: Prisma.IntFilter<"Invoice"> | number
+  lastReminderAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   lines?: Prisma.InvoiceLineListRelationFilter
@@ -386,6 +422,10 @@ export type InvoiceOrderByWithRelationInput = {
   issuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  overdueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  remindersSent?: Prisma.SortOrder
+  lastReminderAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lines?: Prisma.InvoiceLineOrderByRelationAggregateInput
@@ -397,6 +437,7 @@ export type InvoiceOrderByWithRelationInput = {
 export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   number?: string
+  paymentCode?: string
   AND?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
   OR?: Prisma.InvoiceWhereInput[]
   NOT?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
@@ -417,13 +458,16 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   issuedAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
   voidReason?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  overdueAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
+  remindersSent?: Prisma.IntFilter<"Invoice"> | number
+  lastReminderAt?: Prisma.DateTimeNullableFilter<"Invoice"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   lines?: Prisma.InvoiceLineListRelationFilter
   payments?: Prisma.PaymentReferenceListRelationFilter
   creditNotes?: Prisma.CreditNoteListRelationFilter
   intents?: Prisma.PaymentIntentListRelationFilter
-}, "id" | "number">
+}, "id" | "number" | "paymentCode">
 
 export type InvoiceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -445,6 +489,10 @@ export type InvoiceOrderByWithAggregationInput = {
   issuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  overdueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  remindersSent?: Prisma.SortOrder
+  lastReminderAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.InvoiceCountOrderByAggregateInput
@@ -477,6 +525,10 @@ export type InvoiceScalarWhereWithAggregatesInput = {
   issuedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Invoice"> | Date | string | null
   voidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Invoice"> | Date | string | null
   voidReason?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
+  paymentCode?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
+  overdueAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Invoice"> | Date | string | null
+  remindersSent?: Prisma.IntWithAggregatesFilter<"Invoice"> | number
+  lastReminderAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Invoice"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Invoice"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Invoice"> | Date | string
 }
@@ -501,6 +553,10 @@ export type InvoiceCreateInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineCreateNestedManyWithoutInvoiceInput
@@ -529,6 +585,10 @@ export type InvoiceUncheckedCreateInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineUncheckedCreateNestedManyWithoutInvoiceInput
@@ -557,6 +617,10 @@ export type InvoiceUpdateInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUpdateManyWithoutInvoiceNestedInput
@@ -585,6 +649,10 @@ export type InvoiceUncheckedUpdateInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUncheckedUpdateManyWithoutInvoiceNestedInput
@@ -613,6 +681,10 @@ export type InvoiceCreateManyInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -637,6 +709,10 @@ export type InvoiceUpdateManyMutationInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -661,6 +737,10 @@ export type InvoiceUncheckedUpdateManyInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -685,6 +765,10 @@ export type InvoiceCountOrderByAggregateInput = {
   issuedAt?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidReason?: Prisma.SortOrder
+  paymentCode?: Prisma.SortOrder
+  overdueAt?: Prisma.SortOrder
+  remindersSent?: Prisma.SortOrder
+  lastReminderAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -695,6 +779,7 @@ export type InvoiceAvgOrderByAggregateInput = {
   total?: Prisma.SortOrder
   paidAmount?: Prisma.SortOrder
   creditedAmount?: Prisma.SortOrder
+  remindersSent?: Prisma.SortOrder
 }
 
 export type InvoiceMaxOrderByAggregateInput = {
@@ -717,6 +802,10 @@ export type InvoiceMaxOrderByAggregateInput = {
   issuedAt?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidReason?: Prisma.SortOrder
+  paymentCode?: Prisma.SortOrder
+  overdueAt?: Prisma.SortOrder
+  remindersSent?: Prisma.SortOrder
+  lastReminderAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -741,6 +830,10 @@ export type InvoiceMinOrderByAggregateInput = {
   issuedAt?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidReason?: Prisma.SortOrder
+  paymentCode?: Prisma.SortOrder
+  overdueAt?: Prisma.SortOrder
+  remindersSent?: Prisma.SortOrder
+  lastReminderAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -751,6 +844,7 @@ export type InvoiceSumOrderByAggregateInput = {
   total?: Prisma.SortOrder
   paidAmount?: Prisma.SortOrder
   creditedAmount?: Prisma.SortOrder
+  remindersSent?: Prisma.SortOrder
 }
 
 export type InvoiceScalarRelationFilter = {
@@ -788,6 +882,14 @@ export type DateTimeFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type InvoiceCreateNestedOneWithoutLinesInput = {
@@ -866,6 +968,10 @@ export type InvoiceCreateWithoutLinesInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   payments?: Prisma.PaymentReferenceCreateNestedManyWithoutInvoiceInput
@@ -893,6 +999,10 @@ export type InvoiceUncheckedCreateWithoutLinesInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   payments?: Prisma.PaymentReferenceUncheckedCreateNestedManyWithoutInvoiceInput
@@ -936,6 +1046,10 @@ export type InvoiceUpdateWithoutLinesInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payments?: Prisma.PaymentReferenceUpdateManyWithoutInvoiceNestedInput
@@ -963,6 +1077,10 @@ export type InvoiceUncheckedUpdateWithoutLinesInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payments?: Prisma.PaymentReferenceUncheckedUpdateManyWithoutInvoiceNestedInput
@@ -990,6 +1108,10 @@ export type InvoiceCreateWithoutPaymentsInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineCreateNestedManyWithoutInvoiceInput
@@ -1017,6 +1139,10 @@ export type InvoiceUncheckedCreateWithoutPaymentsInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineUncheckedCreateNestedManyWithoutInvoiceInput
@@ -1060,6 +1186,10 @@ export type InvoiceUpdateWithoutPaymentsInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUpdateManyWithoutInvoiceNestedInput
@@ -1087,6 +1217,10 @@ export type InvoiceUncheckedUpdateWithoutPaymentsInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUncheckedUpdateManyWithoutInvoiceNestedInput
@@ -1114,6 +1248,10 @@ export type InvoiceCreateWithoutCreditNotesInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineCreateNestedManyWithoutInvoiceInput
@@ -1141,6 +1279,10 @@ export type InvoiceUncheckedCreateWithoutCreditNotesInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineUncheckedCreateNestedManyWithoutInvoiceInput
@@ -1184,6 +1326,10 @@ export type InvoiceUpdateWithoutCreditNotesInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUpdateManyWithoutInvoiceNestedInput
@@ -1211,6 +1357,10 @@ export type InvoiceUncheckedUpdateWithoutCreditNotesInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUncheckedUpdateManyWithoutInvoiceNestedInput
@@ -1238,6 +1388,10 @@ export type InvoiceCreateWithoutIntentsInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineCreateNestedManyWithoutInvoiceInput
@@ -1265,6 +1419,10 @@ export type InvoiceUncheckedCreateWithoutIntentsInput = {
   issuedAt?: Date | string | null
   voidedAt?: Date | string | null
   voidReason?: string | null
+  paymentCode?: string | null
+  overdueAt?: Date | string | null
+  remindersSent?: number
+  lastReminderAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lines?: Prisma.InvoiceLineUncheckedCreateNestedManyWithoutInvoiceInput
@@ -1308,6 +1466,10 @@ export type InvoiceUpdateWithoutIntentsInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUpdateManyWithoutInvoiceNestedInput
@@ -1335,6 +1497,10 @@ export type InvoiceUncheckedUpdateWithoutIntentsInput = {
   issuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overdueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  remindersSent?: Prisma.IntFieldUpdateOperationsInput | number
+  lastReminderAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.InvoiceLineUncheckedUpdateManyWithoutInvoiceNestedInput
@@ -1420,6 +1586,10 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   issuedAt?: boolean
   voidedAt?: boolean
   voidReason?: boolean
+  paymentCode?: boolean
+  overdueAt?: boolean
+  remindersSent?: boolean
+  lastReminderAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lines?: boolean | Prisma.Invoice$linesArgs<ExtArgs>
@@ -1449,6 +1619,10 @@ export type InvoiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   issuedAt?: boolean
   voidedAt?: boolean
   voidReason?: boolean
+  paymentCode?: boolean
+  overdueAt?: boolean
+  remindersSent?: boolean
+  lastReminderAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["invoice"]>
@@ -1473,6 +1647,10 @@ export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   issuedAt?: boolean
   voidedAt?: boolean
   voidReason?: boolean
+  paymentCode?: boolean
+  overdueAt?: boolean
+  remindersSent?: boolean
+  lastReminderAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["invoice"]>
@@ -1497,11 +1675,15 @@ export type InvoiceSelectScalar = {
   issuedAt?: boolean
   voidedAt?: boolean
   voidReason?: boolean
+  paymentCode?: boolean
+  overdueAt?: boolean
+  remindersSent?: boolean
+  lastReminderAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "sellerOrganizationId" | "buyerOrganizationId" | "orderId" | "currency" | "status" | "statusBeforeDispute" | "subtotal" | "taxTotal" | "total" | "paidAmount" | "creditedAmount" | "dueDate" | "notes" | "createdByUserId" | "issuedAt" | "voidedAt" | "voidReason" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
+export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "sellerOrganizationId" | "buyerOrganizationId" | "orderId" | "currency" | "status" | "statusBeforeDispute" | "subtotal" | "taxTotal" | "total" | "paidAmount" | "creditedAmount" | "dueDate" | "notes" | "createdByUserId" | "issuedAt" | "voidedAt" | "voidReason" | "paymentCode" | "overdueAt" | "remindersSent" | "lastReminderAt" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
 export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lines?: boolean | Prisma.Invoice$linesArgs<ExtArgs>
   payments?: boolean | Prisma.Invoice$paymentsArgs<ExtArgs>
@@ -1543,6 +1725,16 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     issuedAt: Date | null
     voidedAt: Date | null
     voidReason: string | null
+    /**
+     * Unique code a buyer quotes on a bank transfer, so statement lines match automatically (PRD v2 FIN-06).
+     */
+    paymentCode: string | null
+    /**
+     * Set when the invoice first passes its due date unpaid; reminders follow (PLT-03).
+     */
+    overdueAt: Date | null
+    remindersSent: number
+    lastReminderAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["invoice"]>
@@ -1991,6 +2183,10 @@ export interface InvoiceFieldRefs {
   readonly issuedAt: Prisma.FieldRef<"Invoice", 'DateTime'>
   readonly voidedAt: Prisma.FieldRef<"Invoice", 'DateTime'>
   readonly voidReason: Prisma.FieldRef<"Invoice", 'String'>
+  readonly paymentCode: Prisma.FieldRef<"Invoice", 'String'>
+  readonly overdueAt: Prisma.FieldRef<"Invoice", 'DateTime'>
+  readonly remindersSent: Prisma.FieldRef<"Invoice", 'Int'>
+  readonly lastReminderAt: Prisma.FieldRef<"Invoice", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Invoice", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Invoice", 'DateTime'>
 }

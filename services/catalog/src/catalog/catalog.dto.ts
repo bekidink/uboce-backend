@@ -16,12 +16,13 @@ import {
   IsUUID,
   Length,
   Matches,
-  ValidateNested,
-} from 'class-validator';
+  ValidateNested, IsIn } from 'class-validator';
 
 import { ProductStatus, UnitOfMeasure } from '../generated/prisma/enums.js';
 
 const SKU = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
+
+export const TAX_CLASSES = ['standard', 'zero_rated', 'exempt', 'service'];
 
 export class VariantDto {
   @Matches(SKU, { message: 'sku may contain letters, digits, dot, dash and underscore (max 64)' })
@@ -55,6 +56,11 @@ export class VariantDto {
   @IsOptional()
   @IsDecimalString('50')
   packSize?: string | null;
+
+  /** Shipping weight of one unit in kilograms, used for delivery fees. */
+  @IsOptional()
+  @IsDecimalString('25.5')
+  weightKg?: string | null;
 
   @IsOptional()
   @IsBoolean()
@@ -98,6 +104,11 @@ export class UpdateVariantDto {
   @IsOptional()
   @IsDecimalString('50')
   packSize?: string | null;
+
+  /** Shipping weight of one unit in kilograms, used for delivery fees. */
+  @IsOptional()
+  @IsDecimalString('25.5')
+  weightKg?: string | null;
 
   @IsOptional()
   @IsBoolean()
@@ -157,6 +168,11 @@ export class CreateProductDto extends ProductAvailabilityDto {
   @IsEnum(UnitOfMeasure)
   unitOfMeasure: UnitOfMeasure;
 
+  /** standard (default), zero_rated, exempt or service. */
+  @IsOptional()
+  @IsIn(TAX_CLASSES)
+  taxClass?: string;
+
   /** Category specification values; see `requiredAttributes` on the category. */
   @ApiPropertyOptional({ type: 'object', additionalProperties: { type: 'string' }, example: { origin: 'Yirgacheffe', grade: '1', process: 'washed' } })
   @IsOptional()
@@ -190,6 +206,10 @@ export class UpdateProductDto extends ProductAvailabilityDto {
   @IsOptional()
   @IsEnum(UnitOfMeasure)
   unitOfMeasure?: UnitOfMeasure;
+
+  @IsOptional()
+  @IsIn(TAX_CLASSES)
+  taxClass?: string;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: { type: 'string' } })
   @IsOptional()

@@ -15,13 +15,14 @@ import {
   skipTake,
   toPage,
 } from '@uboce/common';
-import type { PaymentNotification } from '@uboce/contracts';
+import type { InternalOrder, PaymentNotification } from '@uboce/contracts';
 
 import { SERVICE_NAME } from '../config.js';
 import { Prisma } from '../generated/prisma/client.js';
 import type { InvoiceStatus } from '../generated/prisma/enums.js';
 import { PaymentsService } from '../payments/payments.service.js';
 import { PrismaService } from '../prisma.service.js';
+import { newPaymentCode } from '../collections/matching.js';
 import { type LineInput, outstanding, priceLines, settlementStatus } from './money.js';
 
 const { Decimal } = Prisma;
@@ -35,6 +36,41 @@ type FullInvoice = Prisma.InvoiceGetPayload<{ include: typeof include }>;
 
 const view = (inv: FullInvoice) => ({ ...inv, outstanding: outstanding(inv).toString() });
 
+/**
+ * Orders placed since PRD v2 carry their tax and delivery fee: the invoice
+ * copies them line by line, so it matches the order to the cent (ORD-06, FIN-01).
+ */
+function fromOrderCharges(order: InternalOrder): (LineInput & { orderLineId?: string })[] {
+  const lines: (LineInput & { orderLineId?: string })[] = order.lines.map((l) => {
+    const discount = Number(l.discountAmount ?? 0) > 0 ? ` (after ${l.discountAmount} discount)` : '';
+    return {
+      description: `${l.description}${discount}`,
+      quantity: l.quantity,
+      unitPrice: l.unitPrice,
+      taxRatePct: l.taxRatePct ?? '0',
+      orderLineId: l.id,
+      fixed: { subtotal: l.netAmount ?? l.lineTotal, tax: l.taxAmount ?? '0' },
+    };
+  });
+  if (Number(order.deliveryFee ?? 0) > 0) {
+    const tax = order.deliveryTax ?? '0';
+    const net = order.taxInclusive ? new Decimal(order.deliveryFee!).minus(tax).toFixed(2) : order.deliveryFee!;
+    lines.push({ description: 'Delivery', quantity: '1', unitPrice: net, taxRatePct: order.deliveryTaxRatePct ?? '0', fixed: { subtotal: net, tax } });
+  }
+  return lines;
+}
+
+/** Older orders: one rate the seller enters; the discount is a negative line taxed at the same rate. */
+function manualTaxLines(order: InternalOrder, taxRatePct: string | undefined): (LineInput & { orderLineId?: string })[] {
+  if (taxRatePct === undefined) throw badRequest('tax_rate_required', 'This order was placed before automatic tax; enter the tax rate');
+  return [
+    ...order.lines.map((l) => ({ description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, taxRatePct, orderLineId: l.id })),
+    ...(Number(order.discountTotal ?? 0) > 0
+      ? [{ description: `Discount${order.promotionCode ? ` (${order.promotionCode})` : ''}`, quantity: '1', unitPrice: `-${order.discountTotal}`, taxRatePct }]
+      : []),
+  ];
+}
+
 @Injectable()
 export class InvoicesService {
   constructor(
@@ -45,7 +81,7 @@ export class InvoicesService {
   ) {}
 
   /** Draft from an order's immutable lines (seller side). */
-  async fromOrder(org: ActingOrganization, userId: string, dto: { orderId: string; taxRatePct: string; dueInDays: number; notes?: string }) {
+  async fromOrder(org: ActingOrganization, userId: string, dto: { orderId: string; taxRatePct?: string; dueInDays: number; notes?: string }) {
     requireBusinessAccount(org, 'issue invoices');
     requireRole(org, SELLER_ROLES, 'invoice orders');
     const order = await this.commerce.getOrder(dto.orderId);
@@ -59,13 +95,7 @@ export class InvoicesService {
       currency: order.currency,
       dueInDays: dto.dueInDays,
       notes: dto.notes,
-      lines: [
-        ...order.lines.map((l) => ({ description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, taxRatePct: dto.taxRatePct, orderLineId: l.id })),
-        // Promotions reduce the taxable amount, so the discount is a negative line taxed at the same rate.
-        ...(Number(order.discountTotal ?? 0) > 0
-          ? [{ description: `Discount${order.promotionCode ? ` (${order.promotionCode})` : ''}`, quantity: '1', unitPrice: `-${order.discountTotal}`, taxRatePct: dto.taxRatePct }]
-          : []),
-      ],
+      lines: order.taxCalculated ? fromOrderCharges(order) : manualTaxLines(order, dto.taxRatePct),
     });
   }
 
@@ -83,7 +113,8 @@ export class InvoicesService {
     const inv = await this.owned(org, invoiceId, 'seller');
     if (inv.status !== 'draft') throw conflict('invalid_transition', `A ${inv.status} invoice cannot be issued`);
     return this.prisma.$transaction(async (tx) => {
-      await tx.invoice.update({ where: { id: invoiceId }, data: { status: 'issued', issuedAt: new Date() } });
+      // The code buyers quote on bank transfers so statements match automatically (FIN-06).
+      await tx.invoice.update({ where: { id: invoiceId }, data: { status: 'issued', issuedAt: new Date(), paymentCode: inv.paymentCode ?? newPaymentCode() } });
       await emitEvent(tx, SERVICE_NAME, 'InvoiceIssued', invoiceId, {
         invoiceId,
         invoiceNumber: inv.number,
@@ -301,6 +332,11 @@ export class InvoicesService {
     });
   }
 
+  /** Records money against the invoice and re-settles it. Also used by collections (cash, bank statements). */
+  async applyPayment(tx: Tx, invoiceId: string, paymentId: string, amount: Prisma.Decimal, note: string) {
+    return this.apply(tx, invoiceId, paymentId, amount, note);
+  }
+
   private async apply(tx: Tx, invoiceId: string, paymentId: string, amount: Prisma.Decimal, note: string) {
     await tx.reconciliation.create({ data: { invoiceId, paymentReferenceId: paymentId, appliedAmount: amount, note } });
     const updated = await tx.invoice.update({ where: { id: invoiceId }, data: { paidAmount: { increment: amount } }, include });
@@ -325,7 +361,7 @@ export class InvoicesService {
     return updated;
   }
 
-  private async nextNumber(tx: Tx, prefix: 'INV' | 'CN') {
+  async nextNumber(tx: Tx, prefix: 'INV' | 'CN' | 'RCPT') {
     const key = `${prefix}-${new Date().getUTCFullYear()}`;
     const [row] = await tx.$queryRaw<{ last: number }[]>`
       INSERT INTO ${Prisma.raw(qualified('document_counters'))} (key, last) VALUES (${key}, 1)

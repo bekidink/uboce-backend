@@ -180,6 +180,42 @@ export class NotificationEventHandlers implements OnApplicationBootstrap, Before
         KybVerificationDecided: this.on('KybVerificationDecided', async (e) =>
           e.data.decision === 'submitted' ? [] : this.toMembers([e.data.subjectId], ['owner', 'admin'], 'verification_update', { kind: 'kyb', decision: e.data.decision }),
         ),
+        // ---- PRD v2.0 ----
+        InvoiceOverdue: this.on('InvoiceOverdue', async (e) =>
+          this.toMembers([e.data.buyerOrganizationId], [...BUYING_ROLES, 'finance_officer'], 'invoice_overdue', {
+            invoiceId: e.data.invoiceId,
+            invoiceNumber: e.data.invoiceNumber,
+            dueDate: formatDate(e.data.dueDate),
+            outstanding: e.data.outstanding,
+            currency: e.data.currency,
+            reminder: String(e.data.reminder),
+          }),
+        ),
+        PaymentAttemptUpdated: this.on('PaymentAttemptUpdated', async (e) =>
+          e.data.status === 'succeeded'
+            ? []
+            : this.toMembers([e.data.buyerOrganizationId], [...BUYING_ROLES, 'finance_officer'], 'payment_attempt', {
+                invoiceId: e.data.invoiceId,
+                invoiceNumber: e.data.invoiceNumber,
+                status: e.data.status,
+              }),
+        ),
+        ManualPaymentRecorded: this.on('ManualPaymentRecorded', async (e) =>
+          this.toMembers([e.data.buyerOrganizationId], [...BUYING_ROLES, 'finance_officer'], 'payment_received', {
+            invoiceId: e.data.invoiceId,
+            invoiceNumber: e.data.invoiceNumber,
+            amount: e.data.amount,
+            currency: e.data.currency,
+            receiptNumber: e.data.receiptNumber,
+          }),
+        ),
+        StockExpiring: this.on('StockExpiring', async (e) =>
+          this.toMembers([e.data.organizationId], ['owner', 'admin', 'warehouse_operator'], 'stock_expiring', {
+            batches: String(e.data.batches),
+            withinDays: String(e.data.withinDays),
+            earliestExpiresOn: e.data.earliestExpiresOn,
+          }),
+        ),
       },
     });
   }

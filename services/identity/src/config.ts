@@ -19,6 +19,8 @@ export const env = loadEnv(
     MFA_ENCRYPTION_KEY: z.string().min(40),
     /** Per IP, on each auth endpoint. Raise only for load tests. */
     AUTH_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).default(10),
+    /** SMS codes per phone number (and per account) per day (PRD v2 NTF-03). */
+    PHONE_CODES_PER_DAY: z.coerce.number().int().min(1).default(5),
     /** Web/mobile app base URL used in emailed links. */
     APP_BASE_URL: z.string().default('http://localhost:4200'),
   }),

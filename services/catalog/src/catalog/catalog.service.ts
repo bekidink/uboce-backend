@@ -89,6 +89,7 @@ const availabilityData = (dto: ProductAvailabilityDto) => {
 const variantExtras = (v: VariantDto | UpdateVariantDto) => ({
   barcode: v.barcode,
   packSize: v.packSize,
+  weightKg: v.weightKg,
   tracksBatches: v.tracksBatches,
   tracksExpiry: v.tracksExpiry,
   shelfLifeDays: v.shelfLifeDays,
@@ -120,6 +121,7 @@ export class CatalogService {
           description: dto.description?.trim() || null,
           categoryId: dto.categoryId,
           unitOfMeasure: dto.unitOfMeasure,
+          ...(dto.taxClass ? { taxClass: dto.taxClass } : {}),
           attributes: attributes(dto.attributes, definitionsOf(category)),
           ...availabilityData(dto),
           createdByUserId: userId,
@@ -173,6 +175,7 @@ export class CatalogService {
           description: dto.description === undefined ? undefined : dto.description.trim() || null,
           categoryId: dto.categoryId,
           unitOfMeasure: dto.unitOfMeasure,
+          ...(dto.taxClass ? { taxClass: dto.taxClass } : {}),
           attributes: dto.attributes ? attributes(dto.attributes, definitionsOf(category)) : undefined,
           ...availabilityData(dto),
         },

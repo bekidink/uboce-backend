@@ -30,6 +30,7 @@ export type ProductVariantAvgAggregateOutputType = {
   price: runtime.Decimal | null
   minOrderQuantity: runtime.Decimal | null
   packSize: runtime.Decimal | null
+  weightKg: runtime.Decimal | null
   shelfLifeDays: number | null
 }
 
@@ -37,6 +38,7 @@ export type ProductVariantSumAggregateOutputType = {
   price: runtime.Decimal | null
   minOrderQuantity: runtime.Decimal | null
   packSize: runtime.Decimal | null
+  weightKg: runtime.Decimal | null
   shelfLifeDays: number | null
 }
 
@@ -52,6 +54,7 @@ export type ProductVariantMinAggregateOutputType = {
   isActive: boolean | null
   barcode: string | null
   packSize: runtime.Decimal | null
+  weightKg: runtime.Decimal | null
   tracksBatches: boolean | null
   tracksExpiry: boolean | null
   shelfLifeDays: number | null
@@ -71,6 +74,7 @@ export type ProductVariantMaxAggregateOutputType = {
   isActive: boolean | null
   barcode: string | null
   packSize: runtime.Decimal | null
+  weightKg: runtime.Decimal | null
   tracksBatches: boolean | null
   tracksExpiry: boolean | null
   shelfLifeDays: number | null
@@ -91,6 +95,7 @@ export type ProductVariantCountAggregateOutputType = {
   isActive: number
   barcode: number
   packSize: number
+  weightKg: number
   tracksBatches: number
   tracksExpiry: number
   shelfLifeDays: number
@@ -104,6 +109,7 @@ export type ProductVariantAvgAggregateInputType = {
   price?: true
   minOrderQuantity?: true
   packSize?: true
+  weightKg?: true
   shelfLifeDays?: true
 }
 
@@ -111,6 +117,7 @@ export type ProductVariantSumAggregateInputType = {
   price?: true
   minOrderQuantity?: true
   packSize?: true
+  weightKg?: true
   shelfLifeDays?: true
 }
 
@@ -126,6 +133,7 @@ export type ProductVariantMinAggregateInputType = {
   isActive?: true
   barcode?: true
   packSize?: true
+  weightKg?: true
   tracksBatches?: true
   tracksExpiry?: true
   shelfLifeDays?: true
@@ -145,6 +153,7 @@ export type ProductVariantMaxAggregateInputType = {
   isActive?: true
   barcode?: true
   packSize?: true
+  weightKg?: true
   tracksBatches?: true
   tracksExpiry?: true
   shelfLifeDays?: true
@@ -165,6 +174,7 @@ export type ProductVariantCountAggregateInputType = {
   isActive?: true
   barcode?: true
   packSize?: true
+  weightKg?: true
   tracksBatches?: true
   tracksExpiry?: true
   shelfLifeDays?: true
@@ -272,6 +282,7 @@ export type ProductVariantGroupByOutputType = {
   isActive: boolean
   barcode: string | null
   packSize: runtime.Decimal | null
+  weightKg: runtime.Decimal | null
   tracksBatches: boolean
   tracksExpiry: boolean
   shelfLifeDays: number | null
@@ -315,6 +326,7 @@ export type ProductVariantWhereInput = {
   isActive?: Prisma.BoolFilter<"ProductVariant"> | boolean
   barcode?: Prisma.StringNullableFilter<"ProductVariant"> | string | null
   packSize?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFilter<"ProductVariant"> | boolean
   tracksExpiry?: Prisma.BoolFilter<"ProductVariant"> | boolean
   shelfLifeDays?: Prisma.IntNullableFilter<"ProductVariant"> | number | null
@@ -338,6 +350,7 @@ export type ProductVariantOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   barcode?: Prisma.SortOrderInput | Prisma.SortOrder
   packSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  weightKg?: Prisma.SortOrderInput | Prisma.SortOrder
   tracksBatches?: Prisma.SortOrder
   tracksExpiry?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -365,6 +378,7 @@ export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"ProductVariant"> | boolean
   barcode?: Prisma.StringNullableFilter<"ProductVariant"> | string | null
   packSize?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFilter<"ProductVariant"> | boolean
   tracksExpiry?: Prisma.BoolFilter<"ProductVariant"> | boolean
   shelfLifeDays?: Prisma.IntNullableFilter<"ProductVariant"> | number | null
@@ -388,6 +402,7 @@ export type ProductVariantOrderByWithAggregationInput = {
   isActive?: Prisma.SortOrder
   barcode?: Prisma.SortOrderInput | Prisma.SortOrder
   packSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  weightKg?: Prisma.SortOrderInput | Prisma.SortOrder
   tracksBatches?: Prisma.SortOrder
   tracksExpiry?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -416,6 +431,7 @@ export type ProductVariantScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"ProductVariant"> | boolean
   barcode?: Prisma.StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
   packSize?: Prisma.DecimalNullableWithAggregatesFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.DecimalNullableWithAggregatesFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolWithAggregatesFilter<"ProductVariant"> | boolean
   tracksExpiry?: Prisma.BoolWithAggregatesFilter<"ProductVariant"> | boolean
   shelfLifeDays?: Prisma.IntNullableWithAggregatesFilter<"ProductVariant"> | number | null
@@ -435,6 +451,7 @@ export type ProductVariantCreateInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -458,6 +475,7 @@ export type ProductVariantUncheckedCreateInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -479,6 +497,7 @@ export type ProductVariantUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -502,6 +521,7 @@ export type ProductVariantUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -524,6 +544,7 @@ export type ProductVariantCreateManyInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -543,6 +564,7 @@ export type ProductVariantUpdateManyMutationInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -563,6 +585,7 @@ export type ProductVariantUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -598,6 +621,7 @@ export type ProductVariantCountOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   barcode?: Prisma.SortOrder
   packSize?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   tracksBatches?: Prisma.SortOrder
   tracksExpiry?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
@@ -609,6 +633,7 @@ export type ProductVariantAvgOrderByAggregateInput = {
   price?: Prisma.SortOrder
   minOrderQuantity?: Prisma.SortOrder
   packSize?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
 }
 
@@ -624,6 +649,7 @@ export type ProductVariantMaxOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   barcode?: Prisma.SortOrder
   packSize?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   tracksBatches?: Prisma.SortOrder
   tracksExpiry?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
@@ -643,6 +669,7 @@ export type ProductVariantMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   barcode?: Prisma.SortOrder
   packSize?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   tracksBatches?: Prisma.SortOrder
   tracksExpiry?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
@@ -654,6 +681,7 @@ export type ProductVariantSumOrderByAggregateInput = {
   price?: Prisma.SortOrder
   minOrderQuantity?: Prisma.SortOrder
   packSize?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
 }
 
@@ -760,6 +788,7 @@ export type ProductVariantCreateWithoutProductInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -781,6 +810,7 @@ export type ProductVariantUncheckedCreateWithoutProductInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -832,6 +862,7 @@ export type ProductVariantScalarWhereInput = {
   isActive?: Prisma.BoolFilter<"ProductVariant"> | boolean
   barcode?: Prisma.StringNullableFilter<"ProductVariant"> | string | null
   packSize?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFilter<"ProductVariant"> | boolean
   tracksExpiry?: Prisma.BoolFilter<"ProductVariant"> | boolean
   shelfLifeDays?: Prisma.IntNullableFilter<"ProductVariant"> | number | null
@@ -851,6 +882,7 @@ export type ProductVariantCreateWithoutPriceTiersInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -873,6 +905,7 @@ export type ProductVariantUncheckedCreateWithoutPriceTiersInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -909,6 +942,7 @@ export type ProductVariantUpdateWithoutPriceTiersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -931,6 +965,7 @@ export type ProductVariantUncheckedUpdateWithoutPriceTiersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -951,6 +986,7 @@ export type ProductVariantCreateWithoutPriceListEntriesInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -973,6 +1009,7 @@ export type ProductVariantUncheckedCreateWithoutPriceListEntriesInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -1009,6 +1046,7 @@ export type ProductVariantUpdateWithoutPriceListEntriesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1031,6 +1069,7 @@ export type ProductVariantUncheckedUpdateWithoutPriceListEntriesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1051,6 +1090,7 @@ export type ProductVariantCreateManyProductInput = {
   isActive?: boolean
   barcode?: string | null
   packSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: number | null
@@ -1070,6 +1110,7 @@ export type ProductVariantUpdateWithoutProductInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1091,6 +1132,7 @@ export type ProductVariantUncheckedUpdateWithoutProductInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1112,6 +1154,7 @@ export type ProductVariantUncheckedUpdateManyWithoutProductInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   packSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tracksBatches?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tracksExpiry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1172,6 +1215,7 @@ export type ProductVariantSelect<ExtArgs extends runtime.Types.Extensions.Intern
   isActive?: boolean
   barcode?: boolean
   packSize?: boolean
+  weightKg?: boolean
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: boolean
@@ -1196,6 +1240,7 @@ export type ProductVariantSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   isActive?: boolean
   barcode?: boolean
   packSize?: boolean
+  weightKg?: boolean
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: boolean
@@ -1217,6 +1262,7 @@ export type ProductVariantSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   isActive?: boolean
   barcode?: boolean
   packSize?: boolean
+  weightKg?: boolean
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: boolean
@@ -1238,6 +1284,7 @@ export type ProductVariantSelectScalar = {
   isActive?: boolean
   barcode?: boolean
   packSize?: boolean
+  weightKg?: boolean
   tracksBatches?: boolean
   tracksExpiry?: boolean
   shelfLifeDays?: boolean
@@ -1245,7 +1292,7 @@ export type ProductVariantSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "organizationId" | "sku" | "name" | "price" | "currency" | "minOrderQuantity" | "attributes" | "isActive" | "barcode" | "packSize" | "tracksBatches" | "tracksExpiry" | "shelfLifeDays" | "createdAt" | "updatedAt", ExtArgs["result"]["productVariant"]>
+export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "organizationId" | "sku" | "name" | "price" | "currency" | "minOrderQuantity" | "attributes" | "isActive" | "barcode" | "packSize" | "weightKg" | "tracksBatches" | "tracksExpiry" | "shelfLifeDays" | "createdAt" | "updatedAt", ExtArgs["result"]["productVariant"]>
 export type ProductVariantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   priceTiers?: boolean | Prisma.ProductVariant$priceTiersArgs<ExtArgs>
@@ -1288,6 +1335,10 @@ export type $ProductVariantPayload<ExtArgs extends runtime.Types.Extensions.Inte
      * Units of the product's unit of measure in one pack, e.g. 50 (kg per bag).
      */
     packSize: runtime.Decimal | null
+    /**
+     * Shipping weight of one unit, for delivery fees (PRD v2 LOG-06).
+     */
+    weightKg: runtime.Decimal | null
     tracksBatches: boolean
     tracksExpiry: boolean
     shelfLifeDays: number | null
@@ -1731,6 +1782,7 @@ export interface ProductVariantFieldRefs {
   readonly isActive: Prisma.FieldRef<"ProductVariant", 'Boolean'>
   readonly barcode: Prisma.FieldRef<"ProductVariant", 'String'>
   readonly packSize: Prisma.FieldRef<"ProductVariant", 'Decimal'>
+  readonly weightKg: Prisma.FieldRef<"ProductVariant", 'Decimal'>
   readonly tracksBatches: Prisma.FieldRef<"ProductVariant", 'Boolean'>
   readonly tracksExpiry: Prisma.FieldRef<"ProductVariant", 'Boolean'>
   readonly shelfLifeDays: Prisma.FieldRef<"ProductVariant", 'Int'>

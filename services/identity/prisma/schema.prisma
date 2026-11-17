@@ -22,6 +22,8 @@ model User {
   /// Stored lowercased; unique across the platform.
   email        String     @unique
   phone        String?    @unique
+  /// Set once the user proves the number with an SMS code; only verified numbers sign in (PRD v2 ORG-01).
+  phoneVerifiedAt DateTime? @map("phone_verified_at") @db.Timestamptz(3)
   passwordHash String     @map("password_hash")
   displayName  String     @map("display_name")
   locale       String     @default("en")
@@ -37,6 +39,7 @@ model User {
   securityEvents     SecurityEvent[]
   recoveryCodes      RecoveryCode[]
   verificationTokens VerificationToken[]
+  phoneVerifications PhoneVerification[]
 
   @@map("users")
 }
@@ -126,4 +129,29 @@ model OutboxEvent {
 
   @@index([publishedAt, createdAt])
   @@map("outbox_events")
+}
+
+enum PhonePurpose {
+  verify
+  login
+}
+
+/// One SMS code: only its HMAC is stored. A newer code for the same number and purpose replaces it.
+model PhoneVerification {
+  id         String       @id @db.Uuid
+  phone      String
+  purpose    PhonePurpose
+  userId     String?      @map("user_id") @db.Uuid
+  codeHash   String       @map("code_hash")
+  attempts   Int          @default(0)
+  expiresAt  DateTime     @map("expires_at") @db.Timestamptz(3)
+  consumedAt DateTime?    @map("consumed_at") @db.Timestamptz(3)
+  ipAddress  String?      @map("ip_address")
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([phone, purpose, createdAt])
+  @@index([expiresAt])
+  @@map("phone_verifications")
 }

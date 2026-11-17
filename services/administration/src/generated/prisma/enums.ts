@@ -17,3 +17,14 @@ export const PlatformRole = {
 } as const
 
 export type PlatformRole = (typeof PlatformRole)[keyof typeof PlatformRole]
+
+
+export const JobRunStatus = {
+  running: 'running',
+  succeeded: 'succeeded',
+  failed: 'failed',
+  skipped: 'skipped',
+  abandoned: 'abandoned'
+} as const
+
+export type JobRunStatus = (typeof JobRunStatus)[keyof typeof JobRunStatus]

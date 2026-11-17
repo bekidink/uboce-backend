@@ -8,6 +8,8 @@ import {
   buildEvent,
   CatalogClient,
   conflict,
+  FinanceClient,
+  LogisticsClient,
   InternalCallError,
   locationScope,
   notFound,
@@ -23,11 +25,12 @@ import {
 } from '@uboce/common';
 import type { CatalogQuote, DomainEvent, EventCatalog, EventType, InternalOrder } from '@uboce/contracts';
 
-import { SERVICE_NAME } from '../config.js';
+import { env, SERVICE_NAME } from '../config.js';
 import { Prisma } from '../generated/prisma/client.js';
 import type { Order, OrderStatus } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
 import type { CreateDirectOrderDto, FulfillmentLocationDto, ListOrdersQueryDto } from './orders.dto.js';
+import { computeCharges, noCharges, type OrderCharges, orderTotal } from './charges.js';
 import { snapshotOf } from './policies.service.js';
 import { type AppliedPromotion, PromotionsService } from './promotions.service.js';
 import { assertTransition, canTransition, cancellationFeePct, InvalidTransitionError, type OrderParty, type PolicySnapshot } from './state-machine.js';
@@ -80,6 +83,12 @@ interface NewOrder {
   createdByUserId: string;
   lines: NewLine[];
   promotion?: AppliedPromotion | null;
+  /** Delivery fee and tax, calculated before the transaction (PRD v2 ORD-06). */
+  charges?: OrderCharges;
+  deliveryCity?: string | null;
+  deliveryRegion?: string | null;
+  buyerLegalName?: string | null;
+  sellerLegalName?: string | null;
 }
 
 /** Stable JSON (sorted keys) so equal requests hash equally regardless of key order. */
@@ -111,13 +120,21 @@ export class OrdersService {
     private readonly organizations: OrganizationsClient,
     private readonly catalog: CatalogClient,
     private readonly promotions: PromotionsService,
+    private readonly finance: FinanceClient,
+    private readonly logistics: LogisticsClient,
   ) {}
 
   /** Consumer side of QuotationAccepted. The unique sourceQuotationId makes a second order impossible. */
   async createFromQuotation(tx: Tx, event: DomainEvent<'QuotationAccepted'>) {
     const q = event.data;
     if (await tx.order.findUnique({ where: { sourceQuotationId: q.quotationId } })) return;
+    const lines = q.lines.map((l) => ({ ...l, priceSource: 'agreed' }));
+    const charges = await computeCharges(
+      { finance: this.finance, logistics: this.logistics },
+      { buyerOrganizationId: q.buyerOrganizationId, sellerOrganizationId: q.supplierOrganizationId, currency: q.currency, chargeDelivery: false, lines, discount: new Decimal(0) },
+    );
     await this.insert(tx, {
+      charges,
       buyerOrganizationId: q.buyerOrganizationId,
       supplierOrganizationId: q.supplierOrganizationId,
       source: 'quotation',
@@ -128,7 +145,7 @@ export class OrdersService {
       deliveryTerms: q.deliveryTerms,
       deliveryLocation: q.deliveryLocation,
       createdByUserId: q.acceptedByUserId,
-      lines: q.lines.map((l) => ({ ...l, priceSource: 'agreed' })),
+      lines,
     });
   }
 
@@ -161,7 +178,22 @@ export class OrdersService {
     const lines = await this.priceLines(dto, buyerId);
     const subtotal = lines.reduce((s, l) => s.plus(new Decimal(l.quantity).times(l.unitPrice)), new Decimal(0));
     const promotion = await this.promotions.best(this.prisma, dto.supplierOrganizationId, buyerId, dto.currency, subtotal, dto.couponCode);
-    requireApprovalLimit(org, subtotal.minus(promotion?.discount ?? 0).toString(), dto.currency, 'place orders');
+    // Delivery and tax are priced by the server from the seller's rate card and tax profile (PRD v2 ORD-06).
+    const charges = await computeCharges(
+      { finance: this.finance, logistics: this.logistics },
+      {
+        buyerOrganizationId: buyerId,
+        sellerOrganizationId: dto.supplierOrganizationId,
+        currency: dto.currency,
+        chargeDelivery: method === 'delivery',
+        city: dto.deliveryCity,
+        region: dto.deliveryRegion,
+        lines,
+        discount: promotion?.discount ?? new Decimal(0),
+      },
+    );
+    // The limit applies to what the buyer will actually pay, delivery and tax included.
+    requireApprovalLimit(org, (charges.calculated ? orderTotal(charges) : subtotal.minus(promotion?.discount ?? 0).plus(charges.deliveryFee)).toString(), dto.currency, 'place orders');
 
     try {
       const order = await this.prisma.$transaction((tx) =>
@@ -181,6 +213,11 @@ export class OrdersService {
           createdByUserId: userId,
           lines,
           promotion,
+          charges,
+          deliveryCity: dto.deliveryCity?.trim() || null,
+          deliveryRegion: dto.deliveryRegion?.trim() || null,
+          buyerLegalName: org.organization.name,
+          sellerLegalName: charges.sellerLegalName ?? supplier.name,
         }),
       );
       return { order, replayed: false };
@@ -360,7 +397,23 @@ export class OrdersService {
       fee = order.total.times(policy.noShowFeePct).dividedBy(100).toDecimalPlaces(2);
       feeKind = 'no_show_fee';
     }
+    const updated = await this.apply(order, side, userId, to, reason, fee, feeKind);
+    if (!updated) throw conflict('concurrent_change', 'The order changed; reload and try again');
+    return updated;
+  }
 
+  /** Conditional status update, history, fees and events; null when the order moved meanwhile. */
+  private async apply(
+    order: Order & { lines: { id: string; productId: string | null; quantity: Prisma.Decimal; unitOfMeasure: string }[] },
+    side: OrderParty | 'system',
+    userId: string | null,
+    to: OrderStatus,
+    reason: string | null,
+    fee: Prisma.Decimal | null,
+    feeKind: 'cancellation_fee' | 'no_show_fee' | null,
+  ) {
+    const orderId = order.id;
+    const policy = order.cancellationPolicy as PolicySnapshot | null;
     return this.prisma.$transaction(async (tx) => {
       const now = new Date();
       // Conditional on the status we checked, so concurrent changes can't both apply.
@@ -373,7 +426,7 @@ export class OrdersService {
           ...(fee ? { cancellationFee: fee } : {}),
         },
       });
-      if (count === 0) throw conflict('concurrent_change', 'The order changed; reload and try again');
+      if (count === 0) return null;
       await tx.orderStatusHistory.create({ data: { orderId, fromStatus: order.status, toStatus: to, changedByUserId: userId, reason } });
       if (to === 'fulfilled') {
         for (const l of order.lines) await tx.orderLine.update({ where: { id: l.id }, data: { fulfilledQuantity: l.quantity } });
@@ -414,6 +467,61 @@ export class OrdersService {
       }
       return tx.order.findUniqueOrThrow({ where: { id: orderId }, include: orderInclude });
     });
+  }
+
+  // ---- Timers (PRD v2 ORD-07, ORD-15), run by the scheduler ---------------------------
+
+  /** Orders the supplier never confirmed are cancelled; Inventory releases anything held. */
+  async expireUnconfirmed(now = new Date()) {
+    const cutoff = new Date(now.getTime() - env.ORDER_CONFIRM_HOURS * 3_600_000);
+    const due = await this.prisma.order.findMany({
+      where: { status: 'pending_confirmation', createdAt: { lt: cutoff } },
+      include: { lines: true },
+      orderBy: { createdAt: 'asc' },
+      take: 200,
+    });
+    let n = 0;
+    for (const order of due) if (await this.apply(order, 'system', null, 'cancelled', 'not confirmed in time', null, null)) n++;
+    return n;
+  }
+
+  /** Pickups past their hold time become no-shows, with the policy's no-show fee. */
+  async expireUncollected(now = new Date()) {
+    const due = await this.prisma.order.findMany({
+      where: { status: 'ready_for_pickup' },
+      include: { lines: true, history: { where: { toStatus: 'ready_for_pickup' }, orderBy: { createdAt: 'desc' }, take: 1 } },
+      orderBy: { updatedAt: 'asc' },
+      take: 500,
+    });
+    let n = 0;
+    for (const order of due) {
+      const policy = order.cancellationPolicy as PolicySnapshot | null;
+      const holdHours = policy?.pickupHoldHours ?? env.PICKUP_HOLD_HOURS;
+      const readyAt = order.history[0]?.createdAt ?? order.updatedAt;
+      if (now.getTime() < readyAt.getTime() + holdHours * 3_600_000) continue;
+      const pct = policy ? Number(policy.noShowFeePct) : 0;
+      const fee = pct > 0 ? order.total.times(pct).dividedBy(100).toDecimalPlaces(2) : null;
+      if (await this.apply(order, 'system', null, 'uncollected', 'not collected in time', fee, fee ? 'no_show_fee' : null)) n++;
+    }
+    return n;
+  }
+
+  /** Delivered orders close once the return window has passed and no return is open. */
+  async closeDelivered(now = new Date()) {
+    const due = await this.prisma.order.findMany({
+      where: { status: 'fulfilled', fulfilledAt: { lt: new Date(now.getTime() - env.ORDER_CLOSE_GRACE_HOURS * 3_600_000) } },
+      include: { lines: true, returns: { where: { status: { in: ['requested', 'approved'] } }, select: { id: true } } },
+      orderBy: { fulfilledAt: 'asc' },
+      take: 500,
+    });
+    let n = 0;
+    for (const order of due) {
+      const policy = order.cancellationPolicy as PolicySnapshot | null;
+      const windowEnds = order.fulfilledAt!.getTime() + (policy?.returnWindowDays ?? 0) * 86_400_000;
+      if (now.getTime() < windowEnds || order.returns.length > 0) continue;
+      if (await this.apply(order, 'system', null, 'closed', 'return window ended', null, null)) n++;
+    }
+    return n;
   }
 
   // ---- System-driven changes (events from Inventory and Logistics) -------------------
@@ -469,6 +577,12 @@ export class OrdersService {
       discountTotal: order.discountTotal.toString(),
       promotionCode: order.promotionCode,
       fulfillmentBranchId: order.fulfillmentBranchId,
+      deliveryFee: order.deliveryFee.toFixed(2),
+      deliveryTax: order.deliveryTax.toFixed(2),
+      deliveryTaxRatePct: order.deliveryTaxRatePct?.toFixed(2) ?? null,
+      taxTotal: order.taxTotal.toFixed(2),
+      taxInclusive: order.taxInclusive,
+      taxCalculated: order.taxCalculated,
       lines: order.lines.map((l) => ({
         id: l.id,
         lineNumber: l.lineNumber,
@@ -479,6 +593,11 @@ export class OrdersService {
         unitPrice: l.unitPrice.toString(),
         lineTotal: l.lineTotal.toString(),
         fulfilledQuantity: l.fulfilledQuantity.toString(),
+        discountAmount: l.discountAmount.toFixed(2),
+        netAmount: l.netAmount?.toFixed(2),
+        taxCode: l.taxCode,
+        taxRatePct: l.taxRatePct?.toFixed(2) ?? null,
+        taxAmount: l.taxAmount.toFixed(2),
       })),
     };
   }
@@ -521,7 +640,13 @@ export class OrdersService {
     const subtotal = lines.reduce((sum, l) => sum.plus(l.lineTotal), new Decimal(0));
     const discount = order.promotion?.discount ?? new Decimal(0);
     const policy = await tx.cancellationPolicy.findFirst({ where: { organizationId: order.supplierOrganizationId, active: true }, orderBy: { version: 'desc' } });
-    const { lines: _, promotion, ...header } = order;
+    const { lines: _, promotion, charges: given, ...header } = order;
+    const charges = given ?? noCharges(order.lines, discount);
+    const chargedLines = lines.map((l, i) => {
+      const c = charges.lines[i]!;
+      return { ...l, discountAmount: c.discountAmount, netAmount: c.netAmount, taxAmount: c.taxAmount, taxRatePct: c.taxRatePct, taxCode: c.taxCode };
+    });
+    const total = charges.calculated ? orderTotal(charges) : subtotal.minus(discount).plus(charges.deliveryFee);
 
     const created = await tx.order.create({
       data: {
@@ -529,11 +654,19 @@ export class OrdersService {
         number: await this.nextNumber(tx),
         subtotal,
         discountTotal: discount,
-        total: subtotal.minus(discount),
+        total,
+        deliveryFee: charges.deliveryFee,
+        deliveryTax: charges.deliveryTax,
+        deliveryTaxRatePct: charges.deliveryTaxRatePct,
+        deliveryQuote: (charges.deliveryQuote ?? undefined) as unknown as Prisma.InputJsonValue | undefined,
+        taxTotal: charges.taxTotal,
+        taxInclusive: charges.taxInclusive,
+        taxCalculated: charges.calculated,
+        taxBreakdown: (charges.taxBreakdown ?? undefined) as unknown as Prisma.InputJsonValue | undefined,
         promotionId: promotion?.promotion.id ?? null,
         promotionCode: promotion?.promotion.code ?? null,
         cancellationPolicy: policy ? (snapshotOf(policy) as unknown as Prisma.InputJsonValue) : undefined,
-        lines: { create: lines },
+        lines: { create: chargedLines },
         history: { create: { fromStatus: null, toStatus: 'pending_confirmation', changedByUserId: order.createdByUserId } },
         ...(order.fulfillmentBranchId
           ? { fulfillmentChanges: { create: { toBranchId: order.fulfillmentBranchId, changedByUserId: order.createdByUserId, reason: 'chosen at checkout' } } }

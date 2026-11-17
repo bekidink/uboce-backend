@@ -61,7 +61,14 @@ export const ModelName = {
   Settlement: 'Settlement',
   DocumentCounter: 'DocumentCounter',
   OutboxEvent: 'OutboxEvent',
-  ProcessedEvent: 'ProcessedEvent'
+  ProcessedEvent: 'ProcessedEvent',
+  CashSession: 'CashSession',
+  CashReceipt: 'CashReceipt',
+  BankStatementImport: 'BankStatementImport',
+  StatementLine: 'StatementLine',
+  TaxRule: 'TaxRule',
+  SellerTaxProfile: 'SellerTaxProfile',
+  TaxExemption: 'TaxExemption'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -100,6 +107,10 @@ export const InvoiceScalarFieldEnum = {
   issuedAt: 'issuedAt',
   voidedAt: 'voidedAt',
   voidReason: 'voidReason',
+  paymentCode: 'paymentCode',
+  overdueAt: 'overdueAt',
+  remindersSent: 'remindersSent',
+  lastReminderAt: 'lastReminderAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -134,6 +145,8 @@ export const PaymentReferenceScalarFieldEnum = {
   status: 'status',
   source: 'source',
   recordedByUserId: 'recordedByUserId',
+  proofDocumentId: 'proofDocumentId',
+  reviewNote: 'reviewNote',
   occurredAt: 'occurredAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -261,6 +274,133 @@ export const ProcessedEventScalarFieldEnum = {
 } as const
 
 export type ProcessedEventScalarFieldEnum = (typeof ProcessedEventScalarFieldEnum)[keyof typeof ProcessedEventScalarFieldEnum]
+
+
+export const CashSessionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  branchId: 'branchId',
+  currency: 'currency',
+  status: 'status',
+  openingFloat: 'openingFloat',
+  expectedAmount: 'expectedAmount',
+  countedAmount: 'countedAmount',
+  variance: 'variance',
+  note: 'note',
+  openedByUserId: 'openedByUserId',
+  closedByUserId: 'closedByUserId',
+  openedAt: 'openedAt',
+  closedAt: 'closedAt',
+  depositLineId: 'depositLineId'
+} as const
+
+export type CashSessionScalarFieldEnum = (typeof CashSessionScalarFieldEnum)[keyof typeof CashSessionScalarFieldEnum]
+
+
+export const CashReceiptScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  organizationId: 'organizationId',
+  invoiceId: 'invoiceId',
+  sessionId: 'sessionId',
+  paymentReferenceId: 'paymentReferenceId',
+  method: 'method',
+  amount: 'amount',
+  currency: 'currency',
+  externalReference: 'externalReference',
+  note: 'note',
+  idempotencyKey: 'idempotencyKey',
+  receivedByUserId: 'receivedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type CashReceiptScalarFieldEnum = (typeof CashReceiptScalarFieldEnum)[keyof typeof CashReceiptScalarFieldEnum]
+
+
+export const BankStatementImportScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  accountLabel: 'accountLabel',
+  fileName: 'fileName',
+  lineCount: 'lineCount',
+  duplicateCount: 'duplicateCount',
+  matchedCount: 'matchedCount',
+  importedByUserId: 'importedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type BankStatementImportScalarFieldEnum = (typeof BankStatementImportScalarFieldEnum)[keyof typeof BankStatementImportScalarFieldEnum]
+
+
+export const StatementLineScalarFieldEnum = {
+  id: 'id',
+  importId: 'importId',
+  organizationId: 'organizationId',
+  fingerprint: 'fingerprint',
+  bookedAt: 'bookedAt',
+  amount: 'amount',
+  currency: 'currency',
+  reference: 'reference',
+  counterparty: 'counterparty',
+  description: 'description',
+  status: 'status',
+  matchNote: 'matchNote',
+  invoiceId: 'invoiceId',
+  paymentReferenceId: 'paymentReferenceId',
+  matchedByUserId: 'matchedByUserId',
+  matchedAt: 'matchedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type StatementLineScalarFieldEnum = (typeof StatementLineScalarFieldEnum)[keyof typeof StatementLineScalarFieldEnum]
+
+
+export const TaxRuleScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  regime: 'regime',
+  taxClass: 'taxClass',
+  ratePct: 'ratePct',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type TaxRuleScalarFieldEnum = (typeof TaxRuleScalarFieldEnum)[keyof typeof TaxRuleScalarFieldEnum]
+
+
+export const SellerTaxProfileScalarFieldEnum = {
+  organizationId: 'organizationId',
+  regime: 'regime',
+  tin: 'tin',
+  vatNumber: 'vatNumber',
+  legalName: 'legalName',
+  pricesIncludeTax: 'pricesIncludeTax',
+  updatedByUserId: 'updatedByUserId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerTaxProfileScalarFieldEnum = (typeof SellerTaxProfileScalarFieldEnum)[keyof typeof SellerTaxProfileScalarFieldEnum]
+
+
+export const TaxExemptionScalarFieldEnum = {
+  id: 'id',
+  buyerOrganizationId: 'buyerOrganizationId',
+  certificateNumber: 'certificateNumber',
+  documentId: 'documentId',
+  validFrom: 'validFrom',
+  validTo: 'validTo',
+  status: 'status',
+  reviewNote: 'reviewNote',
+  submittedByUserId: 'submittedByUserId',
+  reviewedByUserId: 'reviewedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaxExemptionScalarFieldEnum = (typeof TaxExemptionScalarFieldEnum)[keyof typeof TaxExemptionScalarFieldEnum]
 
 
 export const SortOrder = {

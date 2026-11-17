@@ -42,9 +42,9 @@ export class PerformanceEvents extends EventConsumer<Tx> {
       PurchaseOrderConfirmed: this.once('PurchaseOrderConfirmed', (e, tx) =>
         this.fact(tx, e.data.supplierOrganizationId, 'order_confirmed', e.data.orderId, e.occurredAt, e.eventId).then(() => undefined),
       ),
-      // Only the supplier's own cancellations count against it.
+      // The supplier's own cancellations, and orders it never confirmed, count against it.
       PurchaseOrderCancelled: this.once('PurchaseOrderCancelled', async (e, tx) => {
-        if (e.data.party === 'supplier') await this.fact(tx, e.data.supplierOrganizationId, 'order_cancelled', e.data.orderId, e.occurredAt, e.eventId);
+        if (e.data.party === 'supplier' || e.data.party === 'system') await this.fact(tx, e.data.supplierOrganizationId, 'order_cancelled', e.data.orderId, e.occurredAt, e.eventId);
       }),
       DeliveryConfirmed: this.once('DeliveryConfirmed', (e, tx) =>
         this.fact(tx, e.data.shipperOrganizationId, e.data.complete ? 'delivery_complete' : 'delivery_partial', e.data.shipmentId, e.occurredAt, e.eventId).then(() => undefined),

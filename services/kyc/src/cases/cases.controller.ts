@@ -1,18 +1,15 @@
 import {
-  type BeforeApplicationShutdown,
   Body,
   Controller,
   Get,
   Injectable,
-  Logger,
-  type OnApplicationBootstrap,
   Param,
   ParseUUIDPipe,
   Post,
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-import { type AuthUser, type CaseStatus, CurrentUser, Internal, PaginationQueryDto, RequiresPlatformRole } from '@uboce/common';
+import { type AuthUser, type CaseStatus, CurrentUser, Internal, PaginationQueryDto, RequiresPlatformRole, JobRegistry } from '@uboce/common';
 import { IsIn, IsOptional, IsString, IsUUID, Length, Matches } from 'class-validator';
 
 import { CasesService, type SubjectContext } from './cases.service.js';
@@ -161,25 +158,10 @@ export class InternalKycController {
   }
 }
 
-/** Expires approvals past their validity, hourly. */
+/** Expires approvals past their validity; triggered by the scheduler (PRD v2 ORG-11, PLT-03). */
 @Injectable()
-export class ExpiryJob implements OnApplicationBootstrap, BeforeApplicationShutdown {
-  private readonly logger = new Logger(ExpiryJob.name);
-  private timer: NodeJS.Timeout | null = null;
-
-  constructor(private readonly cases: CasesService) {}
-
-  onApplicationBootstrap() {
-    const run = () =>
-      this.cases
-        .expireDue()
-        .then((n) => n > 0 && this.logger.log(`Expired ${n} verification(s)`))
-        .catch((error) => this.logger.error(`Expiry run failed: ${error}`));
-    void run();
-    this.timer = setInterval(run, 60 * 60 * 1000);
-  }
-
-  beforeApplicationShutdown() {
-    if (this.timer) clearInterval(this.timer);
+export class ExpiryJob {
+  constructor(jobs: JobRegistry, cases: CasesService) {
+    jobs.register('verification.expire', () => cases.expireDue());
   }
 }

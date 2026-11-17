@@ -20,8 +20,20 @@ export type DeliveryAttemptModel = runtime.Types.Result.DefaultSelection<Prisma.
 
 export type AggregateDeliveryAttempt = {
   _count: DeliveryAttemptCountAggregateOutputType | null
+  _avg: DeliveryAttemptAvgAggregateOutputType | null
+  _sum: DeliveryAttemptSumAggregateOutputType | null
   _min: DeliveryAttemptMinAggregateOutputType | null
   _max: DeliveryAttemptMaxAggregateOutputType | null
+}
+
+export type DeliveryAttemptAvgAggregateOutputType = {
+  segments: number | null
+  cost: runtime.Decimal | null
+}
+
+export type DeliveryAttemptSumAggregateOutputType = {
+  segments: number | null
+  cost: runtime.Decimal | null
 }
 
 export type DeliveryAttemptMinAggregateOutputType = {
@@ -30,6 +42,11 @@ export type DeliveryAttemptMinAggregateOutputType = {
   provider: string | null
   success: boolean | null
   error: string | null
+  providerMessageId: string | null
+  segments: number | null
+  cost: runtime.Decimal | null
+  receiptStatus: string | null
+  receiptAt: Date | null
   createdAt: Date | null
 }
 
@@ -39,6 +56,11 @@ export type DeliveryAttemptMaxAggregateOutputType = {
   provider: string | null
   success: boolean | null
   error: string | null
+  providerMessageId: string | null
+  segments: number | null
+  cost: runtime.Decimal | null
+  receiptStatus: string | null
+  receiptAt: Date | null
   createdAt: Date | null
 }
 
@@ -48,10 +70,25 @@ export type DeliveryAttemptCountAggregateOutputType = {
   provider: number
   success: number
   error: number
+  providerMessageId: number
+  segments: number
+  cost: number
+  receiptStatus: number
+  receiptAt: number
   createdAt: number
   _all: number
 }
 
+
+export type DeliveryAttemptAvgAggregateInputType = {
+  segments?: true
+  cost?: true
+}
+
+export type DeliveryAttemptSumAggregateInputType = {
+  segments?: true
+  cost?: true
+}
 
 export type DeliveryAttemptMinAggregateInputType = {
   id?: true
@@ -59,6 +96,11 @@ export type DeliveryAttemptMinAggregateInputType = {
   provider?: true
   success?: true
   error?: true
+  providerMessageId?: true
+  segments?: true
+  cost?: true
+  receiptStatus?: true
+  receiptAt?: true
   createdAt?: true
 }
 
@@ -68,6 +110,11 @@ export type DeliveryAttemptMaxAggregateInputType = {
   provider?: true
   success?: true
   error?: true
+  providerMessageId?: true
+  segments?: true
+  cost?: true
+  receiptStatus?: true
+  receiptAt?: true
   createdAt?: true
 }
 
@@ -77,6 +124,11 @@ export type DeliveryAttemptCountAggregateInputType = {
   provider?: true
   success?: true
   error?: true
+  providerMessageId?: true
+  segments?: true
+  cost?: true
+  receiptStatus?: true
+  receiptAt?: true
   createdAt?: true
   _all?: true
 }
@@ -119,6 +171,18 @@ export type DeliveryAttemptAggregateArgs<ExtArgs extends runtime.Types.Extension
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: DeliveryAttemptAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: DeliveryAttemptSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: DeliveryAttemptMinAggregateInputType
@@ -149,6 +213,8 @@ export type DeliveryAttemptGroupByArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   _count?: DeliveryAttemptCountAggregateInputType | true
+  _avg?: DeliveryAttemptAvgAggregateInputType
+  _sum?: DeliveryAttemptSumAggregateInputType
   _min?: DeliveryAttemptMinAggregateInputType
   _max?: DeliveryAttemptMaxAggregateInputType
 }
@@ -159,8 +225,15 @@ export type DeliveryAttemptGroupByOutputType = {
   provider: string
   success: boolean
   error: string | null
+  providerMessageId: string | null
+  segments: number | null
+  cost: runtime.Decimal | null
+  receiptStatus: string | null
+  receiptAt: Date | null
   createdAt: Date
   _count: DeliveryAttemptCountAggregateOutputType | null
+  _avg: DeliveryAttemptAvgAggregateOutputType | null
+  _sum: DeliveryAttemptSumAggregateOutputType | null
   _min: DeliveryAttemptMinAggregateOutputType | null
   _max: DeliveryAttemptMaxAggregateOutputType | null
 }
@@ -189,6 +262,11 @@ export type DeliveryAttemptWhereInput = {
   provider?: Prisma.StringFilter<"DeliveryAttempt"> | string
   success?: Prisma.BoolFilter<"DeliveryAttempt"> | boolean
   error?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  providerMessageId?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  segments?: Prisma.IntNullableFilter<"DeliveryAttempt"> | number | null
+  cost?: Prisma.DecimalNullableFilter<"DeliveryAttempt"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  receiptAt?: Prisma.DateTimeNullableFilter<"DeliveryAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"DeliveryAttempt"> | Date | string
   notification?: Prisma.XOR<Prisma.NotificationScalarRelationFilter, Prisma.NotificationWhereInput>
 }
@@ -199,12 +277,18 @@ export type DeliveryAttemptOrderByWithRelationInput = {
   provider?: Prisma.SortOrder
   success?: Prisma.SortOrder
   error?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  segments?: Prisma.SortOrderInput | Prisma.SortOrder
+  cost?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   notification?: Prisma.NotificationOrderByWithRelationInput
 }
 
 export type DeliveryAttemptWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  provider_providerMessageId?: Prisma.DeliveryAttemptProviderProviderMessageIdCompoundUniqueInput
   AND?: Prisma.DeliveryAttemptWhereInput | Prisma.DeliveryAttemptWhereInput[]
   OR?: Prisma.DeliveryAttemptWhereInput[]
   NOT?: Prisma.DeliveryAttemptWhereInput | Prisma.DeliveryAttemptWhereInput[]
@@ -212,9 +296,14 @@ export type DeliveryAttemptWhereUniqueInput = Prisma.AtLeast<{
   provider?: Prisma.StringFilter<"DeliveryAttempt"> | string
   success?: Prisma.BoolFilter<"DeliveryAttempt"> | boolean
   error?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  providerMessageId?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  segments?: Prisma.IntNullableFilter<"DeliveryAttempt"> | number | null
+  cost?: Prisma.DecimalNullableFilter<"DeliveryAttempt"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  receiptAt?: Prisma.DateTimeNullableFilter<"DeliveryAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"DeliveryAttempt"> | Date | string
   notification?: Prisma.XOR<Prisma.NotificationScalarRelationFilter, Prisma.NotificationWhereInput>
-}, "id">
+}, "id" | "provider_providerMessageId">
 
 export type DeliveryAttemptOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -222,10 +311,17 @@ export type DeliveryAttemptOrderByWithAggregationInput = {
   provider?: Prisma.SortOrder
   success?: Prisma.SortOrder
   error?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  segments?: Prisma.SortOrderInput | Prisma.SortOrder
+  cost?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.DeliveryAttemptCountOrderByAggregateInput
+  _avg?: Prisma.DeliveryAttemptAvgOrderByAggregateInput
   _max?: Prisma.DeliveryAttemptMaxOrderByAggregateInput
   _min?: Prisma.DeliveryAttemptMinOrderByAggregateInput
+  _sum?: Prisma.DeliveryAttemptSumOrderByAggregateInput
 }
 
 export type DeliveryAttemptScalarWhereWithAggregatesInput = {
@@ -237,6 +333,11 @@ export type DeliveryAttemptScalarWhereWithAggregatesInput = {
   provider?: Prisma.StringWithAggregatesFilter<"DeliveryAttempt"> | string
   success?: Prisma.BoolWithAggregatesFilter<"DeliveryAttempt"> | boolean
   error?: Prisma.StringNullableWithAggregatesFilter<"DeliveryAttempt"> | string | null
+  providerMessageId?: Prisma.StringNullableWithAggregatesFilter<"DeliveryAttempt"> | string | null
+  segments?: Prisma.IntNullableWithAggregatesFilter<"DeliveryAttempt"> | number | null
+  cost?: Prisma.DecimalNullableWithAggregatesFilter<"DeliveryAttempt"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.StringNullableWithAggregatesFilter<"DeliveryAttempt"> | string | null
+  receiptAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DeliveryAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DeliveryAttempt"> | Date | string
 }
 
@@ -245,6 +346,11 @@ export type DeliveryAttemptCreateInput = {
   provider: string
   success: boolean
   error?: string | null
+  providerMessageId?: string | null
+  segments?: number | null
+  cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: string | null
+  receiptAt?: Date | string | null
   createdAt?: Date | string
   notification: Prisma.NotificationCreateNestedOneWithoutAttemptsInput
 }
@@ -255,6 +361,11 @@ export type DeliveryAttemptUncheckedCreateInput = {
   provider: string
   success: boolean
   error?: string | null
+  providerMessageId?: string | null
+  segments?: number | null
+  cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: string | null
+  receiptAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -263,6 +374,11 @@ export type DeliveryAttemptUpdateInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   success?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  segments?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notification?: Prisma.NotificationUpdateOneRequiredWithoutAttemptsNestedInput
 }
@@ -273,6 +389,11 @@ export type DeliveryAttemptUncheckedUpdateInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   success?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  segments?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -282,6 +403,11 @@ export type DeliveryAttemptCreateManyInput = {
   provider: string
   success: boolean
   error?: string | null
+  providerMessageId?: string | null
+  segments?: number | null
+  cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: string | null
+  receiptAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -290,6 +416,11 @@ export type DeliveryAttemptUpdateManyMutationInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   success?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  segments?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -299,6 +430,11 @@ export type DeliveryAttemptUncheckedUpdateManyInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   success?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  segments?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -312,13 +448,28 @@ export type DeliveryAttemptOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type DeliveryAttemptProviderProviderMessageIdCompoundUniqueInput = {
+  provider: string
+  providerMessageId: string
+}
+
 export type DeliveryAttemptCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   notificationId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   success?: Prisma.SortOrder
   error?: Prisma.SortOrder
+  providerMessageId?: Prisma.SortOrder
+  segments?: Prisma.SortOrder
+  cost?: Prisma.SortOrder
+  receiptStatus?: Prisma.SortOrder
+  receiptAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type DeliveryAttemptAvgOrderByAggregateInput = {
+  segments?: Prisma.SortOrder
+  cost?: Prisma.SortOrder
 }
 
 export type DeliveryAttemptMaxOrderByAggregateInput = {
@@ -327,6 +478,11 @@ export type DeliveryAttemptMaxOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   success?: Prisma.SortOrder
   error?: Prisma.SortOrder
+  providerMessageId?: Prisma.SortOrder
+  segments?: Prisma.SortOrder
+  cost?: Prisma.SortOrder
+  receiptStatus?: Prisma.SortOrder
+  receiptAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -336,7 +492,17 @@ export type DeliveryAttemptMinOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   success?: Prisma.SortOrder
   error?: Prisma.SortOrder
+  providerMessageId?: Prisma.SortOrder
+  segments?: Prisma.SortOrder
+  cost?: Prisma.SortOrder
+  receiptStatus?: Prisma.SortOrder
+  receiptAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type DeliveryAttemptSumOrderByAggregateInput = {
+  segments?: Prisma.SortOrder
+  cost?: Prisma.SortOrder
 }
 
 export type DeliveryAttemptCreateNestedManyWithoutNotificationInput = {
@@ -381,11 +547,32 @@ export type DeliveryAttemptUncheckedUpdateManyWithoutNotificationNestedInput = {
   deleteMany?: Prisma.DeliveryAttemptScalarWhereInput | Prisma.DeliveryAttemptScalarWhereInput[]
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
 export type DeliveryAttemptCreateWithoutNotificationInput = {
   id?: string
   provider: string
   success: boolean
   error?: string | null
+  providerMessageId?: string | null
+  segments?: number | null
+  cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: string | null
+  receiptAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -394,6 +581,11 @@ export type DeliveryAttemptUncheckedCreateWithoutNotificationInput = {
   provider: string
   success: boolean
   error?: string | null
+  providerMessageId?: string | null
+  segments?: number | null
+  cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: string | null
+  receiptAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -432,6 +624,11 @@ export type DeliveryAttemptScalarWhereInput = {
   provider?: Prisma.StringFilter<"DeliveryAttempt"> | string
   success?: Prisma.BoolFilter<"DeliveryAttempt"> | boolean
   error?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  providerMessageId?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  segments?: Prisma.IntNullableFilter<"DeliveryAttempt"> | number | null
+  cost?: Prisma.DecimalNullableFilter<"DeliveryAttempt"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.StringNullableFilter<"DeliveryAttempt"> | string | null
+  receiptAt?: Prisma.DateTimeNullableFilter<"DeliveryAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"DeliveryAttempt"> | Date | string
 }
 
@@ -440,6 +637,11 @@ export type DeliveryAttemptCreateManyNotificationInput = {
   provider: string
   success: boolean
   error?: string | null
+  providerMessageId?: string | null
+  segments?: number | null
+  cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: string | null
+  receiptAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -448,6 +650,11 @@ export type DeliveryAttemptUpdateWithoutNotificationInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   success?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  segments?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -456,6 +663,11 @@ export type DeliveryAttemptUncheckedUpdateWithoutNotificationInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   success?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  segments?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -464,6 +676,11 @@ export type DeliveryAttemptUncheckedUpdateManyWithoutNotificationInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   success?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  segments?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receiptStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -475,6 +692,11 @@ export type DeliveryAttemptSelect<ExtArgs extends runtime.Types.Extensions.Inter
   provider?: boolean
   success?: boolean
   error?: boolean
+  providerMessageId?: boolean
+  segments?: boolean
+  cost?: boolean
+  receiptStatus?: boolean
+  receiptAt?: boolean
   createdAt?: boolean
   notification?: boolean | Prisma.NotificationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryAttempt"]>
@@ -485,6 +707,11 @@ export type DeliveryAttemptSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   provider?: boolean
   success?: boolean
   error?: boolean
+  providerMessageId?: boolean
+  segments?: boolean
+  cost?: boolean
+  receiptStatus?: boolean
+  receiptAt?: boolean
   createdAt?: boolean
   notification?: boolean | Prisma.NotificationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryAttempt"]>
@@ -495,6 +722,11 @@ export type DeliveryAttemptSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   provider?: boolean
   success?: boolean
   error?: boolean
+  providerMessageId?: boolean
+  segments?: boolean
+  cost?: boolean
+  receiptStatus?: boolean
+  receiptAt?: boolean
   createdAt?: boolean
   notification?: boolean | Prisma.NotificationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryAttempt"]>
@@ -505,10 +737,15 @@ export type DeliveryAttemptSelectScalar = {
   provider?: boolean
   success?: boolean
   error?: boolean
+  providerMessageId?: boolean
+  segments?: boolean
+  cost?: boolean
+  receiptStatus?: boolean
+  receiptAt?: boolean
   createdAt?: boolean
 }
 
-export type DeliveryAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "notificationId" | "provider" | "success" | "error" | "createdAt", ExtArgs["result"]["deliveryAttempt"]>
+export type DeliveryAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "notificationId" | "provider" | "success" | "error" | "providerMessageId" | "segments" | "cost" | "receiptStatus" | "receiptAt" | "createdAt", ExtArgs["result"]["deliveryAttempt"]>
 export type DeliveryAttemptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   notification?: boolean | Prisma.NotificationDefaultArgs<ExtArgs>
 }
@@ -533,6 +770,14 @@ export type $DeliveryAttemptPayload<ExtArgs extends runtime.Types.Extensions.Int
      * Safe diagnostic only — never provider payloads with personal data.
      */
     error: string | null
+    /**
+     * SMS: the gateway's ID, parts billed, estimated cost and the delivery receipt (PRD v2 NTF-02).
+     */
+    providerMessageId: string | null
+    segments: number | null
+    cost: runtime.Decimal | null
+    receiptStatus: string | null
+    receiptAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["deliveryAttempt"]>
   composites: {}
@@ -963,6 +1208,11 @@ export interface DeliveryAttemptFieldRefs {
   readonly provider: Prisma.FieldRef<"DeliveryAttempt", 'String'>
   readonly success: Prisma.FieldRef<"DeliveryAttempt", 'Boolean'>
   readonly error: Prisma.FieldRef<"DeliveryAttempt", 'String'>
+  readonly providerMessageId: Prisma.FieldRef<"DeliveryAttempt", 'String'>
+  readonly segments: Prisma.FieldRef<"DeliveryAttempt", 'Int'>
+  readonly cost: Prisma.FieldRef<"DeliveryAttempt", 'Decimal'>
+  readonly receiptStatus: Prisma.FieldRef<"DeliveryAttempt", 'String'>
+  readonly receiptAt: Prisma.FieldRef<"DeliveryAttempt", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"DeliveryAttempt", 'DateTime'>
 }
     

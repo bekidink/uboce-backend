@@ -82,3 +82,8 @@ export type OutboxEvent = Prisma.OutboxEventModel
  * Inbox for idempotent event consumption.
  */
 export type ProcessedEvent = Prisma.ProcessedEventModel
+/**
+ * Model RateCard
+ * A seller's delivery prices (PRD v2 LOG-06). Never edited: a change is a new version, and orders keep theirs.
+ */
+export type RateCard = Prisma.RateCardModel

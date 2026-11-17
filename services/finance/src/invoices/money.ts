@@ -12,10 +12,20 @@ export interface LineInput {
   unitPrice: string;
   /** Percent, e.g. "15" for 15% VAT. Supplied per line; nothing is assumed per country. */
   taxRatePct: string;
+  /**
+   * Amounts already calculated elsewhere (an order's tax engine result, PRD v2 FIN-09);
+   * used as given so the invoice matches the order to the cent.
+   */
+  fixed?: { subtotal: string; tax: string };
 }
 
 export function priceLines(lines: LineInput[]) {
   const priced = lines.map((l) => {
+    if (l.fixed) {
+      const subtotal = new Decimal(l.fixed.subtotal);
+      const tax = new Decimal(l.fixed.tax);
+      return { ...l, subtotal, tax, total: subtotal.plus(tax) };
+    }
     const subtotal = new Decimal(l.quantity).times(l.unitPrice).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
     const tax = subtotal.times(l.taxRatePct).dividedBy(100).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
     return { ...l, subtotal, tax, total: subtotal.plus(tax) };

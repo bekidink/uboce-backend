@@ -59,3 +59,29 @@ export const SettlementStatus = {
 } as const
 
 export type SettlementStatus = (typeof SettlementStatus)[keyof typeof SettlementStatus]
+
+
+export const CashSessionStatus = {
+  open: 'open',
+  closed: 'closed'
+} as const
+
+export type CashSessionStatus = (typeof CashSessionStatus)[keyof typeof CashSessionStatus]
+
+
+export const StatementLineStatus = {
+  unmatched: 'unmatched',
+  matched: 'matched',
+  ignored: 'ignored'
+} as const
+
+export type StatementLineStatus = (typeof StatementLineStatus)[keyof typeof StatementLineStatus]
+
+
+export const ExemptionStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected'
+} as const
+
+export type ExemptionStatus = (typeof ExemptionStatus)[keyof typeof ExemptionStatus]

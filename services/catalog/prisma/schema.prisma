@@ -62,6 +62,8 @@ model Product {
   description     String?
   categoryId      String        @map("category_id") @db.Uuid
   unitOfMeasure   UnitOfMeasure @map("unit_of_measure")
+  /// standard, zero_rated, exempt or service — decides the tax rule (PRD v2 FIN-09).
+  taxClass        String        @default("standard") @map("tax_class")
   /// Category specification values, e.g. { "origin": "Yirgacheffe", "grade": "1" }.
   attributes      Json          @default("{}")
   status          ProductStatus @default(draft)
@@ -104,6 +106,8 @@ model ProductVariant {
   barcode          String?
   /// Units of the product's unit of measure in one pack, e.g. 50 (kg per bag).
   packSize         Decimal? @map("pack_size") @db.Decimal(18, 4)
+  /// Shipping weight of one unit, for delivery fees (PRD v2 LOG-06).
+  weightKg         Decimal? @map("weight_kg") @db.Decimal(12, 3)
   tracksBatches    Boolean  @default(false) @map("tracks_batches")
   tracksExpiry     Boolean  @default(false) @map("tracks_expiry")
   shelfLifeDays    Int?     @map("shelf_life_days")
